@@ -73,7 +73,8 @@
         }
 
         /* Bahan leaderboard beside the pass/fail card. */
-        .dash-split { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:20px; align-items:start; }
+        /* align-items:stretch so Bahan and the pass/fail card are the same height. */
+        .dash-split { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:20px; align-items:stretch; }
         @media (max-width: 900px) {
             .dash-split { grid-template-columns:1fr; }
         }
