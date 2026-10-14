@@ -88,14 +88,11 @@
         @endforeach
     </div>
 
-    <div class="dash-grid">
-        <div class="dash-col">
-            {{-- Content performance: the three leaderboards a teacher opens this page for -
-                 most-watched video, most-favourited video, most-attempted quiz - as one tabbed
-                 card. (Materials downloads live in the side column.) --}}
-            @php($perfTabs = [$lists[0], $lists[1], $lists[3]])
-            <div class="tp-card" style="overflow:hidden"
-                 x-data="{ tab: 0, hrefs: @js([route('cikgu.video.index'), route('cikgu.video.index'), route('cikgu.kuiz.index')]) }">
+    {{-- Content performance: most-watched video, most-favourited video, most-attempted quiz -
+         one tabbed card, full width like the summary strip above. --}}
+    @php($perfTabs = [$lists[0], $lists[1], $lists[3]])
+    <div class="tp-card" style="overflow:hidden;margin-top:20px"
+         x-data="{ tab: 0, hrefs: @js([route('cikgu.video.index'), route('cikgu.video.index'), route('cikgu.kuiz.index')]) }">
                 <div class="dash-perf-head">
                     <span class="dash-perf-ico"><x-icon name="chart" style="width:26px;height:26px" /></span>
                     <div class="dash-perf-titles">
@@ -139,8 +136,15 @@
                         @endforelse
                     </div>
                 @endforeach
-            </div>
+    </div>
 
+    {{-- Materials downloads: full width, directly below the performance card. --}}
+    <div style="margin-top:20px">
+        @include('cikgu.partials.dashboard-list', ['list' => $lists[2]])
+    </div>
+
+    <div class="dash-grid" style="margin-top:20px">
+        <div class="dash-col">
             {{-- Recent videos --}}
             <div class="tp-card" style="overflow:hidden">
                 <div style="display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--tp-line)">
@@ -204,8 +208,6 @@
 
         {{-- Side column --}}
         <div class="dash-col">
-            @include('cikgu.partials.dashboard-list', ['list' => $lists[2]])
-
             {{-- Pass/fail across every completed attempt on this teacher's quizzes. --}}
             <div class="tp-card" style="padding:22px">
                 <h2 class="tp-g" style="font-size:16px;font-weight:800;color:var(--tp-ink);margin-bottom:14px">{{ __('Lulus / Gagal Kuiz') }}</h2>
