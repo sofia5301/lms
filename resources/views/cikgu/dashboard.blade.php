@@ -181,4 +181,56 @@
         </div>
     </div>
 
+    {{-- Top 10 students on THIS teacher's own quizzes (a compact slice of the Ranking page). --}}
+    <div class="tp-card" style="overflow:hidden;margin-top:20px">
+        <div style="display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--tp-line)">
+            <span style="width:34px;height:34px;border-radius:10px;background:#FEF0CE;color:#E0A21C;display:grid;place-items:center;flex-shrink:0"><x-icon name="trophy" class="h-[18px] w-[18px]" /></span>
+            <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0">
+                <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('10 Murid Teratas') }}</h2>
+                <span style="font-size:12.5px;color:var(--tp-muted)">{{ __('Markah tertinggi pada kuiz yang anda buat.') }}</span>
+            </div>
+            <a href="{{ route('cikgu.ranking') }}" class="tp-g" style="font-size:13px;font-weight:800;white-space:nowrap">{{ __('Lihat semua') }}</a>
+        </div>
+
+        @if ($topStudents->isEmpty())
+            <div style="padding:34px 22px;text-align:center;color:var(--tp-muted);font-size:14px;font-weight:600">{{ __('Belum ada murid menjawab kuiz anda lagi.') }}</div>
+        @else
+            @php($palette = [['#DCF2EE','#0F7A68'],['#E4EEF9','#2E6CA8'],['#FBE4ED','#B84A75'],['#FEF0CE','#8A6A12'],['#FDE7E0','#C24936']])
+            @php($rankCols = '56px minmax(0,2fr) 1fr 1fr 1fr 1fr 1fr')
+            <div style="overflow-x:auto">
+                <div style="min-width:820px">
+                    <div style="display:grid;grid-template-columns:{{ $rankCols }};gap:12px;align-items:center;padding:14px 22px">
+                        <span class="tp-g" style="font-size:12px;font-weight:800;color:var(--tp-muted)">#</span>
+                        <span class="tp-g" style="font-size:12px;font-weight:800;color:var(--tp-muted)">{{ __('Murid') }}</span>
+                        <span class="tp-g" style="font-size:12px;font-weight:800;color:var(--tp-muted);text-align:center">{{ __('Tahun') }}</span>
+                        <span class="tp-g" style="font-size:12px;font-weight:800;color:var(--tp-muted);text-align:center">{{ __('Mata') }}</span>
+                        <span class="tp-g" style="font-size:12px;font-weight:800;color:var(--tp-muted);text-align:center">{{ __('Betul') }}</span>
+                        <span class="tp-g" style="font-size:12px;font-weight:800;color:var(--tp-muted);text-align:center">{{ __('Ketepatan') }}</span>
+                        <span class="tp-g" style="font-size:12px;font-weight:800;color:var(--tp-muted);text-align:center">{{ __('Kuiz') }}</span>
+                    </div>
+
+                    @foreach ($topStudents as $row)
+                        @php($p = $palette[$loop->index % count($palette)])
+                        @php($accBg = $row->accuracy >= 70 ? '#DCF2EE' : ($row->accuracy >= 50 ? '#FEF0CE' : '#FDE7E0'))
+                        @php($accFg = $row->accuracy >= 70 ? '#0F7A68' : ($row->accuracy >= 50 ? '#8A6A12' : '#C24936'))
+                        <div style="display:grid;grid-template-columns:{{ $rankCols }};gap:12px;align-items:center;padding:12px 22px;border-top:1px solid var(--tp-line)">
+                            <span style="font-size:15px;font-weight:800;color:var(--tp-muted)">
+                                @if ($row->rank <= 3)<img src="{{ asset('images/medal'.$row->rank.'.png') }}" alt="{{ $row->rank }}" style="width:26px;height:26px;object-fit:contain;display:inline-block;vertical-align:middle">@else {{ $row->rank }} @endif
+                            </span>
+                            <div style="display:flex;align-items:center;gap:12px;min-width:0">
+                                <span style="width:36px;height:36px;border-radius:10px;background:{{ $p[0] }};color:{{ $p[1] }};display:grid;place-items:center;font-family:'Geist',sans-serif;font-weight:800;font-size:12px;flex-shrink:0">{{ $row->student->initials() }}</span>
+                                <span class="tp-g" style="font-weight:800;font-size:14.5px;color:var(--tp-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $row->student->name }}</span>
+                            </div>
+                            <span style="font-size:13.5px;font-weight:700;color:var(--tp-muted-2);text-align:center">{{ $row->student->grade?->displayName() ?? '-' }}</span>
+                            <span class="tp-g" style="font-weight:800;font-size:15px;color:var(--tp-ink);text-align:center">{{ $row->points }}</span>
+                            <span style="font-size:13.5px;font-weight:700;color:var(--tp-muted-2);text-align:center">{{ $row->correct }}/{{ $row->questions }}</span>
+                            <span style="justify-self:center;background:{{ $accBg }};color:{{ $accFg }};border-radius:999px;padding:4px 12px;font-family:'Geist',sans-serif;font-size:12px;font-weight:800">{{ $row->accuracy }}%</span>
+                            <span style="font-size:13.5px;font-weight:700;color:var(--tp-muted-2);text-align:center">{{ $row->quizzes }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </div>
+
 </x-cikgu-layout>

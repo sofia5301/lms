@@ -7,13 +7,14 @@ use App\Models\Favourite;
 use App\Models\LessonView;
 use App\Models\QuizAttempt;
 use App\Models\User;
+use App\Services\LeaderboardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request, LeaderboardService $leaderboard): View
     {
         $teacher = $request->user();
 
@@ -143,6 +144,9 @@ class DashboardController extends Controller
             'passFail' => $passFail,
             'passFailConfig' => $passFailConfig,
             'lists' => $lists,
+            // Top 10 students on this teacher's OWN quizzes (same board as the full Ranking page,
+            // scoped by teacherId, just the first 10).
+            'topStudents' => $leaderboard->ranking(teacherId: $teacher->id, limit: 10),
             'totalStudents' => User::where('role', User::ROLE_STUDENT)->count(),
             'recentLessons' => $recentLessons,
             'recentQuizzes' => $recentQuizzes,
