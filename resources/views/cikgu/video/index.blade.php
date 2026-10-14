@@ -30,14 +30,7 @@
         <span style="font-size:12.5px;font-weight:700;color:var(--tp-muted)">{{ __('Jumlah tontonan: :count', ['count' => number_format($viewCount)]) }}</span>
     </div>
 
-    <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.video.index')">
-        <div class="tp-newbtn-wrap" style="margin-left:auto">
-            <a href="{{ route('cikgu.video.create') }}" class="tp-btn">
-                <x-icon name="plus" class="h-4 w-4" />
-                {{ __('Video Baru') }}
-            </a>
-        </div>
-    </x-year-subject-filter>
+    <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.video.index')" />
 
     {{-- Clicking a video opens a preview here instead of navigating to the watch page - the same
          look the admin content page uses. A look, not a lesson: no view is counted. --}}
