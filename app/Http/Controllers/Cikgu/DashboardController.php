@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Cikgu;
 
 use App\Http\Controllers\Controller;
 use App\Models\Favourite;
+use App\Models\Grade;
 use App\Models\LessonView;
+use App\Models\Quiz;
 use App\Models\QuizAttempt;
+use App\Models\Subject;
 use App\Models\User;
 use App\Services\LeaderboardService;
 use Illuminate\Http\Request;
@@ -138,15 +141,41 @@ class DashboardController extends Controller
                 'items' => $topQuizzes->map(fn ($q) => $mapItem($q, $q->completed_attempts_count))],
         ];
 
+        // Top-10 board filters (Tahun / Subjek / Kuiz), all scoped to this teacher's own quizzes.
+        $filterGrade = $request->filled('tahun') ? Grade::where('level', $request->integer('tahun'))->first() : null;
+        $filterSubject = $request->filled('subjek') ? Subject::where('slug', $request->string('subjek'))->first() : null;
+        $filterQuiz = $request->filled('kuiz') ? Quiz::where('teacher_id', $teacher->id)->find($request->integer('kuiz')) : null;
+
+        // Quiz options cascade from the chosen Tahun/Subjek, and only ever list the teacher's own.
+        $filterQuizzes = Quiz::query()
+            ->where('teacher_id', $teacher->id)
+            ->where('type', Quiz::TYPE_INTERACTIVE)
+            ->when($filterGrade, fn ($q) => $q->whereHas('chapter', fn ($c) => $c->where('grade_id', $filterGrade->id)))
+            ->when($filterSubject, fn ($q) => $q->whereHas('chapter', fn ($c) => $c->where('subject_id', $filterSubject->id)))
+            ->orderBy('title')
+            ->get();
+
         return view('cikgu.dashboard', [
             'stats' => $stats,
             'summary' => $summary,
             'passFail' => $passFail,
             'passFailConfig' => $passFailConfig,
             'lists' => $lists,
-            // Top 10 students on this teacher's OWN quizzes (same board as the full Ranking page,
-            // scoped by teacherId, just the first 10).
-            'topStudents' => $leaderboard->ranking(teacherId: $teacher->id, limit: 10),
+            // Top 10 students on this teacher's OWN quizzes (same board as the full Ranking page),
+            // honouring the Tahun / Subjek / Kuiz filters below the card.
+            'topStudents' => $leaderboard->ranking(
+                gradeId: $filterGrade?->id,
+                subjectId: $filterSubject?->id,
+                quizId: $filterQuiz?->id,
+                teacherId: $teacher->id,
+                limit: 10,
+            ),
+            'filterGrades' => Grade::orderBy('level')->get(),
+            'filterSubjects' => Subject::orderBy('sort_order')->get(),
+            'filterQuizzes' => $filterQuizzes,
+            'filterGrade' => $filterGrade,
+            'filterSubject' => $filterSubject,
+            'filterQuiz' => $filterQuiz,
             'totalStudents' => User::where('role', User::ROLE_STUDENT)->count(),
             'recentLessons' => $recentLessons,
             'recentQuizzes' => $recentQuizzes,

@@ -181,8 +181,9 @@
         </div>
     </div>
 
-    {{-- Top 10 students on THIS teacher's own quizzes (a compact slice of the Ranking page). --}}
-    <div class="tp-card" style="overflow:hidden;margin-top:20px">
+    {{-- Top 10 students on THIS teacher's own quizzes (a compact slice of the Ranking page).
+         No overflow:hidden here so the filter dropdowns below are never clipped. --}}
+    <div id="top10board" class="tp-card" style="margin-top:20px;scroll-margin-top:20px">
         <div style="display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--tp-line)">
             <span style="width:34px;height:34px;border-radius:10px;background:#FEF0CE;color:#E0A21C;display:grid;place-items:center;flex-shrink:0"><x-icon name="trophy" class="h-[18px] w-[18px]" /></span>
             <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0">
@@ -191,6 +192,48 @@
             </div>
             <a href="{{ route('cikgu.ranking') }}" class="tp-g" style="font-size:13px;font-weight:800;white-space:nowrap">{{ __('Lihat semua') }}</a>
         </div>
+
+        {{-- Filters - only the teacher's own quizzes populate the Kuiz list. Submitting reloads the
+             dashboard with the filter in the query string and jumps back to this board. --}}
+        <form method="GET" action="{{ route('cikgu.dashboard') }}#top10board" class="tp-toolbar" style="padding:16px 22px;border-bottom:1px solid var(--tp-line)">
+            <div class="tp-field">
+                <label for="tahun" class="tp-label">{{ __('Tahun') }}</label>
+                <select id="tahun" name="tahun" class="tp-filter-select" style="min-width:130px" onchange="this.form.submit()">
+                    <option value="">{{ __('Semua tahun') }}</option>
+                    @foreach ($filterGrades as $option)
+                        <option value="{{ $option->level }}" @selected($filterGrade?->id === $option->id)>{{ $option->displayName() }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="tp-field">
+                <label for="subjek" class="tp-label">{{ __('Subjek') }}</label>
+                <select id="subjek" name="subjek" class="tp-filter-select" style="min-width:200px" onchange="this.form.submit()">
+                    <option value="">{{ __('Semua subjek') }}</option>
+                    @foreach ($filterSubjects->groupBy('category') as $category => $group)
+                        <optgroup label="{{ \App\Models\Subject::categoryLabel($category) }}">
+                            @foreach ($group as $option)
+                                <option value="{{ $option->slug }}" @selected($filterSubject?->id === $option->id)>{{ $option->displayName() }}</option>
+                            @endforeach
+                        </optgroup>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="tp-field">
+                <label for="kuiz" class="tp-label">{{ __('Kuiz') }}</label>
+                <select id="kuiz" name="kuiz" class="tp-filter-select" style="min-width:180px" onchange="this.form.submit()">
+                    <option value="">{{ __('Semua kuiz') }}</option>
+                    @foreach ($filterQuizzes as $option)
+                        <option value="{{ $option->id }}" @selected($filterQuiz?->id === $option->id)>{{ $option->title }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            @if (request()->hasAny(['tahun', 'subjek', 'kuiz']))
+                <a href="{{ route('cikgu.dashboard') }}#top10board" style="min-height:46px;display:inline-flex;align-items:center;font-family:'Geist',sans-serif;font-weight:800;font-size:13.5px;color:#C24936">{{ __('Kosongkan') }}</a>
+            @endif
+        </form>
 
         @if ($topStudents->isEmpty())
             <div style="padding:34px 22px;text-align:center;color:var(--tp-muted);font-size:14px;font-weight:600">{{ __('Belum ada murid menjawab kuiz anda lagi.') }}</div>
