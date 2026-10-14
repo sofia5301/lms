@@ -4,9 +4,14 @@
     were identical markup repeated in a loop before.
 --}}
 <div class="tp-card" style="overflow:hidden">
-    <div style="padding:18px 22px;border-bottom:1px solid var(--tp-line);display:flex;flex-direction:column;gap:2px">
-        <h2 class="tp-g" style="font-size:16px;font-weight:800;color:var(--tp-ink)">{{ $list['title'] }}</h2>
-        <span style="font-size:12.5px;color:var(--tp-muted)">{{ $list['sub'] }}</span>
+    <div style="padding:18px 22px;border-bottom:1px solid var(--tp-line);display:flex;align-items:center;gap:12px">
+        @isset($list['icon'])
+            <span style="width:34px;height:34px;border-radius:10px;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;flex-shrink:0"><x-icon :name="$list['icon']" class="h-[18px] w-[18px]" /></span>
+        @endisset
+        <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <h2 class="tp-g" style="font-size:16px;font-weight:800;color:var(--tp-ink)">{{ $list['title'] }}</h2>
+            <span style="font-size:12.5px;color:var(--tp-muted)">{{ $list['sub'] }}</span>
+        </div>
     </div>
 
     @forelse ($list['items'] as $i => $item)

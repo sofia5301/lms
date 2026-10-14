@@ -134,6 +134,7 @@ class DashboardController extends Controller
                 'empty' => __('Video yang digemari murid akan dipaparkan di sini.'),
                 'items' => $topFavourites->map(fn ($l) => $mapItem($l, $l->fav_total))],
             ['title' => __('Bahan Paling Dimuat Turun'), 'sub' => __('Muat turun pada bahan anda'),
+                'icon' => 'download',
                 'empty' => __('Bahan yang dimuat turun murid akan dipaparkan di sini.'),
                 'items' => $topMaterials->map(fn ($m) => $mapItem($m, $m->download_count))],
             ['title' => __('Kuiz Paling Dicuba'), 'sub' => __('Percubaan murid pada kuiz anda'),

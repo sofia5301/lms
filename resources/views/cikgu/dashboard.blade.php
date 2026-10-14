@@ -151,7 +151,10 @@
 
         {{-- Pass/fail: pie chart, a legend list, and the total underneath. --}}
         <div class="tp-card" style="padding:22px">
-            <h2 class="tp-g" style="font-size:16px;font-weight:800;color:var(--tp-ink);margin-bottom:14px">{{ __('Lulus / Gagal Kuiz') }}</h2>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                <span style="width:34px;height:34px;border-radius:10px;background:#EAF2FB;color:#2E6CA8;display:grid;place-items:center;flex-shrink:0"><x-icon name="chart" class="h-[18px] w-[18px]" /></span>
+                <h2 class="tp-g" style="font-size:16px;font-weight:800;color:var(--tp-ink)">{{ __('Lulus / Gagal Kuiz') }}</h2>
+            </div>
 
             @if ($passFail['total'] === 0)
                 <p style="text-align:center;color:var(--tp-muted);padding:24px 0;font-weight:700">{{ __('Belum ada percubaan kuiz selesai lagi.') }}</p>
