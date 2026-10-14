@@ -43,6 +43,34 @@
             .tp-metasep { display:none; }
             .tp-metasub { display:block; margin-top:3px; }
         }
+
+        /* "Prestasi Kandungan": one card holding three tabbed leaderboards. */
+        .dash-perf-head { display:flex; align-items:flex-start; gap:14px; padding:20px 22px 0; }
+        .dash-perf-ico { color:#17907B; flex-shrink:0; margin-top:2px; }
+        .dash-perf-titles { display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+        .dash-perf-titles h2 { margin:0; font-family:'Geist',sans-serif; font-size:19px; font-weight:800; color:var(--tp-ink); }
+        .dash-perf-titles .sub { font-size:12.5px; color:var(--tp-muted); }
+        .dash-perf-all { display:inline-flex; align-items:center; gap:6px; flex-shrink:0; font-family:'Geist',sans-serif; font-size:13px; font-weight:800; color:#17907B; text-decoration:none; white-space:nowrap; }
+        .dash-perf-tabs { display:flex; gap:10px; flex-wrap:wrap; padding:16px 22px; }
+        .dash-tab { min-height:44px; cursor:pointer; border-radius:999px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; padding:0 22px; border:1.5px solid var(--tp-line-2); background:var(--tp-surface); color:var(--tp-ink); transition:all .15s; }
+        .dash-tab:hover { border-color:var(--tp-teal); color:var(--tp-teal); }
+        .dash-tab:focus-visible { outline:2px solid var(--tp-teal); outline-offset:2px; }
+        .dash-tab.is-on { background:var(--tp-teal); border-color:var(--tp-teal); color:#fff; }
+        .dash-perf-row { display:flex; align-items:center; gap:14px; padding:13px 22px; border-top:1px solid var(--tp-line); }
+        .dash-perf-row .rank { width:28px; flex-shrink:0; text-align:center; font-family:'Geist',sans-serif; font-weight:800; font-size:12px; color:var(--tp-muted); }
+        .dash-perf-row .rank img { width:28px; height:28px; object-fit:contain; display:block; margin:0 auto; }
+        .dash-perf-row .subjico { width:36px; height:36px; border-radius:10px; display:grid; place-items:center; flex-shrink:0; }
+        .dash-perf-row .rmid { display:flex; align-items:center; gap:8px 10px; flex-wrap:wrap; min-width:0; flex:1; }
+        .dash-perf-row .rtitle { font-family:'Geist',sans-serif; font-weight:800; font-size:14px; color:var(--tp-ink); }
+        .dash-perf-row .rpill { border-radius:999px; padding:2px 10px; font-family:'Geist',sans-serif; font-weight:800; font-size:11px; }
+        .dash-perf-row .rbab { font-size:12.5px; color:var(--tp-muted); }
+        .dash-perf-row .rvalue { margin-left:auto; flex-shrink:0; padding-left:10px; font-family:'Geist',sans-serif; font-weight:800; font-size:14.5px; color:var(--tp-ink); }
+        @media (max-width: 640px) {
+            .dash-perf-head { padding:16px 16px 0; }
+            .dash-perf-tabs { padding:14px 16px; gap:8px; }
+            .dash-tab { padding:0 16px; font-size:12.5px; }
+            .dash-perf-row { padding:12px 16px; gap:11px; }
+        }
     </style>
 
     {{-- Engagement summary: one strip of totals (views, favourites, downloads, quiz attempts). --}}
@@ -62,17 +90,56 @@
 
     <div class="dash-grid">
         <div class="dash-col">
-            {{-- Content leaderboards: which of a teacher's own videos, materials and quizzes are
-                 actually being used is the thing they open this page to find out. --}}
-            <div class="dash-pair">
-                @foreach ($lists as $index => $list)
-                    @if ($index < 2)
-                        @include('cikgu.partials.dashboard-list', ['list' => $list])
-                    @endif
+            {{-- Content performance: the three leaderboards a teacher opens this page for -
+                 most-watched video, most-favourited video, most-attempted quiz - as one tabbed
+                 card. (Materials downloads live in the side column.) --}}
+            @php($perfTabs = [$lists[0], $lists[1], $lists[3]])
+            <div class="tp-card" style="overflow:hidden"
+                 x-data="{ tab: 0, hrefs: @js([route('cikgu.video.index'), route('cikgu.video.index'), route('cikgu.kuiz.index')]) }">
+                <div class="dash-perf-head">
+                    <span class="dash-perf-ico"><x-icon name="chart" style="width:26px;height:26px" /></span>
+                    <div class="dash-perf-titles">
+                        <h2>{{ __('Prestasi Kandungan') }}</h2>
+                        <span class="sub">{{ __('Tontonan, tanda suka dan percubaan kuiz oleh murid anda.') }}</span>
+                    </div>
+                    <a :href="hrefs[tab]" class="dash-perf-all">{{ __('Lihat semua') }} <x-icon name="arrow-right" class="h-4 w-4" /></a>
+                </div>
+
+                <div class="dash-perf-tabs" role="tablist">
+                    @foreach ($perfTabs as $ti => $t)
+                        <button type="button" role="tab" class="dash-tab" :class="{ 'is-on': tab === {{ $ti }} }"
+                                :aria-selected="tab === {{ $ti }} ? 'true' : 'false'" @click="tab = {{ $ti }}">{{ $t['title'] }}</button>
+                    @endforeach
+                </div>
+
+                @foreach ($perfTabs as $ti => $t)
+                    <div x-show="tab === {{ $ti }}" x-cloak role="tabpanel">
+                        @forelse ($t['items'] as $i => $item)
+                            <div class="dash-perf-row">
+                                <span class="rank">
+                                    @if ($i < 3)
+                                        <img src="{{ asset('images/medal'.($i + 1).'.png') }}" alt="{{ $i + 1 }}">
+                                    @else
+                                        {{ $i + 1 }}
+                                    @endif
+                                </span>
+                                <span class="subjico" style="background:rgb({{ $item['subject']->rgb }} / .14)"><x-icon :name="$item['subject']->iconName()" class="h-[18px] w-[18px]" style="color:rgb({{ $item['subject']->rgb }})" /></span>
+                                <div class="rmid">
+                                    <span class="rtitle">{{ $item['title'] }}</span>
+                                    <span class="rpill" style="background:color-mix(in oklab, {{ $item['subject']->color ?: '#17907B' }} var(--pill-bw), var(--pill-bb));color:color-mix(in oklab, {{ $item['subject']->color ?: '#17907B' }} var(--pill-fw), var(--pill-fb))">{{ $item['subject']->name }}</span>
+                                    <span class="rbab">{{ $item['detail'] }}</span>
+                                </div>
+                                <span class="rvalue">{{ $item['value'] }}</span>
+                            </div>
+                        @empty
+                            <div style="padding:26px 22px;text-align:center;display:flex;flex-direction:column;gap:4px">
+                                <span style="font-size:13.5px;color:var(--tp-muted)">{{ __('Belum ada data.') }}</span>
+                                <span style="font-size:12.5px;color:var(--tp-muted)">{{ $t['empty'] ?? '' }}</span>
+                            </div>
+                        @endforelse
+                    </div>
                 @endforeach
             </div>
-
-            @include('cikgu.partials.dashboard-list', ['list' => $lists[2]])
 
             {{-- Recent videos --}}
             <div class="tp-card" style="overflow:hidden">
@@ -137,7 +204,7 @@
 
         {{-- Side column --}}
         <div class="dash-col">
-            @include('cikgu.partials.dashboard-list', ['list' => $lists[3]])
+            @include('cikgu.partials.dashboard-list', ['list' => $lists[2]])
 
             {{-- Pass/fail across every completed attempt on this teacher's quizzes. --}}
             <div class="tp-card" style="padding:22px">
