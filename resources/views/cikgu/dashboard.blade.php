@@ -10,20 +10,30 @@
         /* The work on the left, the read-only panels on the right. */
         .dash-grid { display:grid; grid-template-columns:minmax(0,2.1fr) minmax(0,1fr); gap:20px; align-items:start; }
         .dash-col  { display:flex; flex-direction:column; gap:20px; min-width:0; }
-        .dash-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
+        /* Engagement summary: one unified strip - round pastel icon + label-over-number, thin dividers. */
+        .dash-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); background:var(--tp-surface); border:1px solid var(--tp-line); border-radius:16px; box-shadow:var(--tp-shadow); overflow:hidden; }
+        .dash-stat { display:flex; align-items:center; gap:14px; padding:20px 22px; min-width:0; }
+        .dash-stat + .dash-stat { border-left:1px solid var(--tp-line); }
+        .dash-stat-ico { width:46px; height:46px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; }
+        .dash-stat-text { display:flex; flex-direction:column; gap:2px; min-width:0; }
+        .dash-stat-label { font-size:12.5px; font-weight:700; color:var(--tp-muted); line-height:1.25; }
+        .dash-stat-value { font-family:'Geist',sans-serif; font-size:26px; font-weight:800; color:var(--tp-ink); line-height:1; }
         .dash-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; align-items:start; }
         @media (max-width: 1180px) {
             .dash-grid { grid-template-columns:1fr; }
         }
         @media (max-width: 900px) {
-            .dash-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:1fr; gap:12px; margin-top:12px !important; }
             .dash-pair { grid-template-columns:1fr; }
-            /* Tidier, more compact KPI cards on phones. */
-            .tp-stat { padding:14px 16px; gap:5px; }
-            .tp-stat-ico { width:34px; height:34px; border-radius:10px; }
-            .tp-stat-ico svg { width:16px; height:16px; }
-            .tp-stat-label { font-size:12px; }
-            .tp-stat-value { font-size:23px; }
+            /* Phones: the strip folds to a 2x2 grid with a cross divider, same look otherwise. */
+            .dash-strip { grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:12px !important; }
+            .dash-stat { padding:16px 14px; gap:11px; }
+            .dash-stat + .dash-stat { border-left:none; }
+            .dash-stat:nth-child(even) { border-left:1px solid var(--tp-line); }
+            .dash-stat:nth-child(n+3) { border-top:1px solid var(--tp-line); }
+            .dash-stat-ico { width:40px; height:40px; }
+            .dash-stat-ico svg { width:17px; height:17px; }
+            .dash-stat-label { font-size:11.5px; }
+            .dash-stat-value { font-size:22px; }
             /* Recent-videos rows: views/date/badge drop to their own line so nothing overlaps. */
             .tp-vidrow { flex-wrap:wrap; row-gap:10px; padding:14px 16px; }
             /* Indent the meta row so it lines up with the title/subject (past the 64px thumb + 16px gap). */
@@ -35,25 +45,17 @@
         }
     </style>
 
-    {{-- Engagement summary. The "this week" line only appears where something actually records a
-         date - materials keep a running count and nothing more, so that card shows the total alone
-         rather than a figure nobody could stand behind. --}}
-    <div class="dash-kpis" style="margin-top:26px">
+    {{-- Engagement summary: one strip of totals (views, favourites, downloads, quiz attempts). --}}
+    <div class="dash-strip" style="margin-top:26px">
         @foreach ($summary as $s)
-            <div class="tp-stat">
-                <div style="display:flex;align-items:center;gap:10px">
-                    <span class="tp-stat-ico" style="background:{{ $s['tint'] }};color:{{ $s['ink'] }}">
-                        <x-icon :name="$s['icon']" class="h-[18px] w-[18px]" />
-                    </span>
-                    <span class="tp-stat-label">{{ $s['label'] }}</span>
+            <div class="dash-stat">
+                <span class="dash-stat-ico" style="background:{{ $s['tint'] }};color:{{ $s['ink'] }}">
+                    <x-icon :name="$s['icon']" class="h-5 w-5" />
+                </span>
+                <div class="dash-stat-text">
+                    <span class="dash-stat-label">{{ $s['label'] }}</span>
+                    <span class="dash-stat-value">{{ $s['value'] }}</span>
                 </div>
-                <span class="tp-stat-value">{{ $s['value'] }}</span>
-                @if ($s['trend'])
-                    <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#0F7A68">
-                        <x-icon name="arrow-right" class="h-3 w-3" style="transform:rotate(-45deg)" />
-                        {{ __(':count minggu ini', ['count' => number_format($s['trend']['count'])]) }}
-                    </span>
-                @endif
             </div>
         @endforeach
     </div>
