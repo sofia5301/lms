@@ -71,6 +71,26 @@
             .dash-tab { padding:0 16px; font-size:12.5px; }
             .dash-perf-row { padding:12px 16px; gap:11px; }
         }
+
+        /* Bahan leaderboard beside the pass/fail donut. */
+        .dash-split { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:20px; align-items:start; }
+        .pf-head { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+        .pf-ico { color:#17907B; display:grid; place-items:center; flex-shrink:0; }
+        .pf-head h2 { margin:0; font-family:'Geist',sans-serif; font-size:16px; font-weight:800; color:var(--tp-ink); }
+        .pf-body { display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap; }
+        .pf-donut { width:176px; height:176px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; }
+        .pf-donut-center { width:118px; height:118px; border-radius:50%; background:var(--tp-surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; }
+        .pf-donut-num { font-family:'Geist',sans-serif; font-size:28px; font-weight:800; color:var(--tp-ink); line-height:1; }
+        .pf-donut-sub { font-size:11.5px; color:var(--tp-muted); text-align:center; max-width:92px; line-height:1.2; }
+        .pf-legend { display:flex; flex-direction:column; gap:16px; flex:1; min-width:160px; }
+        .pf-leg-row { display:flex; align-items:center; gap:10px; }
+        .pf-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
+        .pf-leg-label { font-family:'Geist',sans-serif; font-weight:800; font-size:15px; color:var(--tp-ink); }
+        .pf-leg-val { margin-left:auto; font-family:'Geist',sans-serif; font-weight:800; font-size:16px; }
+        .pf-pct { color:var(--tp-muted); font-weight:700; font-size:14px; }
+        @media (max-width: 900px) {
+            .dash-split { grid-template-columns:1fr; }
+        }
     </style>
 
     {{-- Engagement summary: one strip of totals (views, favourites, downloads, quiz attempts). --}}
@@ -138,15 +158,46 @@
                 @endforeach
     </div>
 
-    {{-- Materials downloads: full width, directly below the performance card. --}}
-    <div style="margin-top:20px">
+    {{-- Materials downloads (left) beside the pass/fail donut (right). --}}
+    @php($passPct = (int) round($passFail['passed'] / max(1, $passFail['total']) * 100))
+    <div class="dash-split" style="margin-top:20px">
         @include('cikgu.partials.dashboard-list', ['list' => $lists[2]])
+
+        {{-- Pass/fail: a donut with the total in the hole and a side legend. --}}
+        <div class="tp-card" style="padding:22px">
+            <div class="pf-head">
+                <span class="pf-ico"><x-icon name="chart" style="width:24px;height:24px" /></span>
+                <h2>{{ __('Lulus / Gagal Kuiz') }}</h2>
+            </div>
+            @if ($passFail['total'] === 0)
+                <p style="text-align:center;color:var(--tp-muted);padding:24px 0;font-weight:700">{{ __('Belum ada percubaan kuiz selesai lagi.') }}</p>
+            @else
+                <div class="pf-body">
+                    <div class="pf-donut" style="background:conic-gradient(#0F7A68 0 {{ $passPct }}%, #C24936 {{ $passPct }}% 100%)">
+                        <div class="pf-donut-center">
+                            <span class="pf-donut-num">{{ number_format($passFail['total']) }}</span>
+                            <span class="pf-donut-sub">{{ __('percubaan selesai') }}</span>
+                        </div>
+                    </div>
+                    <div class="pf-legend">
+                        <div class="pf-leg-row">
+                            <span class="pf-dot" style="background:#0F7A68"></span>
+                            <span class="pf-leg-label">{{ __('Lulus') }}</span>
+                            <span class="pf-leg-val" style="color:#0F7A68">{{ number_format($passFail['passed']) }} <span class="pf-pct">({{ $passPct }}%)</span></span>
+                        </div>
+                        <div class="pf-leg-row">
+                            <span class="pf-dot" style="background:#C24936"></span>
+                            <span class="pf-leg-label">{{ __('Gagal') }}</span>
+                            <span class="pf-leg-val" style="color:#C24936">{{ number_format($passFail['failed']) }} <span class="pf-pct">({{ 100 - $passPct }}%)</span></span>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
 
-    <div class="dash-grid" style="margin-top:20px">
-        <div class="dash-col">
-            {{-- Recent videos --}}
-            <div class="tp-card" style="overflow:hidden">
+    {{-- Recent videos --}}
+    <div class="tp-card" style="overflow:hidden;margin-top:20px">
                 <div style="display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--tp-line)">
                     <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink);flex:1">{{ __('Video Terbaru Saya') }}</h2>
                     <a href="{{ route('cikgu.video.index') }}" class="tp-g" style="font-size:13px;font-weight:800">{{ __('Lihat semua') }}</a>
@@ -176,8 +227,8 @@
                 @endforelse
             </div>
 
-            {{-- Recent quizzes --}}
-            <div class="tp-card" style="overflow:hidden">
+    {{-- Recent quizzes --}}
+    <div class="tp-card" style="overflow:hidden;margin-top:20px">
                 <div style="display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--tp-line)">
                     <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink);flex:1">{{ __('Kuiz Saya') }}</h2>
                     <a href="{{ route('cikgu.kuiz.index') }}" class="tp-g" style="font-size:13px;font-weight:800">{{ __('Lihat semua') }}</a>
@@ -204,61 +255,5 @@
                     <div style="padding:28px 22px;text-align:center;color:var(--tp-muted);font-size:14px">{{ __('Belum ada kuiz. Cipta kuiz pertama anda.') }}</div>
                 @endforelse
             </div>
-        </div>
-
-        {{-- Side column --}}
-        <div class="dash-col">
-            {{-- Pass/fail across every completed attempt on this teacher's quizzes. --}}
-            <div class="tp-card" style="padding:22px">
-                <h2 class="tp-g" style="font-size:16px;font-weight:800;color:var(--tp-ink);margin-bottom:14px">{{ __('Lulus / Gagal Kuiz') }}</h2>
-
-                @if ($passFail['total'] === 0)
-                    <p style="text-align:center;color:var(--tp-muted);padding:24px 0;font-weight:700">{{ __('Belum ada percubaan kuiz selesai lagi.') }}</p>
-                @else
-                    <div style="display:flex;flex-direction:column;gap:16px">
-                        <x-chart :config="$passFailConfig" :height="200" :title="__('Lulus lawan gagal')" :table="false"
-                            :rows="[['label' => __('Lulus'), 'value' => $passFail['passed']], ['label' => __('Gagal'), 'value' => $passFail['failed']]]" />
-
-                        <div style="display:flex;flex-direction:column;gap:12px">
-                            <div style="display:flex;align-items:center;gap:10px">
-                                <span style="width:12px;height:12px;border-radius:4px;background:#0F7A68;flex-shrink:0"></span>
-                                <span class="tp-g" style="font-weight:800;font-size:14px;color:var(--tp-ink)">{{ __('Lulus') }}</span>
-                                <span class="tp-g" style="margin-left:auto;font-weight:800;font-size:14px;color:#0F7A68">{{ number_format($passFail['passed']) }} <span style="color:var(--tp-muted);font-weight:700">({{ round($passFail['passed'] / max(1, $passFail['total']) * 100) }}%)</span></span>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:10px">
-                                <span style="width:12px;height:12px;border-radius:4px;background:#C24936;flex-shrink:0"></span>
-                                <span class="tp-g" style="font-weight:800;font-size:14px;color:var(--tp-ink)">{{ __('Gagal') }}</span>
-                                <span class="tp-g" style="margin-left:auto;font-weight:800;font-size:14px;color:#C24936">{{ number_format($passFail['failed']) }} <span style="color:var(--tp-muted);font-weight:700">({{ round($passFail['failed'] / max(1, $passFail['total']) * 100) }}%)</span></span>
-                            </div>
-                            <div style="border-top:1px solid var(--tp-line);padding-top:12px;display:flex;align-items:center;gap:10px">
-                                <span class="tp-g" style="font-weight:800;font-size:14px;color:var(--tp-ink)">{{ __('Jumlah percubaan selesai') }}</span>
-                                <span class="tp-g" style="margin-left:auto;font-weight:800;font-size:14px;color:var(--tp-ink)">{{ number_format($passFail['total']) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
-
-            {{-- Quick actions: the four things a teacher creates, each already a page of its own. --}}
-            <div class="tp-card" style="overflow:hidden">
-                <div style="padding:18px 22px;border-bottom:1px solid var(--tp-line)">
-                    <h2 class="tp-g" style="font-size:16px;font-weight:800;color:var(--tp-ink)">{{ __('Tindakan Pantas') }}</h2>
-                </div>
-                @foreach ([
-                    ['route' => 'cikgu.video.create', 'icon' => 'upload', 'label' => __('Muat Naik Video')],
-                    ['route' => 'cikgu.bahan.create', 'icon' => 'file', 'label' => __('Muat Naik Bahan')],
-                    ['route' => 'cikgu.kuiz.create', 'icon' => 'quiz', 'label' => __('Cipta Kuiz')],
-                    ['route' => 'cikgu.bab.index', 'icon' => 'book', 'label' => __('Lihat Bab')],
-                ] as $action)
-                    <a href="{{ route($action['route']) }}"
-                       style="display:flex;align-items:center;gap:12px;padding:13px 22px;border-bottom:1px solid var(--tp-line);text-decoration:none;color:var(--tp-ink)">
-                        <x-icon :name="$action['icon']" class="h-[18px] w-[18px]" style="color:var(--tp-muted-2)" />
-                        <span class="tp-g" style="font-weight:800;font-size:14px;flex:1">{{ $action['label'] }}</span>
-                        <x-icon name="chevron-right" class="h-4 w-4" style="color:var(--tp-muted)" />
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    </div>
 
 </x-cikgu-layout>
