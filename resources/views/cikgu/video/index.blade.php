@@ -4,6 +4,22 @@
     heading-icon="video"
     :sub="__('Rakaman kelas yang anda muat naik atau pautkan dari YouTube')">
 
+    <style>
+        /* Video list as a table: Video / Subjek / Tahun·Bab / Sumber / Tontonan / Status / Tindakan.
+           The table keeps a min-width and scrolls sideways inside .vt-wrap on narrow screens. */
+        .vt-wrap { overflow-x:auto; }
+        .vt-table { min-width:920px; }
+        .vt-head, .vt-row { display:grid; grid-template-columns:minmax(0,2.4fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,0.95fr) minmax(0,0.78fr) minmax(0,1.05fr) 100px; gap:14px; align-items:center; }
+        .vt-head { padding:13px 22px; }
+        .vt-colh { font-family:'Geist',sans-serif; font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--tp-muted); }
+        .vt-row { padding:12px 22px; border-top:1px solid var(--tp-line); }
+        .vt-video { display:flex; align-items:center; gap:14px; min-width:0; }
+        .vt-thumb { position:relative; width:84px; height:54px; border-radius:9px; overflow:hidden; border:none; padding:0; cursor:pointer; flex-shrink:0; }
+        .vt-title { text-align:left; background:none; border:none; padding:0; cursor:pointer; font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-ink); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .vt-cell { font-size:13px; font-weight:700; color:var(--tp-muted-2); min-width:0; }
+        .vt-tind { display:flex; align-items:center; gap:6px; }
+    </style>
+
     {{-- Total videos uploaded by this teacher (all-time, not the filtered count). --}}
     <div class="tp-stat" style="max-width:340px;margin-bottom:18px">
         <div style="display:flex;align-items:center;gap:10px">
@@ -40,86 +56,89 @@
             <a href="{{ route('cikgu.video.create') }}" class="tp-btn" style="margin-top:6px">{{ __('Tambah Video Pertama') }}</a>
         </div>
     @else
-        <div class="tp-list">
-            @foreach ($lessons as $lesson)
-                @php($subject = $lesson->chapter->subject)
-                @php($preview = [
-                    'title' => $lesson->title,
-                    'subtitle' => collect([$subject->name, $lesson->chapter->grade->displayName(), __('Bab :n', ['n' => $lesson->chapter->number])])->implode(' · '),
-                    'kind' => $lesson->isYoutube() ? 'youtube' : 'upload',
-                    'src' => $lesson->isYoutube() ? $lesson->embedUrl() : $lesson->videoUrl(),
-                    'poster' => $lesson->thumbnailUrl(),
-                ])
-                <div class="tp-listcard">
-                    {{-- Thumbnail: click to preview. A play disc sits over the frame and, once a
-                         duration has been captured, a badge in the corner shows it. --}}
-                    <button type="button" @click="open(@js($preview))" title="{{ __('Lihat video') }}" class="tp-vidthumb"
-                            style="position:relative;width:128px;height:80px;border-radius:12px;overflow:hidden;background:rgb({{ $subject->rgb }} / .14);border:none;padding:0;cursor:pointer;flex-shrink:0">
-                        @if ($lesson->thumbnailUrl())
-                            <img src="{{ $lesson->thumbnailUrl() }}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">
-                        @endif
-                        <span style="position:absolute;inset:0;display:grid;place-items:center">
-                            <span style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.28)">
-                                <x-icon name="play" class="h-4 w-4" style="color:#1F2937;margin-left:2px" />
-                            </span>
-                        </span>
-                        @if ($lesson->durationLabel())
-                            <span style="position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.8);color:#fff;font-family:'Geist',sans-serif;font-weight:700;font-size:11px;padding:2px 6px;border-radius:6px">{{ $lesson->durationLabel() }}</span>
-                        @endif
-                    </button>
+        <div class="tp-card">
+            <div class="vt-wrap">
+                <div class="vt-table">
+                    <div class="vt-head">
+                        <span class="vt-colh">{{ __('Video') }}</span>
+                        <span class="vt-colh">{{ __('Subjek') }}</span>
+                        <span class="vt-colh">{{ __('Tahun · Bab') }}</span>
+                        <span class="vt-colh">{{ __('Sumber') }}</span>
+                        <span class="vt-colh">{{ __('Tontonan') }}</span>
+                        <span class="vt-colh">{{ __('Status') }}</span>
+                        <span class="vt-colh">{{ __('Tindakan') }}</span>
+                    </div>
 
-                    <div class="tp-vidbody" style="display:flex;flex-direction:column;gap:8px;min-width:0;flex:1">
-                        <div class="tp-vidinfo" style="display:flex;flex-direction:column;gap:8px;min-width:0">
-                            <button type="button" @click="open(@js($preview))" class="tp-g" style="text-align:left;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-weight:800;font-size:16px;color:var(--tp-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $lesson->title }}</button>
+                    @foreach ($lessons as $lesson)
+                        @php($subject = $lesson->chapter->subject)
+                        @php($preview = [
+                            'title' => $lesson->title,
+                            'subtitle' => collect([$subject->name, $lesson->chapter->grade->displayName(), __('Bab :n', ['n' => $lesson->chapter->number])])->implode(' · '),
+                            'kind' => $lesson->isYoutube() ? 'youtube' : 'upload',
+                            'src' => $lesson->isYoutube() ? $lesson->embedUrl() : $lesson->videoUrl(),
+                            'poster' => $lesson->thumbnailUrl(),
+                        ])
+                        <div class="vt-row">
+                            {{-- VIDEO: thumbnail (click to preview) + title --}}
+                            <div class="vt-video">
+                                <button type="button" @click="open(@js($preview))" title="{{ __('Lihat video') }}" class="vt-thumb" style="background:rgb({{ $subject->rgb }} / .14)">
+                                    @if ($lesson->thumbnailUrl())
+                                        <img src="{{ $lesson->thumbnailUrl() }}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+                                    @endif
+                                    <span style="position:absolute;inset:0;display:grid;place-items:center">
+                                        <span style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.28)"><x-icon name="play" class="h-[13px] w-[13px]" style="color:#1F2937;margin-left:2px" /></span>
+                                    </span>
+                                    @if ($lesson->durationLabel())
+                                        <span style="position:absolute;right:4px;bottom:4px;background:rgba(0,0,0,.8);color:#fff;font-family:'Geist',sans-serif;font-weight:700;font-size:10px;padding:1px 5px;border-radius:5px">{{ $lesson->durationLabel() }}</span>
+                                    @endif
+                                </button>
+                                <button type="button" @click="open(@js($preview))" class="vt-title">{{ $lesson->title }}</button>
+                            </div>
 
-                            {{-- Subject on its own line: the coloured chip is what the eye picks out
-                                 when scanning the list. --}}
-                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                                <span class="tp-tag" style="background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }})">{{ $subject->name }}</span>
+                            {{-- SUBJEK --}}
+                            <div><span class="tp-tag" style="background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }})">{{ $subject->name }}</span></div>
+
+                            {{-- TAHUN · BAB --}}
+                            <div class="vt-cell">{{ $lesson->chapter->grade->displayName() }} · {{ __('Bab :n', ['n' => $lesson->chapter->number]) }}</div>
+
+                            {{-- SUMBER --}}
+                            <div class="vt-cell"><span style="display:inline-flex;align-items:center;gap:7px"><x-icon name="{{ $lesson->isYoutube() ? 'youtube' : 'upload' }}" class="h-4 w-4" style="color:{{ $lesson->isYoutube() ? '#FF0000' : 'var(--tp-muted-2)' }}" />{{ $lesson->isYoutube() ? 'YouTube' : __('Muat naik') }}</span></div>
+
+                            {{-- TONTONAN --}}
+                            <div class="vt-cell"><span style="display:inline-flex;align-items:center;gap:6px"><img src="{{ asset('images/eye.png') }}" alt="" style="width:15px;height:15px;object-fit:contain">{{ $lesson->views_count }}</span></div>
+
+                            {{-- STATUS: click to toggle publish --}}
+                            <div>
+                                <form method="POST" action="{{ route('cikgu.video.terbit', $lesson) }}">
+                                    @csrf
+                                    <button type="submit" class="tp-badge {{ $lesson->is_published ? 'tp-badge-ok' : 'tp-badge-draft' }}" style="border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+                                        @if ($lesson->is_published)<x-icon name="check-circle" class="h-4 w-4" />@endif
+                                        {{ $lesson->is_published ? __('Diterbitkan') : __('Draf') }}
+                                    </button>
+                                </form>
+                            </div>
+
+                            {{-- TINDAKAN: edit + delete --}}
+                            <div class="vt-tind">
+                                <a href="{{ route('cikgu.video.edit', $lesson) }}" class="tp-icon-action" title="{{ __('Sunting') }}">
+                                    <x-icon name="pencil" class="h-[17px] w-[17px]" />
+                                    <span class="sr-only">{{ __('Sunting :title', ['title' => $lesson->title]) }}</span>
+                                </a>
+                                @php($delMsg = __('Padam video ":title"? Fail video juga akan dipadam. Tindakan ini tidak boleh dibatalkan.', ['title' => $lesson->title]))
+                                <x-confirm-modal id="del-video-{{ $lesson->id }}" :action="route('cikgu.video.destroy', $lesson)" :title="__('Padam video?')" :message="$delMsg">
+                                    <button type="button" class="tp-icon-action tp-icon-danger" title="{{ __('Padam') }}">
+                                        <x-icon name="trash" class="h-[17px] w-[17px]" />
+                                        <span class="sr-only">{{ __('Padam :title', ['title' => $lesson->title]) }}</span>
+                                    </button>
+                                </x-confirm-modal>
                             </div>
                         </div>
-
-                        {{-- Detail row, each item led by an icon. --}}
-                        <div class="tp-vidmetarow" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
-                            <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="calendar" class="h-4 w-4" style="color:var(--tp-muted-2)" />{{ $lesson->chapter->grade->displayName() }} · {{ __('Bab :n', ['n' => $lesson->chapter->number]) }}</span>
-                            <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="{{ $lesson->isYoutube() ? 'youtube' : 'upload' }}" class="h-4 w-4" style="color:var(--tp-muted-2)" />{{ $lesson->isYoutube() ? 'YouTube' : __('Muat naik') }}</span>
-                            <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><img src="{{ asset('images/eye.png') }}" alt="" style="width:16px;height:16px;object-fit:contain">{{ $lesson->views_count }} {{ __('tontonan') }}</span>
-                            @unless ($lesson->chapter->is_active)
-                                <span class="tp-tag" style="background:#FEF0CE;color:#8A6A12">{{ __('Bab tidak lagi dalam kurikulum') }}</span>
-                            @endunless
-                        </div>
-                    </div>
-
-                    {{-- Actions: publish toggle + edit + delete. On mobile they drop to their own row. --}}
-                    <div class="tp-listactions" style="display:flex;align-items:center;gap:14px;flex-shrink:0">
-                        <form method="POST" action="{{ route('cikgu.video.terbit', $lesson) }}" style="flex-shrink:0">
-                            @csrf
-                            <button type="submit" class="tp-badge {{ $lesson->is_published ? 'tp-badge-ok' : 'tp-badge-draft' }}" style="border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
-                                @if ($lesson->is_published)
-                                    <x-icon name="check-circle" class="h-4 w-4" />
-                                @endif
-                                {{ $lesson->is_published ? __('Diterbitkan') : __('Draf') }}
-                            </button>
-                        </form>
-
-                        <a href="{{ route('cikgu.video.edit', $lesson) }}" class="tp-btn-ghost" style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px">
-                            <x-icon name="pencil" class="h-4 w-4" />{{ __('Sunting') }}
-                        </a>
-
-                        @php($delMsg = __('Padam video ":title"? Fail video juga akan dipadam. Tindakan ini tidak boleh dibatalkan.', ['title' => $lesson->title]))
-                        <x-confirm-modal id="del-video-{{ $lesson->id }}" :action="route('cikgu.video.destroy', $lesson)"
-                            :title="__('Padam video?')" :message="$delMsg">
-                            <button type="button" class="tp-icon-action tp-icon-danger" title="{{ __('Padam') }}" style="flex-shrink:0;background:#FDECEC;border:none;border-radius:14px">
-                                <x-icon name="trash" class="h-[18px] w-[18px]" />
-                                <span class="sr-only">{{ __('Padam :title', ['title' => $lesson->title]) }}</span>
-                            </button>
-                        </x-confirm-modal>
-                    </div>
+                    @endforeach
                 </div>
-            @endforeach
+            </div>
         </div>
 
-        <div>{{ $lessons->links('pagination.tp') }}</div>
+        <div style="margin-top:16px">{{ $lessons->links('pagination.tp') }}</div>
     @endif
 
         {{-- Preview modal: gradient header + black video body, the shared admin shell. x-if so
