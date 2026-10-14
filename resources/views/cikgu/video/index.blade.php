@@ -18,6 +18,8 @@
         .vt-title { text-align:left; background:none; border:none; padding:0; cursor:pointer; font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-ink); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
         .vt-cell { font-size:13px; font-weight:700; color:var(--tp-muted-2); min-width:0; }
         .vt-tind { display:flex; align-items:center; gap:6px; }
+        /* Centre every column except Video (header + data), so titles sit centred in their column. */
+        .vt-head > :not(:first-child), .vt-row > :not(.vt-video) { justify-self:center; text-align:center; }
     </style>
 
     {{-- Total videos uploaded by this teacher (all-time, not the filtered count). --}}
