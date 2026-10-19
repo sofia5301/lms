@@ -4,6 +4,25 @@
     heading-icon="file"
     :sub="__('Slaid, PDF dan lembaran kerja yang menyokong video anda')">
 
+    <style>
+        /* Materials as a table: Bahan / Subjek / Tahun·Bab / Jenis / Saiz / Muat Turun / Tindakan.
+           Keeps a min-width and scrolls sideways inside .bt-wrap on narrow screens. */
+        .bt-wrap { overflow-x:auto; }
+        .bt-table { min-width:940px; }
+        .bt-head, .bt-row { display:grid; grid-template-columns:minmax(0,2.4fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,0.75fr) minmax(0,0.75fr) minmax(0,0.9fr) 140px; gap:14px; align-items:center; }
+        .bt-head { padding:13px 22px; }
+        .bt-colh { font-family:'Geist',sans-serif; font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--tp-muted); }
+        .bt-row { padding:12px 22px; border-top:1px solid var(--tp-line); }
+        .bt-item { display:flex; align-items:center; gap:14px; min-width:0; }
+        .bt-ico { width:46px; height:46px; border-radius:12px; display:grid; place-items:center; border:none; padding:0; cursor:pointer; flex-shrink:0; }
+        .bt-title { text-align:left; background:none; border:none; padding:0; cursor:pointer; font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-ink); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .bt-cell { font-size:13px; font-weight:700; color:var(--tp-muted-2); min-width:0; }
+        .bt-type { background:#EAEBFB; color:#4F46E5; border-radius:999px; padding:4px 12px; font-family:'Geist',sans-serif; font-size:11.5px; font-weight:800; }
+        .bt-tind { display:flex; align-items:center; gap:6px; }
+        /* Centre every column except Bahan (header + data), so titles sit centred in their column. */
+        .bt-head > :not(:first-child), .bt-row > :not(.bt-item) { justify-self:center; text-align:center; }
+    </style>
+
     {{-- Total materials uploaded by this teacher (all-time, not the filtered count). --}}
     <div class="tp-stat" style="max-width:340px;margin-bottom:18px">
         <div style="display:flex;align-items:center;gap:10px">
@@ -14,14 +33,7 @@
         <span style="font-size:12.5px;font-weight:700;color:var(--tp-muted)">{{ __('Bahan pengajaran') }}</span>
     </div>
 
-    <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.bahan.index')">
-        <div class="tp-newbtn-wrap" style="margin-left:auto">
-            <a href="{{ route('cikgu.bahan.create') }}" class="tp-btn">
-                <x-icon name="plus" class="h-4 w-4" />
-                {{ __('Bahan Baru') }}
-            </a>
-        </div>
-    </x-year-subject-filter>
+    <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.bahan.index')" />
 
     {{-- Clicking a material's name opens a preview here, the same shell the admin content list uses.
          PDFs and images render in place; anything the browser can't show offers a download. --}}
@@ -40,72 +52,78 @@
             <a href="{{ route('cikgu.bahan.create') }}" class="tp-btn" style="margin-top:6px">{{ __('Muat Naik Bahan') }}</a>
         </div>
     @else
-        <div class="tp-list">
-            @foreach ($materials as $material)
-                @php($subject = $material->chapter->subject)
-                @php($preview = [
-                    'title' => $material->title,
-                    'subtitle' => collect([$subject->name, $material->chapter->grade->displayName(), __('Bab :n', ['n' => $material->chapter->number])])->implode(' · '),
-                    'kind' => $material->previewKind(),
-                    'src' => $material->fileUrl(),
-                    'name' => $material->original_name,
-                    'type' => strtoupper($material->extension()),
-                    'size' => $material->humanSize(),
-                    'downloadUrl' => route('muat-turun.bahan', $material),
-                ])
-                <div class="tp-listcard">
-                    {{-- File-type icon in a tinted square; clicking it opens the preview. --}}
-                    <button type="button" @click="open(@js($preview))" title="{{ __('Lihat bahan') }}"
-                            style="width:60px;height:60px;border-radius:14px;background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }});display:grid;place-items:center;flex-shrink:0;border:none;cursor:pointer"><x-icon :name="$material->iconName()" class="h-7 w-7" /></button>
-
-                    <div style="display:flex;flex-direction:column;gap:8px;min-width:0;flex:1">
-                        <button type="button" @click="open(@js($preview))" class="tp-g" style="text-align:left;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-weight:800;font-size:17px;color:var(--tp-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $material->title }}</button>
-
-                        <div>
-                            <span class="tp-tag" style="background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }})">{{ $subject->name }}</span>
-                        </div>
-
-                        {{-- Detail row, each item led by an icon. --}}
-                        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-                            <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="graduation" class="h-4 w-4" style="color:#0F7A68" />{{ $material->chapter->grade->displayName() }}</span>
-                            <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="book" class="h-4 w-4" style="color:#0F7A68" />{{ __('Bab :n', ['n' => $material->chapter->number]) }}</span>
-                            @if ($material->lesson)
-                                <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><x-icon name="file" class="h-4 w-4" style="color:#0F7A68;flex-shrink:0" />{{ $material->lesson->title }}</span>
-                            @endif
-                            <span style="display:inline-flex;align-items:center;gap:12px">
-                                <span style="background:#EAEBFB;color:#4F46E5;border-radius:999px;padding:4px 12px;font-family:'Geist',sans-serif;font-size:11.5px;font-weight:800">{{ strtoupper($material->extension()) }}</span>
-                                <span class="tp-meta">{{ $material->humanSize() }}</span>
-                                <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="download" class="h-4 w-4" style="color:var(--tp-muted-2)" />{{ $material->download_count }}</span>
-                            </span>
-                        </div>
+        <div class="tp-card">
+            <div class="bt-wrap">
+                <div class="bt-table">
+                    <div class="bt-head">
+                        <span class="bt-colh">{{ __('Bahan') }}</span>
+                        <span class="bt-colh">{{ __('Subjek') }}</span>
+                        <span class="bt-colh">{{ __('Tahun · Bab') }}</span>
+                        <span class="bt-colh">{{ __('Jenis') }}</span>
+                        <span class="bt-colh">{{ __('Saiz') }}</span>
+                        <span class="bt-colh">{{ __('Muat Turun') }}</span>
+                        <span class="bt-colh">{{ __('Tindakan') }}</span>
                     </div>
 
+                    @foreach ($materials as $material)
+                        @php($subject = $material->chapter->subject)
+                        @php($preview = [
+                            'title' => $material->title,
+                            'subtitle' => collect([$subject->name, $material->chapter->grade->displayName(), __('Bab :n', ['n' => $material->chapter->number])])->implode(' · '),
+                            'kind' => $material->previewKind(),
+                            'src' => $material->fileUrl(),
+                            'name' => $material->original_name,
+                            'type' => strtoupper($material->extension()),
+                            'size' => $material->humanSize(),
+                            'downloadUrl' => route('muat-turun.bahan', $material),
+                        ])
+                        <div class="bt-row">
+                            {{-- BAHAN: file-type icon (click to preview) + title --}}
+                            <div class="bt-item">
+                                <button type="button" @click="open(@js($preview))" title="{{ __('Lihat bahan') }}" class="bt-ico" style="background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }})"><x-icon :name="$material->iconName()" class="h-6 w-6" /></button>
+                                <button type="button" @click="open(@js($preview))" class="bt-title">{{ $material->title }}</button>
+                            </div>
 
-                    {{-- Actions: download + edit + delete. On mobile they drop to their own row. --}}
-                    <div class="tp-listactions" style="display:flex;align-items:center;gap:14px;flex-shrink:0">
-                        <a href="{{ route('muat-turun.bahan', $material) }}" class="tp-icon-action" style="flex-shrink:0;background:#DCF2EE;color:#0F7A68" title="{{ __('Muat turun') }}">
-                            <x-icon name="download" class="h-[18px] w-[18px]" />
-                            <span class="sr-only">{{ __('Muat turun :title', ['title' => $material->title]) }}</span>
-                        </a>
+                            {{-- SUBJEK --}}
+                            <div><span class="tp-tag" style="background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }})">{{ $subject->name }}</span></div>
 
-                        <a href="{{ route('cikgu.bahan.edit', $material) }}" class="tp-btn-ghost" style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px">
-                            <x-icon name="pencil" class="h-4 w-4" />{{ __('Sunting') }}
-                        </a>
+                            {{-- TAHUN · BAB --}}
+                            <div class="bt-cell">{{ $material->chapter->grade->displayName() }} · {{ __('Bab :n', ['n' => $material->chapter->number]) }}</div>
 
-                        @php($delMsg = __('Padam bahan ":title"? Fail juga akan dipadam.', ['title' => $material->title]))
-                        <x-confirm-modal id="del-bahan-{{ $material->id }}" :action="route('cikgu.bahan.destroy', $material)"
-                            :title="__('Padam bahan?')" :message="$delMsg">
-                            <button type="button" class="tp-icon-action tp-icon-danger" title="{{ __('Padam') }}" style="flex-shrink:0;background:#FDE7E0">
-                                <x-icon name="trash" class="h-[18px] w-[18px]" />
-                                <span class="sr-only">{{ __('Padam :title', ['title' => $material->title]) }}</span>
-                            </button>
-                        </x-confirm-modal>
-                    </div>
+                            {{-- JENIS --}}
+                            <div><span class="bt-type">{{ strtoupper($material->extension()) }}</span></div>
+
+                            {{-- SAIZ --}}
+                            <div class="bt-cell">{{ $material->humanSize() }}</div>
+
+                            {{-- MUAT TURUN --}}
+                            <div class="bt-cell"><span style="display:inline-flex;align-items:center;gap:6px"><x-icon name="download" class="h-4 w-4" style="color:var(--tp-muted-2)" />{{ $material->download_count }}</span></div>
+
+                            {{-- TINDAKAN: download + edit + delete --}}
+                            <div class="bt-tind">
+                                <a href="{{ route('muat-turun.bahan', $material) }}" class="tp-icon-action" style="color:#0F7A68" title="{{ __('Muat turun') }}">
+                                    <x-icon name="download" class="h-[17px] w-[17px]" />
+                                    <span class="sr-only">{{ __('Muat turun :title', ['title' => $material->title]) }}</span>
+                                </a>
+                                <a href="{{ route('cikgu.bahan.edit', $material) }}" class="tp-icon-action" title="{{ __('Sunting') }}">
+                                    <x-icon name="pencil" class="h-[17px] w-[17px]" />
+                                    <span class="sr-only">{{ __('Sunting :title', ['title' => $material->title]) }}</span>
+                                </a>
+                                @php($delMsg = __('Padam bahan ":title"? Fail juga akan dipadam.', ['title' => $material->title]))
+                                <x-confirm-modal id="del-bahan-{{ $material->id }}" :action="route('cikgu.bahan.destroy', $material)" :title="__('Padam bahan?')" :message="$delMsg">
+                                    <button type="button" class="tp-icon-action tp-icon-danger" title="{{ __('Padam') }}">
+                                        <x-icon name="trash" class="h-[17px] w-[17px]" />
+                                        <span class="sr-only">{{ __('Padam :title', ['title' => $material->title]) }}</span>
+                                    </button>
+                                </x-confirm-modal>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-            @endforeach
+            </div>
         </div>
 
-        <div>{{ $materials->links('pagination.tp') }}</div>
+        <div style="margin-top:16px">{{ $materials->links('pagination.tp') }}</div>
     @endif
 
         {{-- Preview modal: PDFs and images render in place, other files show a document card with a
