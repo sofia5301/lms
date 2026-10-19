@@ -6,6 +6,7 @@
     @php($isDark = ($theme ?? 'light') === 'dark')
     <div style="display:flex;flex-direction:column;gap:22px"
          x-data="{
+             tab: 'video',
              lesson: null,
              item: null,
              quiz: null,
@@ -42,6 +43,25 @@
                 .bs-summary { flex:1 1 100%; }
                 .bs-title { font-size:24px; }
             }
+
+            /* Content tabs (Video / Bahan / Kuiz) + per-section card. */
+            .bsec-tabs { display:flex; align-items:flex-end; gap:2px; border-bottom:1px solid var(--tp-line); flex-wrap:wrap; }
+            .bsec-tab { display:inline-flex; align-items:center; gap:9px; font-family:'Geist',sans-serif; font-weight:800; font-size:15px; color:var(--tp-muted); background:none; border:none; border-bottom:2.5px solid transparent; margin-bottom:-1px; padding:12px 22px; cursor:pointer; white-space:nowrap; }
+            .bsec-tab:hover { color:var(--tp-ink); }
+            .bsec-tab.is-on { color:var(--tp-teal); border-bottom-color:var(--tp-teal); }
+            .bsec-card { background:var(--tp-surface); border:1.5px solid var(--tp-line); border-radius:18px; overflow:hidden; }
+            .bsec-head { display:flex; align-items:center; gap:14px; padding:18px 22px; border-bottom:1px solid var(--tp-line); flex-wrap:wrap; }
+            .bsec-tile { width:48px; height:48px; border-radius:13px; display:grid; place-items:center; flex-shrink:0; }
+            .bsec-ht { flex:1; min-width:160px; display:flex; flex-direction:column; gap:3px; }
+            .bsec-title { font-family:'Geist',sans-serif; font-weight:800; font-size:18px; color:var(--tp-ink); }
+            .bsec-sub { font-size:13px; font-weight:600; color:var(--tp-muted); }
+            .bsec-new { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 18px; border-radius:12px; color:#fff; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; text-decoration:none; flex-shrink:0; }
+            .bsec-new:hover { filter:brightness(1.06); }
+            /* Flatten the list rows into dividers inside the section card. */
+            .bsec-card .tp-list { gap:0; }
+            .bsec-card .tp-listcard { border:none; border-radius:0; box-shadow:none; border-top:1px solid var(--tp-line); }
+            .bsec-card .tp-list .tp-listcard:first-child { border-top:none; }
+            .bsec-card .tp-empty { border:none; }
         </style>
 
         <a href="{{ route('cikgu.bab.index', ['subjek' => $subject->slug, 'tahun' => $grade->level]) }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Semua Bab') }}</a>
@@ -85,9 +105,21 @@
             </div>
         </div>
 
+        {{-- Content tabs: one section visible at a time. --}}
+        <div class="bsec-tabs">
+            <button type="button" class="bsec-tab" :class="tab==='video' ? 'is-on' : ''" @click="tab='video'"><x-icon name="video" class="h-[18px] w-[18px]" style="color:#0F7A68" />{{ __('Video') }}</button>
+            <button type="button" class="bsec-tab" :class="tab==='bahan' ? 'is-on' : ''" @click="tab='bahan'"><x-icon name="file" class="h-[18px] w-[18px]" style="color:#B84A75" />{{ __('Bahan') }}</button>
+            <button type="button" class="bsec-tab" :class="tab==='kuiz' ? 'is-on' : ''" @click="tab='kuiz'"><x-icon name="quiz" class="h-[18px] w-[18px]" style="color:#8A6A12" />{{ __('Kuiz') }}</button>
+        </div>
+
         {{-- Videos --}}
-        <section style="display:flex;flex-direction:column;gap:12px">
-            <h2 class="tp-g" style="display:flex;align-items:center;gap:8px;font-size:17px;font-weight:800;color:var(--tp-ink)"><x-icon name="video" style="width:19px;height:19px;color:#0F7A68" />{{ __('Video') }} <span style="color:var(--tp-muted)">({{ $lessons->count() }})</span></h2>
+        <div class="bsec-card" x-show="tab==='video'" x-cloak>
+            <div class="bsec-head" style="background:rgba(15,122,104,.05)">
+                <span class="bsec-tile" style="background:#DCF2EE;color:#0F7A68"><x-icon name="video" class="h-6 w-6" /></span>
+                <div class="bsec-ht"><span class="bsec-title">{{ __('Video') }}</span><span class="bsec-sub">{{ __('Rakaman kelas yang anda muat naik atau pautkan dari YouTube') }}</span></div>
+                <a href="{{ route('cikgu.video.create') }}" class="bsec-new" style="background:linear-gradient(135deg,#1E7A58,#176B4C)"><x-icon name="plus" class="h-4 w-4" />{{ __('Video Baru') }}</a>
+            </div>
+            <div class="bsec-body">
 
             @if ($lessons->isEmpty())
                 <div class="tp-empty" style="padding:26px">
@@ -126,11 +158,17 @@
                     @endforeach
                 </div>
             @endif
-        </section>
+            </div>
+        </div>
 
         {{-- Materials --}}
-        <section style="display:flex;flex-direction:column;gap:12px">
-            <h2 class="tp-g" style="display:flex;align-items:center;gap:8px;font-size:17px;font-weight:800;color:var(--tp-ink)"><x-icon name="file" style="width:19px;height:19px;color:#0F7A68" />{{ __('Bahan') }} <span style="color:var(--tp-muted)">({{ $materials->count() }})</span></h2>
+        <div class="bsec-card" x-show="tab==='bahan'" x-cloak>
+            <div class="bsec-head" style="background:rgba(184,74,117,.05)">
+                <span class="bsec-tile" style="background:#FBE4ED;color:#B84A75"><x-icon name="file" class="h-6 w-6" /></span>
+                <div class="bsec-ht"><span class="bsec-title">{{ __('Bahan') }}</span><span class="bsec-sub">{{ __('Muat turun pada bahan anda') }}</span></div>
+                <a href="{{ route('cikgu.bahan.create') }}" class="bsec-new" style="background:linear-gradient(135deg,#D9548A,#C13E74)"><x-icon name="plus" class="h-4 w-4" />{{ __('Bahan Baru') }}</a>
+            </div>
+            <div class="bsec-body">
 
             @if ($materials->isEmpty())
                 <div class="tp-empty" style="padding:26px">
@@ -168,11 +206,17 @@
                     @endforeach
                 </div>
             @endif
-        </section>
+            </div>
+        </div>
 
         {{-- Quizzes --}}
-        <section style="display:flex;flex-direction:column;gap:12px">
-            <h2 class="tp-g" style="display:flex;align-items:center;gap:8px;font-size:17px;font-weight:800;color:var(--tp-ink)"><x-icon name="quiz" style="width:19px;height:19px;color:#0F7A68" />{{ __('Kuiz') }} <span style="color:var(--tp-muted)">({{ $quizzes->count() }})</span></h2>
+        <div class="bsec-card" x-show="tab==='kuiz'" x-cloak>
+            <div class="bsec-head" style="background:rgba(138,106,18,.05)">
+                <span class="bsec-tile" style="background:#FEF0CE;color:#8A6A12"><x-icon name="quiz" class="h-6 w-6" /></span>
+                <div class="bsec-ht"><span class="bsec-title">{{ __('Kuiz') }}</span><span class="bsec-sub">{{ __('Kuiz interaktif yang menanda sendiri, dan kuiz bercetak') }}</span></div>
+                <a href="{{ route('cikgu.kuiz.mod') }}" class="bsec-new" style="background:linear-gradient(135deg,#D9862B,#BE7020)"><x-icon name="plus" class="h-4 w-4" />{{ __('Kuiz Baru') }}</a>
+            </div>
+            <div class="bsec-body">
 
             @if ($quizzes->isEmpty())
                 <div class="tp-empty" style="padding:26px">
@@ -223,7 +267,8 @@
                     @endforeach
                 </div>
             @endif
-        </section>
+            </div>
+        </div>
 
         {{-- Video preview modal - a look, not a lesson (no view counted); x-if so closing destroys
              the player and its audio. Same shell the admin content preview uses. --}}
