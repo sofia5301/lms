@@ -42,12 +42,12 @@
         .vf-ghero .t { font-family:'Geist',sans-serif; font-weight:800; font-size:15px; color:var(--tp-ink); }
         .vf-ghero .s { font-size:13px; color:var(--tp-muted); margin-top:5px; line-height:1.5; }
         .vf-gcard { border-radius:16px; border:1px solid var(--tp-line); padding:16px 18px; }
-        .vf-gcard.g1 { background:rgba(23,144,123,.13); }
-        .vf-gcard.g2 { background:rgba(46,108,168,.13); }
-        .vf-gcard.g3 { background:rgba(124,92,191,.13); }
+        .vf-gcard.g1 { background:rgba(23,144,123,.22); }
+        .vf-gcard.g2 { background:rgba(46,108,168,.22); }
+        .vf-gcard.g3 { background:rgba(124,92,191,.22); }
         .vf-gh { display:flex; align-items:center; gap:9px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; color:var(--tp-ink); margin-bottom:12px; }
         .vf-gh .gi { width:30px; height:30px; border-radius:9px; display:grid; place-items:center; flex-shrink:0; }
-        .vf-gli { display:flex; align-items:flex-start; gap:9px; font-size:12.5px; font-weight:600; color:var(--tp-muted); line-height:1.45; }
+        .vf-gli { display:flex; align-items:flex-start; gap:9px; font-size:12.5px; font-weight:700; color:var(--tp-ink); line-height:1.45; }
         .vf-gli + .vf-gli { margin-top:10px; }
     </style>
 
