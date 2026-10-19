@@ -37,13 +37,30 @@ class QuizController extends Controller
         $filter = \App\Support\ContentFilter::fromRequest($request);
         $search = trim((string) $request->query('q', ''));
 
+        // Counts for the type tabs reflect the Tahun/Subjek/Bab filter + search, not the type tab.
+        $countBase = fn () => $filter->apply($teacher->quizzes())
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', '%'.$search.'%'));
+        $counts = [
+            'semua' => $countBase()->count(),
+            'interaktif' => $countBase()->where('type', Quiz::TYPE_INTERACTIVE)->count(),
+            'bercetak' => $countBase()->where('type', Quiz::TYPE_FILE)->count(),
+        ];
+
+        $typeFor = ['interaktif' => Quiz::TYPE_INTERACTIVE, 'bercetak' => Quiz::TYPE_FILE];
+        $kind = in_array($request->query('jenis'), ['interaktif', 'bercetak'], true) ? $request->query('jenis') : null;
+        $sort = in_array($request->query('isih'), ['terbaru', 'terlama', 'percubaan', 'nama'], true) ? $request->query('isih') : 'terbaru';
+
         $quizzes = $filter->apply(
             $teacher->quizzes()
                 ->with('chapter.subject', 'chapter.grade', 'questions.options')
                 ->withCount(['questions', 'attempts as completed_attempts_count' => fn ($q) => $q->whereNotNull('completed_at')])
         )
             ->when($search !== '', fn ($query) => $query->where('title', 'like', '%'.$search.'%'))
-            ->latest('id')
+            ->when($kind, fn ($query) => $query->where('type', $typeFor[$kind]))
+            ->when($sort === 'terbaru', fn ($query) => $query->latest('id'))
+            ->when($sort === 'terlama', fn ($query) => $query->oldest('id'))
+            ->when($sort === 'percubaan', fn ($query) => $query->orderByDesc('completed_attempts_count')->latest('id'))
+            ->when($sort === 'nama', fn ($query) => $query->orderBy('title'))
             ->paginate(12)
             ->withQueryString();
 
@@ -54,6 +71,9 @@ class QuizController extends Controller
             'filter' => $filter,
             // All-time count of quizzes created by this teacher (not the filtered page count).
             'totalQuizzes' => $teacher->quizzes()->count(),
+            'counts' => $counts,
+            'kind' => $kind,
+            'sort' => $sort,
         ]);
     }
 
