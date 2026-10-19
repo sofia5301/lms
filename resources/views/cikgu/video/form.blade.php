@@ -49,6 +49,7 @@
         .vf-gh .gi { width:30px; height:30px; border-radius:9px; display:grid; place-items:center; flex-shrink:0; }
         .vf-gli { display:flex; align-items:flex-start; gap:9px; font-size:12.5px; font-weight:700; color:var(--tp-ink); line-height:1.45; }
         .vf-gli + .vf-gli { margin-top:10px; }
+        .vf-gli svg { flex-shrink:0; margin-top:1px; }
     </style>
 
     <a href="{{ route('cikgu.video.index') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:16px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Video') }}</a>
