@@ -31,7 +31,7 @@
             .bs-sub { margin:0; font-size:14px; font-weight:600; color:var(--tp-muted); }
             .bs-crumb { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--tp-muted-2); flex-wrap:wrap; }
             .bs-crumb .sep { color:var(--tp-muted); display:inline-flex; }
-            .bs-summary { flex:0 0 340px; max-width:100%; background:var(--tp-surface); border:1px solid var(--tp-line); border-radius:16px; padding:18px 20px; align-self:center; }
+            .bs-summary { flex:0 0 430px; max-width:100%; background:var(--tp-surface); border:1px solid var(--tp-line); border-radius:16px; padding:18px 24px; align-self:center; }
             .bs-sumh { display:block; font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-ink); margin-bottom:14px; }
             .bs-stats { display:flex; align-items:center; gap:14px; }
             .bs-stat { flex:1; display:flex; align-items:center; gap:11px; min-width:0; }
