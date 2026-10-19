@@ -15,13 +15,72 @@
              close() { this.lesson = null; this.item = null; this.quiz = null; document.body.classList.remove('overflow-hidden'); },
          }"
          @keydown.escape.window="close()">
+        <style>
+            /* This page uses a custom hero header, so the layout's plain heading is hidden. */
+            .tp-head .tp-heading { display:none; }
+
+            .bs-hero { display:flex; align-items:stretch; gap:22px; flex-wrap:wrap; border-radius:20px; padding:26px 28px; border:1.5px solid var(--tp-line); background:var(--tp-surface); background-image:linear-gradient(135deg, rgba(23,144,123,.16), rgba(23,144,123,.03)); }
+            .bs-left { flex:1 1 360px; min-width:0; display:flex; flex-direction:column; justify-content:space-between; gap:20px; }
+            .bs-head { display:flex; align-items:flex-start; gap:16px; }
+            .bs-tile { width:58px; height:58px; border-radius:16px; background:#DCF2EE; color:#0F7A68; display:grid; place-items:center; flex-shrink:0; }
+            .bs-tag { display:inline-flex; align-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:12px; padding:4px 12px; border-radius:999px; background:#E8EDE9; color:#4A5A52; }
+            .bs-title { font-family:'Geist',sans-serif; font-size:30px; font-weight:800; letter-spacing:-.01em; color:var(--tp-ink); line-height:1.12; margin:9px 0 4px; }
+            .bs-sub { margin:0; font-size:14px; font-weight:600; color:var(--tp-muted); }
+            .bs-crumb { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--tp-muted-2); flex-wrap:wrap; }
+            .bs-crumb .sep { color:var(--tp-muted); display:inline-flex; }
+            .bs-summary { flex:0 0 340px; max-width:100%; background:var(--tp-surface); border:1px solid var(--tp-line); border-radius:16px; padding:18px 20px; align-self:center; }
+            .bs-sumh { display:block; font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-ink); margin-bottom:14px; }
+            .bs-stats { display:flex; align-items:center; gap:14px; }
+            .bs-stat { flex:1; display:flex; align-items:center; gap:11px; min-width:0; }
+            .bs-stat .sq { width:40px; height:40px; border-radius:11px; display:grid; place-items:center; flex-shrink:0; }
+            .bs-stat .n { font-family:'Geist',sans-serif; font-size:22px; font-weight:800; color:var(--tp-ink); line-height:1; }
+            .bs-stat .l { font-size:11.5px; font-weight:700; color:var(--tp-muted); margin-top:3px; }
+            @media (max-width:820px) {
+                .bs-summary { flex:1 1 100%; }
+                .bs-title { font-size:24px; }
+            }
+        </style>
+
         <a href="{{ route('cikgu.bab.index', ['subjek' => $subject->slug, 'tahun' => $grade->level]) }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Semua Bab') }}</a>
 
-        <span class="tp-crumb" style="align-self:flex-start;background:#E4EEF9;color:#2E6CA8;border-radius:999px;padding:5px 14px;font-family:'Geist',sans-serif;font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px"><x-icon :name="$subject->iconName()" class="h-[15px] w-[15px]" />{{ $subject->name }} – {{ $grade->displayName() }} – {{ __('Bab :number', ['number' => $chapter->number]) }}</span>
+        {{-- Hero header: subject tile + Bab tag + title + breadcrumb on the left, a white content
+             summary card on the right, over a soft teal banner (no illustration). --}}
+        <div class="bs-hero">
+            <div class="bs-left">
+                <div class="bs-head">
+                    <span class="bs-tile"><x-icon :name="$subject->iconName()" class="h-7 w-7" /></span>
+                    <div style="min-width:0">
+                        <span class="bs-tag">{{ __('Bab :number', ['number' => $chapter->number]) }}</span>
+                        <h1 class="bs-title">{{ $chapter->title }}</h1>
+                        <p class="bs-sub">{{ __('Kandungan anda dalam bab ini') }}</p>
+                    </div>
+                </div>
+                <div class="bs-crumb">
+                    <x-icon name="home" class="h-4 w-4" />
+                    {{ $subject->name }} – {{ $grade->displayName() }}
+                    <span class="sep"><x-icon name="chevron-right" class="h-4 w-4" /></span>
+                    {{ __('Bab :number', ['number' => $chapter->number]) }}
+                </div>
+            </div>
 
-        @if ($chapter->description)
-            <p style="margin:0;font-size:15px;color:var(--tp-muted-2);max-width:640px">{{ $chapter->description }}</p>
-        @endif
+            <div class="bs-summary">
+                <span class="bs-sumh">{{ __('Ringkasan Kandungan') }}</span>
+                <div class="bs-stats">
+                    <div class="bs-stat">
+                        <span class="sq" style="background:#DCF2EE;color:#17907B"><x-icon name="video" class="h-5 w-5" /></span>
+                        <div><div class="n">{{ $lessons->count() }}</div><div class="l">{{ __('Video') }}</div></div>
+                    </div>
+                    <div class="bs-stat">
+                        <span class="sq" style="background:#E4EEF9;color:#2E6CA8"><x-icon name="file" class="h-5 w-5" /></span>
+                        <div><div class="n">{{ $materials->count() }}</div><div class="l">{{ __('Bahan') }}</div></div>
+                    </div>
+                    <div class="bs-stat">
+                        <span class="sq" style="background:#EDE7F9;color:#7C5CBF"><x-icon name="help-circle" class="h-5 w-5" /></span>
+                        <div><div class="n">{{ $quizzes->count() }}</div><div class="l">{{ __('Kuiz') }}</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         {{-- Videos --}}
         <section style="display:flex;flex-direction:column;gap:12px">
