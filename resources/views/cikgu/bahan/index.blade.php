@@ -36,7 +36,7 @@
 
         /* Stat + filters on one row, split by a divider (stacks on small screens). */
         .bf-card { display:flex; align-items:stretch; flex-wrap:wrap; }
-        .bf-stat { display:flex; align-items:center; gap:22px; padding:24px 80px 24px 36px; flex-shrink:0; }
+        .bf-stat { display:flex; align-items:center; gap:22px; padding:24px 80px 24px 36px; flex-shrink:0; min-width:350px; }
         .bf-div { width:1px; background:var(--tp-line); align-self:stretch; margin:18px 0; flex-shrink:0; }
         .bf-filters { flex:1; min-width:280px; display:flex; align-items:center; padding:18px 28px; }
         /* The three dropdowns share the row evenly, so there's no empty gap on the right. */
@@ -47,7 +47,7 @@
         .bf-filters select.tp-filter-select { width:100%; min-width:0; }
         @media (max-width:860px) {
             .bf-div { display:none; }
-            .bf-stat { width:100%; border-bottom:1px solid var(--tp-line); }
+            .bf-stat { width:100%; min-width:0; border-bottom:1px solid var(--tp-line); }
             .bf-filters { width:100%; }
         }
     </style>
