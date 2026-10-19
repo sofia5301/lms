@@ -36,7 +36,8 @@
         /* Guide sidebar. */
         .vf-guide { display:flex; flex-direction:column; gap:16px; position:sticky; top:14px; }
         .vf-ghero { border-radius:16px; overflow:hidden; border:1px solid var(--tp-line); background:var(--tp-surface); }
-        .vf-ghero .banner { height:130px; display:grid; place-items:center; background:linear-gradient(135deg, rgba(46,108,168,.12), rgba(46,108,168,.03)); }
+        .vf-ghero .banner { position:relative; height:150px; overflow:hidden; background:linear-gradient(135deg, rgba(46,108,168,.12), rgba(46,108,168,.03)); }
+        .vf-ghero .banner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
         .vf-ghero .body { padding:15px 18px; }
         .vf-ghero .t { font-family:'Geist',sans-serif; font-weight:800; font-size:15px; color:var(--tp-ink); }
         .vf-ghero .s { font-size:13px; color:var(--tp-muted); margin-top:5px; line-height:1.5; }
