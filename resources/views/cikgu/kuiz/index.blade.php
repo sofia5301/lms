@@ -190,7 +190,7 @@
                                                 'correct' => (bool) $option->is_correct,
                                             ])->all(),
                                         ])->all(),
-                                    ]))">{{ __('Lihat Soalan') }}</button>
+                                    ]))">{{ __('Lihat') }}</button>
                                     <a href="{{ route('cikgu.kuiz.statistik', $quiz) }}" class="tp-icon-action" title="{{ __('Statistik') }}">
                                         <x-icon name="chart" class="h-[17px] w-[17px]" />
                                         <span class="sr-only">{{ __('Statistik') }}</span>
