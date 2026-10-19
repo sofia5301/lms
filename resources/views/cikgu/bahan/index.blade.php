@@ -33,9 +33,15 @@
 
         /* Stat + filters on one row, split by a divider (stacks on small screens). */
         .bf-card { display:flex; align-items:stretch; flex-wrap:wrap; }
-        .bf-stat { display:flex; align-items:center; gap:16px; padding:18px 24px; flex-shrink:0; }
-        .bf-div { width:1px; background:var(--tp-line); align-self:stretch; margin:16px 0; flex-shrink:0; }
-        .bf-filters { flex:1; min-width:260px; display:flex; align-items:center; padding:18px 24px; }
+        .bf-stat { display:flex; align-items:center; gap:16px; padding:18px 26px; flex-shrink:0; }
+        .bf-div { width:1px; background:var(--tp-line); align-self:stretch; margin:18px 0; flex-shrink:0; }
+        .bf-filters { flex:1; min-width:280px; display:flex; align-items:center; padding:18px 28px; }
+        /* The three dropdowns share the row evenly, so there's no empty gap on the right. */
+        .bf-filters .ysf-form-cikgu { flex:1; min-width:0; }
+        .bf-filters .tp-field { flex:1 1 0; min-width:150px; }
+        .bf-filters .ss-wrap { display:block !important; width:100% !important; min-width:0 !important; }
+        .bf-filters .ss-trigger { width:100%; }
+        .bf-filters select.tp-filter-select { width:100%; min-width:0; }
         @media (max-width:860px) {
             .bf-div { display:none; }
             .bf-stat { width:100%; border-bottom:1px solid var(--tp-line); }
