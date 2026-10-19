@@ -15,7 +15,7 @@
         .bab-toggle button.is-on { background:#DCF2EE; color:#0F7A68; }
 
         /* Master-detail split: chapter list (left) + chapter detail (right). Stacks on small screens. */
-        .bab-split { display:grid; grid-template-columns:minmax(0,0.95fr) minmax(0,1.35fr); gap:18px; align-items:start; }
+        .bab-split { display:grid; grid-template-columns:minmax(0,0.95fr) minmax(0,1.35fr); gap:18px; align-items:stretch; }
         @media (max-width:980px) { .bab-split { grid-template-columns:1fr; } }
 
         /* Left: chapter list. In grid mode it becomes two compact columns. */
@@ -33,8 +33,7 @@
         .bab-chev { color:var(--tp-muted); flex-shrink:0; }
 
         /* Right: chapter detail card. */
-        .bab-detail { background:var(--tp-surface); border:1.5px solid var(--tp-line); border-radius:20px; padding:26px 28px; position:sticky; top:18px; }
-        @media (max-width:980px) { .bab-detail { position:static; } }
+        .bab-detail { background:var(--tp-surface); border:1.5px solid var(--tp-line); border-radius:20px; padding:26px 28px; height:100%; }
         .bab-hero { position:relative; overflow:hidden; border-radius:16px; margin:18px 0 22px; min-height:150px; display:grid; place-items:center; }
         .bab-hero .ic { opacity:.22; }
         .bab-tag { display:inline-flex; align-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:12px; padding:5px 12px; border-radius:999px; }
