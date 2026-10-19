@@ -38,6 +38,15 @@
             .bf-stat { width:100%; min-width:0; border-bottom:1px solid var(--tp-line); }
             .bf-filters { width:100%; }
         }
+
+        /* Options bar above the table: source tabs (left) + sort (right). */
+        .bt-optbar { display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; border-bottom:1px solid var(--tp-line); margin:18px 0 6px; }
+        .bt-tabs { display:flex; align-items:center; gap:2px; flex-wrap:wrap; }
+        .bt-tab { font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-muted); text-decoration:none; padding:10px 14px; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+        .bt-tab:hover { color:var(--tp-ink); }
+        .bt-tab.is-on { color:var(--tp-teal); border-bottom-color:var(--tp-teal); }
+        .bt-sort { margin-left:auto; display:flex; align-items:center; gap:10px; padding-bottom:8px; }
+        .bt-sortlabel { font-size:13px; font-weight:700; color:var(--tp-muted); white-space:nowrap; }
     </style>
 
     {{-- Search videos by title. Carries the current filters as hidden fields so searching keeps them. --}}
@@ -71,16 +80,7 @@
         </div>
     </div>
 
-    {{-- Clicking a video opens a preview here instead of navigating to the watch page - the same
-         look the admin content page uses. A look, not a lesson: no view is counted. --}}
-    <div x-data="{
-             lesson: null,
-             open(data) { this.lesson = data; document.body.classList.add('overflow-hidden'); },
-             close() { this.lesson = null; document.body.classList.remove('overflow-hidden'); },
-         }"
-         @keydown.escape.window="close()">
-
-    @if ($lessons->isEmpty())
+    @if ($counts['semua'] === 0)
         <div class="tp-empty">
             <span style="font-size:30px">🎬</span>
             <h3 class="tp-g" style="font-size:19px;font-weight:800;color:var(--tp-ink)">{{ __('Belum ada video') }}</h3>
@@ -88,6 +88,46 @@
             <a href="{{ route('cikgu.video.create') }}" class="tp-btn" style="margin-top:6px">{{ __('Tambah Video Pertama') }}</a>
         </div>
     @else
+        {{-- Source tabs + sort. Tabs preserve the Tahun/Subjek/Bab filter + search; counts reflect them. --}}
+        @php($base = request()->except(['jenis', 'page']))
+        @php($tabs = [
+            ['key' => null, 'label' => __('Semua'), 'count' => $counts['semua']],
+            ['key' => 'youtube', 'label' => 'YouTube', 'count' => $counts['youtube']],
+            ['key' => 'upload', 'label' => __('Muat Naik'), 'count' => $counts['upload']],
+        ])
+        <div class="bt-optbar">
+            <div class="bt-tabs">
+                @foreach ($tabs as $tab)
+                    @php($tabUrl = $tab['key'] ? route('cikgu.video.index', array_merge($base, ['jenis' => $tab['key']])) : route('cikgu.video.index', $base))
+                    <a href="{{ $tabUrl }}" @class(['bt-tab', 'is-on' => $kind === $tab['key']])>{{ $tab['label'] }} ({{ $tab['count'] }})</a>
+                @endforeach
+            </div>
+
+            <form method="GET" action="{{ route('cikgu.video.index') }}" class="bt-sort">
+                @foreach (request()->except(['isih', 'page']) as $k => $v)
+                    @unless (is_array($v))<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endunless
+                @endforeach
+                <label for="isih" class="bt-sortlabel">{{ __('Isih mengikut') }}</label>
+                <select id="isih" name="isih" class="tp-filter-select" style="min-width:160px" onchange="this.form.submit()">
+                    <option value="terbaru" @selected($sort === 'terbaru')>{{ __('Terbaru') }}</option>
+                    <option value="terlama" @selected($sort === 'terlama')>{{ __('Terlama') }}</option>
+                    <option value="tontonan" @selected($sort === 'tontonan')>{{ __('Paling Ditonton') }}</option>
+                    <option value="nama" @selected($sort === 'nama')>{{ __('Nama (A-Z)') }}</option>
+                </select>
+            </form>
+        </div>
+
+        {{-- Clicking a video opens a preview here instead of navigating to the watch page. --}}
+        <div x-data="{
+                 lesson: null,
+                 open(data) { this.lesson = data; document.body.classList.add('overflow-hidden'); },
+                 close() { this.lesson = null; document.body.classList.remove('overflow-hidden'); },
+             }"
+             @keydown.escape.window="close()">
+
+        @if ($lessons->isEmpty())
+            <div class="tp-card" style="padding:40px 22px;text-align:center;color:var(--tp-muted);font-size:14px;font-weight:600">{{ __('Tiada video untuk pilihan ini.') }}</div>
+        @else
         <div class="tp-card">
             <div class="vt-wrap">
                 <div class="vt-table">
@@ -193,4 +233,5 @@
             </x-content-preview>
         </template>
     </div>
+    @endif
 </x-cikgu-layout>

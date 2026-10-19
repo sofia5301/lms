@@ -47,11 +47,27 @@ class LessonController extends Controller
         $filter = \App\Support\ContentFilter::fromRequest($request);
         $q = trim((string) $request->query('q', ''));
 
+        // Counts for the source tabs reflect the Tahun/Subjek/Bab filter + search, not the tab itself.
+        $countBase = fn () => $filter->apply($teacher->lessons())
+            ->when($q !== '', fn ($query) => $query->where('title', 'like', '%'.$q.'%'));
+        $counts = [
+            'semua' => $countBase()->count(),
+            'youtube' => $countBase()->where('source', 'youtube')->count(),
+            'upload' => $countBase()->where('source', 'upload')->count(),
+        ];
+
+        $kind = in_array($request->query('jenis'), ['youtube', 'upload'], true) ? $request->query('jenis') : null;
+        $sort = in_array($request->query('isih'), ['terbaru', 'terlama', 'tontonan', 'nama'], true) ? $request->query('isih') : 'terbaru';
+
         $lessons = $filter->apply(
             $teacher->lessons()->with('chapter.subject', 'chapter.grade')
         )
             ->when($q !== '', fn ($query) => $query->where('title', 'like', '%'.$q.'%'))
-            ->latest('id')
+            ->when($kind, fn ($query) => $query->where('source', $kind))
+            ->when($sort === 'terbaru', fn ($query) => $query->latest('id'))
+            ->when($sort === 'terlama', fn ($query) => $query->oldest('id'))
+            ->when($sort === 'tontonan', fn ($query) => $query->orderByDesc('views_count')->latest('id'))
+            ->when($sort === 'nama', fn ($query) => $query->orderBy('title'))
             ->paginate(12)
             ->withQueryString();
 
@@ -63,6 +79,9 @@ class LessonController extends Controller
             // All-time totals for this teacher (not the filtered page count).
             'totalVideos' => $teacher->lessons()->count(),
             'viewCount' => (int) $teacher->lessons()->sum('views_count'),
+            'counts' => $counts,
+            'kind' => $kind,
+            'sort' => $sort,
         ]);
     }
 
