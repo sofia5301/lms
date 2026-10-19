@@ -353,7 +353,7 @@
         {{-- Guide sidebar. --}}
         <aside class="vf-guide">
             <div class="vf-ghero">
-                <div class="banner"><x-icon name="youtube" class="h-12 w-12" style="color:#FF0000" /></div>
+                <div class="banner"><img src="{{ asset('images/youtube.webp') }}" alt="" style="max-height:88px;max-width:70%;object-fit:contain"></div>
                 <div class="body">
                     <div class="t">{{ __('Panduan Memuat Naik Video') }}</div>
                     <div class="s">{{ __('Anda boleh memuat naik fail video atau menggunakan pautan dari YouTube.') }}</div>
