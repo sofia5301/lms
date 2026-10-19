@@ -20,8 +20,8 @@
         .bt-type { background:#EAEBFB; color:#4F46E5; border-radius:999px; padding:4px 12px; font-family:'Geist',sans-serif; font-size:11.5px; font-weight:800; }
         .bt-tind { display:flex; align-items:center; gap:7px; }
         .bt-tind .tp-icon-action { border:1.5px solid var(--tp-line-2); }
-        .bt-tind .bt-dl { border-color:#0F7A68; }
-        .bt-tind .tp-icon-danger { border-color:#C24936; }
+        .bt-tind .bt-dl { border-color:rgba(15,122,104,.45); }
+        .bt-tind .tp-icon-danger { border-color:rgba(194,73,54,.45); }
         /* Centre every column except Bahan (header + data), so titles sit centred in their column. */
         .bt-head > :not(:first-child), .bt-row > :not(.bt-item) { justify-self:center; text-align:center; }
 

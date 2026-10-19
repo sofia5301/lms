@@ -19,7 +19,7 @@
         .vt-cell { font-size:13px; font-weight:700; color:var(--tp-muted-2); min-width:0; }
         .vt-tind { display:flex; align-items:center; gap:8px; }
         .vt-tind .tp-icon-action { border:1.5px solid var(--tp-line-2); }
-        .vt-tind .tp-icon-danger { border-color:#C24936; }
+        .vt-tind .tp-icon-danger { border-color:rgba(194,73,54,.45); }
         /* Centre every column except Video (header + data), so titles sit centred in their column. */
         .vt-head > :not(:first-child), .vt-row > :not(.vt-video) { justify-self:center; text-align:center; }
 
