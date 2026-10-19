@@ -10,18 +10,13 @@
         .bab-topright { display:flex; align-items:center; gap:16px; padding-bottom:4px; }
         .bab-count { display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:700; color:var(--tp-muted); white-space:nowrap; }
         .bab-count .dot { width:8px; height:8px; border-radius:50%; background:#2BB39B; flex-shrink:0; }
-        .bab-toggle { display:flex; align-items:center; gap:4px; background:var(--tp-surface); border:1.5px solid var(--tp-line-2); border-radius:12px; padding:4px; }
-        .bab-toggle button { display:grid; place-items:center; width:40px; height:36px; border:none; border-radius:9px; background:transparent; color:var(--tp-muted); cursor:pointer; }
-        .bab-toggle button.is-on { background:#DCF2EE; color:#0F7A68; }
 
         /* Master-detail split: chapter list (left) + chapter detail (right). Stacks on small screens. */
         .bab-split { display:grid; grid-template-columns:minmax(0,0.95fr) minmax(0,1.35fr); gap:18px; align-items:stretch; }
         @media (max-width:980px) { .bab-split { grid-template-columns:1fr; } }
 
-        /* Left: chapter list. In grid mode it becomes two compact columns. */
+        /* Left: chapter list. */
         .bab-list { display:flex; flex-direction:column; gap:10px; }
-        .bab-list.is-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-        @media (max-width:560px) { .bab-list.is-grid { grid-template-columns:1fr; } }
         .bab-item { display:flex; align-items:center; gap:14px; width:100%; text-align:left; background:var(--tp-surface); border:1.5px solid var(--tp-line); border-radius:16px; padding:14px 16px; cursor:pointer; transition:border-color .12s, box-shadow .12s; }
         .bab-item:hover { border-color:var(--tp-line-2); }
         .bab-item.is-on { border-color:#2BB39B; box-shadow:0 0 0 3px rgba(43,179,155,.14); }
@@ -77,7 +72,6 @@
 
     <div style="display:flex;flex-direction:column;gap:18px"
          x-data="{
-             view: 'list',
              selected: 0,
              chapters: @js($chaptersData),
              get sel() { return this.chapters[this.selected] ?? null; },
@@ -95,10 +89,6 @@
             @if ($subject && $grade && $chapters->isNotEmpty())
                 <div class="bab-topright">
                     <span class="bab-count"><span class="dot"></span>{{ __(':count bab tersedia', ['count' => $chapters->count()]) }}</span>
-                    <div class="bab-toggle" role="group" aria-label="{{ __('Papar sebagai') }}">
-                        <button type="button" @click="view = 'list'" :class="view === 'list' ? 'is-on' : ''" title="{{ __('Senarai') }}" aria-label="{{ __('Senarai') }}"><x-icon name="list" class="h-[18px] w-[18px]" /></button>
-                        <button type="button" @click="view = 'grid'" :class="view === 'grid' ? 'is-on' : ''" title="{{ __('Grid') }}" aria-label="{{ __('Grid') }}"><x-icon name="grid" class="h-[18px] w-[18px]" /></button>
-                    </div>
                 </div>
             @endif
         </div>
@@ -120,7 +110,7 @@
             @else
                 <div class="bab-split">
                     {{-- LEFT: chapter list (single column, or two in grid mode). --}}
-                    <div class="bab-list" :class="view === 'grid' ? 'is-grid' : ''">
+                    <div class="bab-list">
                         @foreach ($chapters as $chapter)
                             @php($c = $palette[$loop->index % count($palette)])
                             <button type="button" class="bab-item" :class="selected === {{ $loop->index }} ? 'is-on' : ''"
