@@ -22,8 +22,9 @@
         .qt-tind { display:flex; align-items:center; gap:10px; }
         .qt-tind .tp-icon-action { border:1.5px solid var(--tp-line-2); }
         .qt-tind .tp-icon-danger { border-color:rgba(194,73,54,.45); }
-        /* Centre every column (header + data), so values sit centred in their column. */
-        .qt-head > *, .qt-row > * { justify-self:center; text-align:center; }
+        /* Centre every column except Kuiz (header + data); the Kuiz column stays left-aligned so
+           the icons and titles line up on a single edge, like the Video/Bahan tables. */
+        .qt-head > :not(:first-child), .qt-row > :not(.qt-kuis) { justify-self:center; text-align:center; }
 
         /* Options bar above the table: type tabs (left) + sort (right). */
         .bt-optbar { display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; border-bottom:1px solid var(--tp-line); margin:18px 0 6px; }
