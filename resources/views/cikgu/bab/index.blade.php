@@ -143,14 +143,11 @@
                     {{-- RIGHT: detail of the selected chapter (reactive). --}}
                     <template x-if="sel">
                     <div class="bab-detail" style="--acc:rgb({{ $subject->rgb }});--acc-tint:rgb({{ $subject->rgb }} / .14)">
-                        <span class="bab-tag" style="background:var(--acc-tint);color:var(--acc)">{{ __('Bab') }} <span x-text="sel.number" style="margin-left:4px"></span></span>
                         <h2 class="bab-title" x-text="sel.title"></h2>
 
                         <div class="bab-headmeta">
+                            <span class="bab-tag" style="background:var(--acc-tint);color:var(--acc)">{{ __('Bab') }} <span x-text="sel.number" style="margin-left:4px"></span></span>
                             <span class="tp-tag" style="background:var(--acc-tint);color:var(--acc)">{{ $subject->name }}</span>
-                            <span class="bab-m"><x-icon name="video" class="h-4 w-4" style="color:#17907B" /><span x-text="sel.videos"></span> video</span>
-                            <span class="bab-m"><x-icon name="file" class="h-4 w-4" style="color:#2E6CA8" /><span x-text="sel.bahan"></span> {{ __('bahan') }}</span>
-                            <span class="bab-m"><x-icon name="help-circle" class="h-4 w-4" style="color:#7C5CBF" /><span x-text="sel.kuiz"></span> {{ __('kuiz') }}</span>
                         </div>
 
                         {{-- Hero banner: a subject-tinted panel with the subject glyph (no illustration). --}}
