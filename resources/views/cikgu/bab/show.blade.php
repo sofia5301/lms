@@ -16,8 +16,10 @@
          }"
          @keydown.escape.window="close()">
         <style>
-            /* This page uses a custom hero header, so the layout's plain heading is hidden. */
+            /* This page uses a custom hero header, so the layout's plain heading is hidden. The
+               control bar (BM/EN, night mode, bell) keeps its original right-hand spot. */
             .tp-head .tp-heading { display:none; }
+            .tp-head .tp-topbar { margin-left:auto; }
 
             .bs-hero { display:flex; align-items:stretch; gap:22px; flex-wrap:wrap; border-radius:20px; padding:26px 28px; border:1.5px solid var(--tp-line); background:var(--tp-surface); background-image:linear-gradient(135deg, rgba(23,144,123,.16), rgba(23,144,123,.03)); }
             .bs-left { flex:1 1 360px; min-width:0; display:flex; flex-direction:column; justify-content:space-between; gap:20px; }
