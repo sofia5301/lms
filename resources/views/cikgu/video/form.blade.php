@@ -5,282 +5,386 @@
     heading-icon="video"
     :sub="__('Rakaman kelas yang anda muat naik atau pautkan dari YouTube')">
 
-    <form method="POST"
-          action="{{ $editing ? route('cikgu.video.update', $lesson) : route('cikgu.video.store') }}"
-          enctype="multipart/form-data"
-          class="tp-formwrap"
-          x-data="videoForm({{ Js::from([
-              'source' => old('source', $lesson->source ?? 'youtube'),
-              'maxMb' => config('lms.video_max_mb'),
-              'maxVideos' => \App\Http\Requests\LessonRequest::MAX_VIDEOS,
-              'editing' => $editing,
-              'hasVideo' => (bool) $lesson->video_path,
-              'fallbackUrl' => route('cikgu.video.index'),
-              'labels' => [
-                  'tooBig' => __('Saiz video :size MB melebihi had :max MB. Sila muat naik ke YouTube (Unlisted) dan tampal pautannya.'),
-                  'serverTooBig' => __('Fail terlalu besar untuk server. Sila guna pautan YouTube.'),
-                  'uploadFailed' => __('Muat naik gagal (ralat :status). Sila cuba lagi.'),
-                  'networkFailed' => __('Muat naik gagal. Sila semak sambungan internet anda dan cuba lagi.'),
-                  'thumbReady' => __('Gambar kecil diambil daripada video anda.'),
-                  'thumbFailed' => __('Gambar kecil tidak dapat diambil daripada video ini. Anda boleh muat naik gambar sendiri.'),
-                  'notVideo' => __('":name" bukan fail video. Guna MP4 atau WEBM.'),
-                  'tooManyFiles' => __('Had :max video sekali muat naik.'),
-                  'videoCount' => __(':count video dipilih'),
-              ],
-          ]) }})"
-          @submit.prevent="submit($event)">
-        @csrf
-        @if ($editing) @method('PUT') @endif
+    <style>
+        /* Add-video layout: a step rail (left), the form (centre), and a guide sidebar (right). */
+        .vf-layout { display:grid; grid-template-columns:190px minmax(0,1fr) 330px; gap:22px; align-items:start; }
+        .vf-layout .tp-formwrap { max-width:none; }
+        @media (max-width:1180px) { .vf-layout { grid-template-columns:minmax(0,1fr) 320px; } .vf-steps { display:none; } }
+        @media (max-width:860px) { .vf-layout { grid-template-columns:1fr; } .vf-guide { order:2; } }
 
-        <a href="{{ route('cikgu.video.index') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Video') }}</a>
+        /* Step rail. */
+        .vf-steps { position:sticky; top:14px; display:flex; flex-direction:column; }
+        .vf-step { display:flex; align-items:flex-start; gap:12px; padding:0 0 26px; position:relative; text-decoration:none; }
+        .vf-step:last-child { padding-bottom:0; }
+        .vf-step::before { content:''; position:absolute; left:14px; top:30px; height:calc(100% - 30px); width:2px; background:var(--tp-line); }
+        .vf-step:last-child::before { display:none; }
+        .vf-step .num { width:30px; height:30px; border-radius:50%; background:var(--tp-surface); color:var(--tp-muted); border:1.5px solid var(--tp-line-2); display:grid; place-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:13px; flex-shrink:0; position:relative; z-index:1; }
+        .vf-step.is-on .num { background:var(--tp-teal); color:#fff; border-color:var(--tp-teal); }
+        .vf-step .lbl { font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-ink); line-height:1.3; margin-top:4px; }
+        .vf-step:not(.is-on) .lbl { color:var(--tp-muted); }
 
-        {{-- Location --}}
-        <div class="tp-panelform">
-            <div style="display:flex;flex-direction:column;gap:3px">
-                <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Lokasi video') }}</h2>
-                <span style="font-size:13px;color:var(--tp-muted)">{{ __('Setiap video mesti dimasukkan dalam satu Bab.') }}</span>
-            </div>
-            <x-chapter-picker :subjects="$subjects" :grades="$grades" :chapter="$chapter" />
-        </div>
+        /* Source choice tiles. */
+        .vf-src { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        @media (max-width:520px) { .vf-src { grid-template-columns:1fr; } }
+        .vf-srcbtn { display:flex; align-items:center; gap:13px; text-align:left; padding:15px 16px; border:1.5px solid var(--tp-line-2); border-radius:14px; background:var(--tp-surface); cursor:pointer; }
+        .vf-srcbtn:hover { border-color:var(--tp-teal); }
+        .vf-srcbtn.is-on { border-color:var(--tp-teal); background:rgba(23,144,123,.06); box-shadow:0 0 0 3px rgba(23,144,123,.1); }
+        .vf-srcbtn .ic { width:42px; height:42px; border-radius:11px; display:grid; place-items:center; flex-shrink:0; background:var(--tp-surface-2); }
+        .vf-srcbtn .t { display:block; font-family:'Geist',sans-serif; font-weight:800; font-size:14.5px; color:var(--tp-ink); }
+        .vf-srcbtn .s { display:block; font-size:12px; color:var(--tp-muted); margin-top:2px; }
 
-        {{-- Details. Uploading a batch names each video in its own row, so this panel steps aside:
-             one title and one description cannot describe five different recordings. --}}
-        <div class="tp-panelform" @if (! $editing) x-show="! batch" x-cloak @endif>
-            <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Butiran video') }}</h2>
-            <div class="tp-field">
-                <label for="title" class="tp-label">{{ __('Tajuk') }}</label>
-                <input id="title" name="title" type="text" value="{{ old('title', $lesson->title) }}" class="tp-input" @error('title') aria-invalid="true" @enderror>
-                @error('title') <span class="tp-error">{{ $message }}</span> @enderror
-            </div>
-            <div class="tp-field">
-                <label for="description" class="tp-label">{{ __('Penerangan (pilihan)') }}</label>
-                <textarea id="description" name="description" rows="4" class="tp-textarea">{{ old('description', $lesson->description) }}</textarea>
-                @error('description') <span class="tp-error">{{ $message }}</span> @enderror
-            </div>
-        </div>
+        /* Guide sidebar. */
+        .vf-guide { display:flex; flex-direction:column; gap:16px; position:sticky; top:14px; }
+        .vf-ghero { border-radius:16px; overflow:hidden; border:1px solid var(--tp-line); background:var(--tp-surface); }
+        .vf-ghero .banner { height:130px; display:grid; place-items:center; background:linear-gradient(135deg, rgba(46,108,168,.12), rgba(46,108,168,.03)); }
+        .vf-ghero .body { padding:15px 18px; }
+        .vf-ghero .t { font-family:'Geist',sans-serif; font-weight:800; font-size:15px; color:var(--tp-ink); }
+        .vf-ghero .s { font-size:13px; color:var(--tp-muted); margin-top:5px; line-height:1.5; }
+        .vf-gcard { border-radius:16px; border:1px solid var(--tp-line); padding:16px 18px; }
+        .vf-gcard.g1 { background:rgba(23,144,123,.05); }
+        .vf-gcard.g2 { background:rgba(46,108,168,.05); }
+        .vf-gcard.g3 { background:rgba(124,92,191,.05); }
+        .vf-gh { display:flex; align-items:center; gap:9px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; color:var(--tp-ink); margin-bottom:12px; }
+        .vf-gh .gi { width:30px; height:30px; border-radius:9px; display:grid; place-items:center; flex-shrink:0; }
+        .vf-gli { display:flex; align-items:flex-start; gap:9px; font-size:12.5px; font-weight:600; color:var(--tp-muted); line-height:1.45; }
+        .vf-gli + .vf-gli { margin-top:10px; }
+    </style>
 
-        {{-- Source --}}
-        <div class="tp-panelform">
-            <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Sumber video') }}</h2>
+    <a href="{{ route('cikgu.video.index') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:16px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Video') }}</a>
 
-            {{-- A radiogroup, not a tablist: choosing a source also decides which value the form
-                 submits, so radio semantics (single choice) fit better than tabs. --}}
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" role="radiogroup" aria-label="{{ __('Sumber video') }}">
-                <button type="button" role="radio" :aria-checked="source === 'youtube' ? 'true' : 'false'"
-                        @click="switchSource('youtube')" class="tp-toggle" :class="{ 'is-on': source === 'youtube' }">
-                    <x-icon name="play" class="h-4 w-4" /> {{ __('Pautan YouTube') }}
-                </button>
-                <button type="button" role="radio" :aria-checked="source === 'upload' ? 'true' : 'false'"
-                        @click="switchSource('upload')" class="tp-toggle" :class="{ 'is-on': source === 'upload' }">
-                    <x-icon name="upload" class="h-4 w-4" /> {{ __('Muat Naik Video') }}
-                </button>
-            </div>
+    <div class="vf-layout">
+        {{-- Step rail (visual; each step scrolls to its section). --}}
+        <aside class="vf-steps">
+            <a href="#sec-maklumat" class="vf-step is-on"><span class="num">1</span><span class="lbl">{{ __('Maklumat Video') }}</span></a>
+            <a href="#sec-sumber" class="vf-step"><span class="num">2</span><span class="lbl">{{ __('Sumber Video') }}</span></a>
+            <a href="#sec-gambar" class="vf-step"><span class="num">3</span><span class="lbl">{{ __('Gambar Kecil & Fail') }}</span></a>
+            <a href="#sec-terbit" class="vf-step"><span class="num">4</span><span class="lbl">{{ __('Semakan') }}</span></a>
+        </aside>
 
-            <input type="hidden" name="source" :value="source">
+        <form method="POST"
+              action="{{ $editing ? route('cikgu.video.update', $lesson) : route('cikgu.video.store') }}"
+              enctype="multipart/form-data"
+              class="tp-formwrap"
+              x-data="videoForm({{ Js::from([
+                  'source' => old('source', $lesson->source ?? 'youtube'),
+                  'maxMb' => config('lms.video_max_mb'),
+                  'maxVideos' => \App\Http\Requests\LessonRequest::MAX_VIDEOS,
+                  'editing' => $editing,
+                  'hasVideo' => (bool) $lesson->video_path,
+                  'fallbackUrl' => route('cikgu.video.index'),
+                  'labels' => [
+                      'tooBig' => __('Saiz video :size MB melebihi had :max MB. Sila muat naik ke YouTube (Unlisted) dan tampal pautannya.'),
+                      'serverTooBig' => __('Fail terlalu besar untuk server. Sila guna pautan YouTube.'),
+                      'uploadFailed' => __('Muat naik gagal (ralat :status). Sila cuba lagi.'),
+                      'networkFailed' => __('Muat naik gagal. Sila semak sambungan internet anda dan cuba lagi.'),
+                      'thumbReady' => __('Gambar kecil diambil daripada video anda.'),
+                      'thumbFailed' => __('Gambar kecil tidak dapat diambil daripada video ini. Anda boleh muat naik gambar sendiri.'),
+                      'notVideo' => __('":name" bukan fail video. Guna MP4 atau WEBM.'),
+                      'tooManyFiles' => __('Had :max video sekali muat naik.'),
+                      'videoCount' => __(':count video dipilih'),
+                  ],
+              ]) }})"
+              @submit.prevent="submit($event)">
+            @csrf
+            @if ($editing) @method('PUT') @endif
 
-            {{-- Both panels are rendered and stacked in the SAME grid cell, so the box is always
-                 as tall as the taller panel. Switching source only flips which one is visible -
-                 the height never changes, so iOS/WebKit (which has no scroll anchoring) has
-                 nothing to jump to. The inactive panel is visibility:hidden - it keeps its space
-                 in the grid but drops out of tab order and the accessibility tree. --}}
-            <div class="tp-sourcestack" style="display:grid" x-cloak>
-            {{-- YouTube --}}
-            <div id="panel-youtube" role="group" aria-label="{{ __('Pautan YouTube') }}"
-                 style="grid-area:1 / 1"
-                 :style="source === 'youtube' ? {} : { visibility: 'hidden', pointerEvents: 'none' }"
-                 :aria-hidden="source !== 'youtube'" class="tp-field">
-                <label for="youtube_url" class="tp-label">{{ __('Pautan YouTube') }}</label>
-                <input id="youtube_url" name="youtube_url" type="url"
-                       value="{{ old('youtube_url', $lesson->youtube_id ? 'https://www.youtube.com/watch?v='.$lesson->youtube_id : '') }}"
-                       placeholder="https://www.youtube.com/watch?v=..." class="tp-input" aria-describedby="youtube-help"
-                       @error('youtube_url') aria-invalid="true" @enderror>
-                <p id="youtube-help" class="tp-hint">{{ __('Anda boleh guna pautan biasa, youtu.be, /embed/, /shorts/ atau /live/. Video dimainkan terus dalam platform ini.') }}</p>
-                @error('youtube_url') <span class="tp-error">{{ $message }}</span> @enderror
-            </div>
+            {{-- 1. Maklumat Video: Tahun/Subjek/Bab + title + description. --}}
+            <div class="tp-panelform" id="sec-maklumat">
+                <div style="display:flex;flex-direction:column;gap:3px">
+                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Maklumat Video') }}</h2>
+                    <span style="font-size:13px;color:var(--tp-muted)">{{ __('Masukkan maklumat asas video anda.') }}</span>
+                </div>
+                <x-chapter-picker :subjects="$subjects" :grades="$grades" :chapter="$chapter" />
 
-            {{-- Upload --}}
-            <div id="panel-upload" role="group" aria-label="{{ __('Muat Naik Video') }}"
-                 style="grid-area:1 / 1"
-                 :style="source === 'upload' ? {} : { visibility: 'hidden', pointerEvents: 'none' }"
-                 :aria-hidden="source !== 'upload'" class="tp-field">
-                <label class="tp-label">{{ $editing ? __('Fail video') : __('Fail video') }}</label>
-
-                @if ($editing)
-                    {{-- Editing replaces the one file this video points at, so it stays single. --}}
-                    <div class="tp-dropzone" :class="dragging && 'is-dragging'"
-                         role="button" tabindex="0" aria-controls="video"
-                         @click="$refs.video.click()"
-                         @keydown.enter.prevent="$refs.video.click()"
-                         @keydown.space.prevent="$refs.video.click()"
-                         @dragover.prevent="dragging = true"
-                         @dragenter.prevent="dragging = true"
-                         @dragleave.prevent="dragging = false"
-                         @drop.prevent="dragging = false; replaceVideo($event.dataTransfer?.files?.[0])">
-                        <x-icon name="upload" class="h-7 w-7" style="color:var(--tp-teal)" />
-                        <template x-if="! videoName">
-                            <span class="tp-g" style="font-weight:800;font-size:14.5px;color:var(--tp-ink)">{{ __('Seret & lepaskan fail di sini') }}</span>
-                        </template>
-                        <template x-if="videoName">
-                            <span class="tp-g" style="font-weight:800;font-size:14.5px;color:var(--tp-ink);word-break:break-all" x-text="videoName"></span>
-                        </template>
-                        <span class="tp-hint" x-text="videoName ? videoSize : @js(__('atau'))"></span>
-                        <span class="tp-btn-outline" style="min-height:38px;padding:0 16px;font-size:13px;pointer-events:none">{{ __('Tambah Fail') }}</span>
+                {{-- Uploading a batch names each video in its own row, so one title/description
+                     cannot describe five recordings: this block steps aside in batch mode. --}}
+                <div @if (! $editing) x-show="! batch" x-cloak @endif style="display:flex;flex-direction:column;gap:16px">
+                    <div class="tp-field">
+                        <label for="title" class="tp-label">{{ __('Tajuk') }}</label>
+                        <input id="title" name="title" type="text" value="{{ old('title', $lesson->title) }}" class="tp-input" @error('title') aria-invalid="true" @enderror>
+                        @error('title') <span class="tp-error">{{ $message }}</span> @enderror
                     </div>
-
-                    <input id="video" name="video" type="file" accept=".mp4,.webm,video/mp4,video/webm"
-                           x-ref="video" @change="onVideoChosen($event)" class="sr-only" aria-describedby="video-help" @error('video') aria-invalid="true" @enderror>
-                    <p id="video-help" class="tp-hint">
-                        {{ __('Format MP4 atau WEBM. Had saiz :max MB.', ['max' => config('lms.video_max_mb')]) }}
-                        @if ($lesson->video_path) {{ __('Biarkan kosong untuk mengekalkan video sedia ada.') }} @endif
-                    </p>
-                @else
-                    {{-- Creating takes any number of recordings at once. Each becomes its own
-                         video, titled by its row. --}}
-                    <div class="tp-dropzone" :class="dragging && 'is-dragging'"
-                         role="button" tabindex="0"
-                         @click="$refs.picker.click()"
-                         @keydown.enter.prevent="$refs.picker.click()"
-                         @keydown.space.prevent="$refs.picker.click()"
-                         @dragover.prevent="dragging = true"
-                         @dragenter.prevent="dragging = true"
-                         @dragleave.prevent="dragging = false"
-                         @drop.prevent="dragging = false; take($event.dataTransfer?.files)">
-                        <x-icon name="upload" class="h-7 w-7" style="color:var(--tp-teal)" />
-                        <span class="tp-g" style="font-weight:800;font-size:14.5px;color:var(--tp-ink)">{{ __('Seret & lepaskan fail di sini') }}</span>
-                        <span class="tp-hint">{{ __('atau') }}</span>
-                        <span class="tp-btn-outline" style="min-height:38px;padding:0 16px;font-size:13px;pointer-events:none">{{ __('Tambah Fail') }}</span>
+                    <div class="tp-field">
+                        <label for="description" class="tp-label">{{ __('Penerangan (pilihan)') }}</label>
+                        <textarea id="description" name="description" rows="4" class="tp-textarea">{{ old('description', $lesson->description) }}</textarea>
+                        @error('description') <span class="tp-error">{{ $message }}</span> @enderror
                     </div>
-
-                    <input type="file" multiple x-ref="picker" accept=".mp4,.webm,video/mp4,video/webm"
-                           @change="take($event.target.files); $event.target.value = ''" class="sr-only">
-                    <input type="file" name="videos[]" multiple x-ref="videos" class="sr-only" tabindex="-1" aria-hidden="true">
-
-                    <p id="video-help" class="tp-hint">
-                        {{ __('Format MP4 atau WEBM. Had saiz :max MB setiap fail.', ['max' => config('lms.video_max_mb')]) }}
-                        {{ __('Setiap fail menjadi satu video berasingan.') }}
-                    </p>
-
-                    <div x-show="videos.length" x-cloak style="border:1px solid var(--tp-line-2);border-radius:14px;overflow:hidden;margin-top:4px">
-                        <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--tp-line)">
-                            <span class="tp-g" style="font-weight:800;font-size:14px;color:var(--tp-ink)"
-                                  x-text="labels.videoCount.replace(':count', videos.length)"></span>
-                            <span class="tp-hint" style="margin-left:auto">{{ __('Maks. saiz setiap fail: :max MB', ['max' => config('lms.video_max_mb')]) }}</span>
-                        </div>
-
-                        <div style="display:grid;grid-template-columns:1fr 88px minmax(180px,1.2fr) 44px;gap:12px;padding:9px 16px;border-bottom:1px solid var(--tp-line)">
-                            <span class="tp-g tp-hint" style="font-weight:800">{{ __('Fail') }}</span>
-                            <span class="tp-g tp-hint" style="font-weight:800">{{ __('Saiz') }}</span>
-                            <span class="tp-g tp-hint" style="font-weight:800">{{ __('Tajuk video') }}</span>
-                            <span></span>
-                        </div>
-
-                        <template x-for="(row, index) in videos" :key="row.key">
-                            <div style="display:grid;grid-template-columns:1fr 88px minmax(180px,1.2fr) 44px;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--tp-line)">
-                                <span style="display:flex;align-items:center;gap:10px;min-width:0">
-                                    <span style="width:34px;height:34px;flex-shrink:0;border-radius:9px;background:#E4EEF9;color:#2E6CA8;display:grid;place-items:center">
-                                        <x-icon name="video" class="h-4 w-4" />
-                                    </span>
-                                    <span style="min-width:0;display:flex;flex-direction:column">
-                                        <span class="tp-g" style="font-weight:800;font-size:13.5px;color:var(--tp-ink);word-break:break-all" x-text="row.name"></span>
-                                        <span class="tp-hint" x-text="row.thumbReady ? @js(__('Gambar kecil sedia')) : row.ext"></span>
-                                    </span>
-                                </span>
-                                <span class="tp-hint" x-text="row.size"></span>
-                                <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
-                                    {{-- Paired to the file by position: video_titles[i] names videos[i]. --}}
-                                    <input type="text" name="video_titles[]" maxlength="255"
-                                           class="tp-input" style="min-height:38px;font-size:13.5px"
-                                           :placeholder="row.name"
-                                           aria-label="{{ __('Tajuk video') }}"
-                                           x-model="row.title">
-                                </span>
-                                <button type="button" class="tp-icon-action tp-icon-danger" @click="removeVideo(index)" title="{{ __('Buang') }}">
-                                    <x-icon name="trash" class="h-4 w-4" />
-                                    <span class="sr-only">{{ __('Buang video') }}</span>
-                                </button>
-                            </div>
-                        </template>
-                    </div>
-
-                    {{-- One hidden input per captured frame, keyed by the row it belongs to, so a
-                         capture that fails leaves a gap instead of shifting the rest. --}}
-                    <div x-ref="thumbs" class="sr-only" aria-hidden="true"></div>
-
-                    @foreach ($errors->get('videos.*') as $messages)
-                        <span class="tp-error">{{ $messages[0] }}</span>
-                    @endforeach
-                    @error('videos') <span class="tp-error">{{ $message }}</span> @enderror
-                @endif
-
-                <p x-show="sizeError" x-cloak class="tp-error" x-text="sizeError"></p>
-                @error('video') <span class="tp-error">{{ $message }}</span> @enderror
-                <div class="tp-note" style="display:flex;gap:10px;background:#FEF0CE;border:1px solid rgba(138,106,18,.25);border-radius:12px;padding:12px 14px;font-size:13px;color:#8A6A12;margin-top:6px">
-                    <x-icon name="info-circle" class="h-5 w-5" style="flex-shrink:0;margin-top:1px" />
-                    <div>{{ __('Untuk rakaman kelas penuh (video panjang atau besar), kami syorkan muat naik ke YouTube (Unlisted) dan tampal pautan di sini. Muat naik terus sesuai untuk klip pendek sahaja.') }}</div>
                 </div>
             </div>
-            </div>{{-- /.tp-sourcestack --}}
 
-            {{-- Thumbnail. A batch captures one frame per video automatically, so a single
-                 picker here would only be ambiguous. --}}
-            <div class="tp-field" style="border-top:1px solid var(--tp-line);padding-top:16px"
-                 @if (! $editing) x-show="! batch" x-cloak @endif>
-                <label for="thumbnail" class="tp-label">{{ __('Gambar kecil (pilihan)') }}</label>
-                {{-- Localised file button: the browser's native "Choose File / No file chosen" cannot
-                     be retexted, so the input is hidden and driven from a styled label in the form's
-                     own Alpine scope (keeps x-ref / onThumbnailPicked working). --}}
-                <label for="thumbnail" class="tp-filepick" style="display:flex;align-items:center;gap:14px;width:100%;min-height:46px;box-sizing:border-box;padding:5px;cursor:pointer;border:1.5px solid var(--tp-line-2);border-radius:12px;background:var(--tp-input)">
-                    <span style="display:inline-flex;align-items:center;min-height:36px;padding:0 16px;border-radius:10px;background:var(--tp-teal);color:#fff;white-space:nowrap;font-family:'Geist',sans-serif;font-weight:800;font-size:13px">{{ __('Pilih Fail') }}</span>
-                    <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Nunito',sans-serif;font-size:13.5px;color:var(--tp-muted)" x-text="thumbName || '{{ __('Tiada fail dipilih') }}'"></span>
+            {{-- 2. Sumber Video --}}
+            <div class="tp-panelform" id="sec-sumber">
+                <div style="display:flex;flex-direction:column;gap:3px">
+                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Sumber Video') }}</h2>
+                    <span style="font-size:13px;color:var(--tp-muted)">{{ __('Pilih cara anda ingin menambah video.') }}</span>
+                </div>
+
+                {{-- A radiogroup, not a tablist: choosing a source also decides which value the form
+                     submits, so radio semantics (single choice) fit better than tabs. --}}
+                <div class="vf-src" role="radiogroup" aria-label="{{ __('Sumber Video') }}">
+                    <button type="button" role="radio" :aria-checked="source === 'youtube' ? 'true' : 'false'"
+                            @click="switchSource('youtube')" class="vf-srcbtn" :class="{ 'is-on': source === 'youtube' }">
+                        <span class="ic"><x-icon name="youtube" class="h-5 w-5" style="color:#FF0000" /></span>
+                        <span style="min-width:0"><span class="t">{{ __('Pautan YouTube') }}</span><span class="s">{{ __('Pautkan video yang sedia ada') }}</span></span>
+                    </button>
+                    <button type="button" role="radio" :aria-checked="source === 'upload' ? 'true' : 'false'"
+                            @click="switchSource('upload')" class="vf-srcbtn" :class="{ 'is-on': source === 'upload' }">
+                        <span class="ic"><x-icon name="upload" class="h-5 w-5" /></span>
+                        <span style="min-width:0"><span class="t">{{ __('Muat Naik Video') }}</span><span class="s">{{ __('Muat naik fail video dari peranti anda') }}</span></span>
+                    </button>
+                </div>
+
+                <input type="hidden" name="source" :value="source">
+
+                {{-- Both panels are rendered and stacked in the SAME grid cell, so the box is always
+                     as tall as the taller panel. Switching source only flips which one is visible -
+                     the height never changes, so iOS/WebKit (which has no scroll anchoring) has
+                     nothing to jump to. The inactive panel is visibility:hidden - it keeps its space
+                     in the grid but drops out of tab order and the accessibility tree. --}}
+                <div class="tp-sourcestack" style="display:grid" x-cloak>
+                {{-- YouTube --}}
+                <div id="panel-youtube" role="group" aria-label="{{ __('Pautan YouTube') }}"
+                     style="grid-area:1 / 1"
+                     :style="source === 'youtube' ? {} : { visibility: 'hidden', pointerEvents: 'none' }"
+                     :aria-hidden="source !== 'youtube'" class="tp-field">
+                    <label for="youtube_url" class="tp-label">{{ __('Pautan YouTube') }}</label>
+                    <input id="youtube_url" name="youtube_url" type="url"
+                           value="{{ old('youtube_url', $lesson->youtube_id ? 'https://www.youtube.com/watch?v='.$lesson->youtube_id : '') }}"
+                           placeholder="https://www.youtube.com/watch?v=..." class="tp-input" aria-describedby="youtube-help"
+                           @error('youtube_url') aria-invalid="true" @enderror>
+                    <p id="youtube-help" class="tp-hint">{{ __('Anda boleh guna pautan biasa, youtu.be, /embed/, /shorts/ atau /live/. Video dimainkan terus dalam platform ini.') }}</p>
+                    @error('youtube_url') <span class="tp-error">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- Upload --}}
+                <div id="panel-upload" role="group" aria-label="{{ __('Muat Naik Video') }}"
+                     style="grid-area:1 / 1"
+                     :style="source === 'upload' ? {} : { visibility: 'hidden', pointerEvents: 'none' }"
+                     :aria-hidden="source !== 'upload'" class="tp-field">
+                    <label class="tp-label">{{ $editing ? __('Fail video') : __('Fail video') }}</label>
+
+                    @if ($editing)
+                        {{-- Editing replaces the one file this video points at, so it stays single. --}}
+                        <div class="tp-dropzone" :class="dragging && 'is-dragging'"
+                             role="button" tabindex="0" aria-controls="video"
+                             @click="$refs.video.click()"
+                             @keydown.enter.prevent="$refs.video.click()"
+                             @keydown.space.prevent="$refs.video.click()"
+                             @dragover.prevent="dragging = true"
+                             @dragenter.prevent="dragging = true"
+                             @dragleave.prevent="dragging = false"
+                             @drop.prevent="dragging = false; replaceVideo($event.dataTransfer?.files?.[0])">
+                            <x-icon name="upload" class="h-7 w-7" style="color:var(--tp-teal)" />
+                            <template x-if="! videoName">
+                                <span class="tp-g" style="font-weight:800;font-size:14.5px;color:var(--tp-ink)">{{ __('Seret & lepaskan fail di sini') }}</span>
+                            </template>
+                            <template x-if="videoName">
+                                <span class="tp-g" style="font-weight:800;font-size:14.5px;color:var(--tp-ink);word-break:break-all" x-text="videoName"></span>
+                            </template>
+                            <span class="tp-hint" x-text="videoName ? videoSize : @js(__('atau'))"></span>
+                            <span class="tp-btn-outline" style="min-height:38px;padding:0 16px;font-size:13px;pointer-events:none">{{ __('Tambah Fail') }}</span>
+                        </div>
+
+                        <input id="video" name="video" type="file" accept=".mp4,.webm,video/mp4,video/webm"
+                               x-ref="video" @change="onVideoChosen($event)" class="sr-only" aria-describedby="video-help" @error('video') aria-invalid="true" @enderror>
+                        <p id="video-help" class="tp-hint">
+                            {{ __('Format MP4 atau WEBM. Had saiz :max MB.', ['max' => config('lms.video_max_mb')]) }}
+                            @if ($lesson->video_path) {{ __('Biarkan kosong untuk mengekalkan video sedia ada.') }} @endif
+                        </p>
+                    @else
+                        {{-- Creating takes any number of recordings at once. Each becomes its own
+                             video, titled by its row. --}}
+                        <div class="tp-dropzone" :class="dragging && 'is-dragging'"
+                             role="button" tabindex="0"
+                             @click="$refs.picker.click()"
+                             @keydown.enter.prevent="$refs.picker.click()"
+                             @keydown.space.prevent="$refs.picker.click()"
+                             @dragover.prevent="dragging = true"
+                             @dragenter.prevent="dragging = true"
+                             @dragleave.prevent="dragging = false"
+                             @drop.prevent="dragging = false; take($event.dataTransfer?.files)">
+                            <x-icon name="upload" class="h-7 w-7" style="color:var(--tp-teal)" />
+                            <span class="tp-g" style="font-weight:800;font-size:14.5px;color:var(--tp-ink)">{{ __('Seret & lepaskan fail di sini') }}</span>
+                            <span class="tp-hint">{{ __('atau') }}</span>
+                            <span class="tp-btn-outline" style="min-height:38px;padding:0 16px;font-size:13px;pointer-events:none">{{ __('Tambah Fail') }}</span>
+                        </div>
+
+                        <input type="file" multiple x-ref="picker" accept=".mp4,.webm,video/mp4,video/webm"
+                               @change="take($event.target.files); $event.target.value = ''" class="sr-only">
+                        <input type="file" name="videos[]" multiple x-ref="videos" class="sr-only" tabindex="-1" aria-hidden="true">
+
+                        <p id="video-help" class="tp-hint">
+                            {{ __('Format MP4 atau WEBM. Had saiz :max MB setiap fail.', ['max' => config('lms.video_max_mb')]) }}
+                            {{ __('Setiap fail menjadi satu video berasingan.') }}
+                        </p>
+
+                        <div x-show="videos.length" x-cloak style="border:1px solid var(--tp-line-2);border-radius:14px;overflow:hidden;margin-top:4px">
+                            <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--tp-line)">
+                                <span class="tp-g" style="font-weight:800;font-size:14px;color:var(--tp-ink)"
+                                      x-text="labels.videoCount.replace(':count', videos.length)"></span>
+                                <span class="tp-hint" style="margin-left:auto">{{ __('Maks. saiz setiap fail: :max MB', ['max' => config('lms.video_max_mb')]) }}</span>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 88px minmax(180px,1.2fr) 44px;gap:12px;padding:9px 16px;border-bottom:1px solid var(--tp-line)">
+                                <span class="tp-g tp-hint" style="font-weight:800">{{ __('Fail') }}</span>
+                                <span class="tp-g tp-hint" style="font-weight:800">{{ __('Saiz') }}</span>
+                                <span class="tp-g tp-hint" style="font-weight:800">{{ __('Tajuk video') }}</span>
+                                <span></span>
+                            </div>
+
+                            <template x-for="(row, index) in videos" :key="row.key">
+                                <div style="display:grid;grid-template-columns:1fr 88px minmax(180px,1.2fr) 44px;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--tp-line)">
+                                    <span style="display:flex;align-items:center;gap:10px;min-width:0">
+                                        <span style="width:34px;height:34px;flex-shrink:0;border-radius:9px;background:#E4EEF9;color:#2E6CA8;display:grid;place-items:center">
+                                            <x-icon name="video" class="h-4 w-4" />
+                                        </span>
+                                        <span style="min-width:0;display:flex;flex-direction:column">
+                                            <span class="tp-g" style="font-weight:800;font-size:13.5px;color:var(--tp-ink);word-break:break-all" x-text="row.name"></span>
+                                            <span class="tp-hint" x-text="row.thumbReady ? @js(__('Gambar kecil sedia')) : row.ext"></span>
+                                        </span>
+                                    </span>
+                                    <span class="tp-hint" x-text="row.size"></span>
+                                    <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                                        {{-- Paired to the file by position: video_titles[i] names videos[i]. --}}
+                                        <input type="text" name="video_titles[]" maxlength="255"
+                                               class="tp-input" style="min-height:38px;font-size:13.5px"
+                                               :placeholder="row.name"
+                                               aria-label="{{ __('Tajuk video') }}"
+                                               x-model="row.title">
+                                    </span>
+                                    <button type="button" class="tp-icon-action tp-icon-danger" @click="removeVideo(index)" title="{{ __('Buang') }}">
+                                        <x-icon name="trash" class="h-4 w-4" />
+                                        <span class="sr-only">{{ __('Buang video') }}</span>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+
+                        {{-- One hidden input per captured frame, keyed by the row it belongs to, so a
+                             capture that fails leaves a gap instead of shifting the rest. --}}
+                        <div x-ref="thumbs" class="sr-only" aria-hidden="true"></div>
+
+                        @foreach ($errors->get('videos.*') as $messages)
+                            <span class="tp-error">{{ $messages[0] }}</span>
+                        @endforeach
+                        @error('videos') <span class="tp-error">{{ $message }}</span> @enderror
+                    @endif
+
+                    <p x-show="sizeError" x-cloak class="tp-error" x-text="sizeError"></p>
+                    @error('video') <span class="tp-error">{{ $message }}</span> @enderror
+                    <div class="tp-note" style="display:flex;gap:10px;background:#FEF0CE;border:1px solid rgba(138,106,18,.25);border-radius:12px;padding:12px 14px;font-size:13px;color:#8A6A12;margin-top:6px">
+                        <x-icon name="info-circle" class="h-5 w-5" style="flex-shrink:0;margin-top:1px" />
+                        <div>{{ __('Untuk rakaman kelas penuh (video panjang atau besar), kami syorkan muat naik ke YouTube (Unlisted) dan tampal pautan di sini. Muat naik terus sesuai untuk klip pendek sahaja.') }}</div>
+                    </div>
+                </div>
+                </div>{{-- /.tp-sourcestack --}}
+            </div>
+
+            {{-- 3. Gambar Kecil (Thumbnail). A batch captures one frame per video automatically,
+                 so a single picker here would only be ambiguous. --}}
+            <div class="tp-panelform" id="sec-gambar" @if (! $editing) x-show="! batch" x-cloak @endif>
+                <div style="display:flex;flex-direction:column;gap:3px">
+                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Gambar Kecil (Thumbnail)') }}</h2>
+                    <span style="font-size:13px;color:var(--tp-muted)">{{ __('Pilih gambar kecil untuk video anda.') }}</span>
+                </div>
+                <div class="tp-field">
+                    {{-- Localised file button: the browser's native "Choose File / No file chosen" cannot
+                         be retexted, so the input is hidden and driven from a styled label in the form's
+                         own Alpine scope (keeps x-ref / onThumbnailPicked working). --}}
+                    <label for="thumbnail" class="tp-filepick" style="display:flex;align-items:center;gap:14px;width:100%;min-height:46px;box-sizing:border-box;padding:5px;cursor:pointer;border:1.5px solid var(--tp-line-2);border-radius:12px;background:var(--tp-input)">
+                        <span style="display:inline-flex;align-items:center;min-height:36px;padding:0 16px;border-radius:10px;background:var(--tp-teal);color:#fff;white-space:nowrap;font-family:'Geist',sans-serif;font-weight:800;font-size:13px">{{ __('Pilih Fail') }}</span>
+                        <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Nunito',sans-serif;font-size:13.5px;color:var(--tp-muted)" x-text="thumbName || '{{ __('Tiada fail dipilih') }}'"></span>
+                    </label>
+                    <input id="thumbnail" name="thumbnail" type="file" accept="image/*" class="sr-only"
+                           x-ref="thumbnail" @change="thumbName = $event.target.files[0]?.name || ''; onThumbnailPicked()" aria-describedby="thumbnail-help">
+                    <p id="thumbnail-help" class="tp-hint">{{ __('Dibuat secara automatik daripada video anda. Muat naik gambar sendiri untuk menggantikannya.') }}</p>
+                    {{-- Live status for the frame we capture from the chosen video file. --}}
+                    <p x-show="thumbBusy" x-cloak class="tp-hint" aria-live="polite" style="display:flex;align-items:center;gap:6px"><x-icon name="clock" class="h-4 w-4" /> {{ __('Sedang mengambil gambar daripada video…') }}</p>
+                    <p x-show="thumbNote" x-cloak class="tp-hint" style="color:#0F7A68;font-weight:700" aria-live="polite" x-text="thumbNote"></p>
+                    <p x-show="thumbError" x-cloak class="tp-hint" style="color:#8A6A12" aria-live="polite" x-text="thumbError"></p>
+                    @error('thumbnail') <span class="tp-error">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            {{-- 4. Tetapan Penerbitan --}}
+            <div class="tp-panelform" id="sec-terbit">
+                <div style="display:flex;flex-direction:column;gap:3px">
+                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Tetapan Penerbitan') }}</h2>
+                    <span style="font-size:13px;color:var(--tp-muted)">{{ __('Pilih sama ada video ini sudah siap untuk diterbitkan.') }}</span>
+                </div>
+                <label for="is_published" style="display:flex;align-items:flex-start;gap:14px;cursor:pointer">
+                    <input id="is_published" name="is_published" type="checkbox" value="1" @checked(old('is_published', $lesson->is_published ?? true)) style="width:20px;height:20px;margin-top:2px;accent-color:#17907B">
+                    <span style="display:flex;flex-direction:column;gap:2px">
+                        <span class="tp-g" style="font-weight:800;font-size:14.5px;color:var(--tp-ink)">{{ __('Terbitkan kepada murid') }}</span>
+                        <span style="font-size:12.5px;color:var(--tp-muted)">{{ __('Nyahtanda untuk simpan sebagai draf. Murid tidak dapat melihat draf.') }}</span>
+                    </span>
                 </label>
-                <input id="thumbnail" name="thumbnail" type="file" accept="image/*" class="sr-only"
-                       x-ref="thumbnail" @change="thumbName = $event.target.files[0]?.name || ''; onThumbnailPicked()" aria-describedby="thumbnail-help">
-                <p id="thumbnail-help" class="tp-hint">{{ __('Dibuat secara automatik daripada video anda. Muat naik gambar sendiri untuk menggantikannya.') }}</p>
-                {{-- Live status for the frame we capture from the chosen video file. --}}
-                <p x-show="thumbBusy" x-cloak class="tp-hint" aria-live="polite" style="display:flex;align-items:center;gap:6px"><x-icon name="clock" class="h-4 w-4" /> {{ __('Sedang mengambil gambar daripada video…') }}</p>
-                <p x-show="thumbNote" x-cloak class="tp-hint" style="color:#0F7A68;font-weight:700" aria-live="polite" x-text="thumbNote"></p>
-                <p x-show="thumbError" x-cloak class="tp-hint" style="color:#8A6A12" aria-live="polite" x-text="thumbError"></p>
-                @error('thumbnail') <span class="tp-error">{{ $message }}</span> @enderror
             </div>
-        </div>
 
-        {{-- Publish --}}
-        <label for="is_published" class="tp-checkrow">
-            <input id="is_published" name="is_published" type="checkbox" value="1" @checked(old('is_published', $lesson->is_published ?? true)) style="width:20px;height:20px;margin-top:2px;accent-color:#17907B">
-            <span style="display:flex;flex-direction:column;gap:2px">
-                <span class="tp-g" style="font-weight:800;font-size:14.5px;color:var(--tp-ink)">{{ __('Terbitkan kepada murid') }}</span>
-                <span style="font-size:12.5px;color:var(--tp-muted)">{{ __('Nyahtanda untuk simpan sebagai draf. Murid tidak dapat melihat draf.') }}</span>
-            </span>
-        </label>
-
-        {{-- Upload progress --}}
-        <div x-show="uploading" x-cloak class="tp-panelform">
-            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:700;color:var(--tp-ink)">
-                <span>{{ __('Memuat naik video...') }}</span>
-                <span x-text="progress + '%'">0%</span>
+            {{-- Upload progress --}}
+            <div x-show="uploading" x-cloak class="tp-panelform">
+                <div style="display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:700;color:var(--tp-ink)">
+                    <span>{{ __('Memuat naik video...') }}</span>
+                    <span x-text="progress + '%'">0%</span>
+                </div>
+                <div style="height:12px;width:100%;overflow:hidden;border-radius:999px;background:var(--tp-line)" role="progressbar" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+                    {{-- Object syntax, not a string: Alpine applies a string :style with setAttribute,
+                         which would replace the whole style attribute and leave the fill with no height
+                         and no colour - a bar that tracks progress perfectly and is invisible doing it. --}}
+                    <div style="height:100%;border-radius:999px;background:#17907B;transition:width .15s" :style="{ width: progress + '%' }"></div>
+                </div>
+                <p class="tp-hint">{{ __('Jangan tutup halaman ini sehingga selesai.') }}</p>
             </div>
-            <div style="height:12px;width:100%;overflow:hidden;border-radius:999px;background:var(--tp-line)" role="progressbar" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
-                {{-- Object syntax, not a string: Alpine applies a string :style with setAttribute,
-                     which would replace the whole style attribute and leave the fill with no height
-                     and no colour - a bar that tracks progress perfectly and is invisible doing it. --}}
-                <div style="height:100%;border-radius:999px;background:#17907B;transition:width .15s" :style="{ width: progress + '%' }"></div>
+
+            <div x-show="failed" x-cloak style="display:flex;gap:10px;background:#FDE7E0;border:1px solid rgba(194,73,54,.25);border-radius:14px;padding:14px 18px;font-size:13.5px;color:#C24936">
+                <x-icon name="alert" class="h-5 w-5" style="flex-shrink:0;margin-top:1px" />
+                <div x-text="failed"></div>
             </div>
-            <p class="tp-hint">{{ __('Jangan tutup halaman ini sehingga selesai.') }}</p>
-        </div>
 
-        <div x-show="failed" x-cloak style="display:flex;gap:10px;background:#FDE7E0;border:1px solid rgba(194,73,54,.25);border-radius:14px;padding:14px 18px;font-size:13.5px;color:#C24936">
-            <x-icon name="alert" class="h-5 w-5" style="flex-shrink:0;margin-top:1px" />
-            <div x-text="failed"></div>
-        </div>
+            <div class="tp-formfooter" style="display:flex;gap:12px">
+                <button type="submit" class="tp-btn" style="min-height:48px" :disabled="uploading">
+                    <span x-show="! uploading">{{ $editing ? __('Simpan Perubahan') : __('Simpan Video') }}</span>
+                    <span x-show="uploading" x-cloak>{{ __('Menyimpan...') }}</span>
+                </button>
+                <a href="{{ route('cikgu.video.index') }}" class="tp-btn-outline" style="min-height:48px">{{ __('Batal') }}</a>
+            </div>
+        </form>
 
-        <div class="tp-formfooter" style="display:flex;gap:12px">
-            <button type="submit" class="tp-btn" style="min-height:48px" :disabled="uploading">
-                <span x-show="! uploading">{{ $editing ? __('Simpan Perubahan') : __('Simpan Video') }}</span>
-                <span x-show="uploading" x-cloak>{{ __('Menyimpan...') }}</span>
-            </button>
-            <a href="{{ route('cikgu.video.index') }}" class="tp-btn-outline" style="min-height:48px">{{ __('Batal') }}</a>
-        </div>
-    </form>
+        {{-- Guide sidebar. --}}
+        <aside class="vf-guide">
+            <div class="vf-ghero">
+                <div class="banner"><x-icon name="youtube" class="h-12 w-12" style="color:#FF0000" /></div>
+                <div class="body">
+                    <div class="t">{{ __('Panduan Memuat Naik Video') }}</div>
+                    <div class="s">{{ __('Anda boleh memuat naik fail video atau menggunakan pautan dari YouTube.') }}</div>
+                </div>
+            </div>
+
+            <div class="vf-gcard g1">
+                <div class="vf-gh"><span class="gi" style="background:#DCF2EE;color:#0F7A68"><x-icon name="device" class="h-4 w-4" /></span>{{ __('Keperluan Video') }}</div>
+                <div class="vf-gli"><x-icon name="file" class="h-4 w-4" style="color:#0F7A68" />{{ __('Format disokong: MP4, WEBM') }}</div>
+                <div class="vf-gli"><x-icon name="scale" class="h-4 w-4" style="color:#0F7A68" />{{ __('Saiz maksimum: :max MB', ['max' => config('lms.video_max_mb')]) }}</div>
+                <div class="vf-gli"><x-icon name="laptop" class="h-4 w-4" style="color:#0F7A68" />{{ __('Resolusi disarankan: 1280 x 720 (HD)') }}</div>
+                <div class="vf-gli"><x-icon name="check-circle" class="h-4 w-4" style="color:#0F7A68" />{{ __('Pastikan kandungan sesuai untuk murid') }}</div>
+            </div>
+
+            <div class="vf-gcard g2">
+                <div class="vf-gh"><span class="gi" style="background:#E4EEF9;color:#2E6CA8"><x-icon name="bulb" class="h-4 w-4" /></span>{{ __('Petua') }}</div>
+                <div class="vf-gli"><x-icon name="check" class="h-4 w-4" style="color:#2E6CA8" />{{ __('Gunakan tajuk yang jelas dan menarik') }}</div>
+                <div class="vf-gli"><x-icon name="check" class="h-4 w-4" style="color:#2E6CA8" />{{ __('Berikan penerangan ringkas tentang isi video') }}</div>
+                <div class="vf-gli"><x-icon name="check" class="h-4 w-4" style="color:#2E6CA8" />{{ __('Pilih gambar kecil yang sesuai') }}</div>
+                <div class="vf-gli"><x-icon name="check" class="h-4 w-4" style="color:#2E6CA8" />{{ __('Pastikan audio dan visual jelas') }}</div>
+            </div>
+
+            <div class="vf-gcard g3">
+                <div class="vf-gh"><span class="gi" style="background:#EDE7F9;color:#7C5CBF"><x-icon name="info-circle" class="h-4 w-4" /></span>{{ __('Perkara yang perlu dielakkan') }}</div>
+                <div class="vf-gli"><x-icon name="x-circle" class="h-4 w-4" style="color:#C24936" />{{ __('Jangan muat naik kandungan yang melanggar hak cipta') }}</div>
+                <div class="vf-gli"><x-icon name="x-circle" class="h-4 w-4" style="color:#C24936" />{{ __('Elakkan maklumat peribadi murid') }}</div>
+                <div class="vf-gli"><x-icon name="x-circle" class="h-4 w-4" style="color:#C24936" />{{ __('Pastikan bahasa yang digunakan sesuai') }}</div>
+                <div class="vf-gli"><x-icon name="x-circle" class="h-4 w-4" style="color:#C24936" />{{ __('Jangan muat naik video yang tidak berkaitan pembelajaran') }}</div>
+            </div>
+        </aside>
+    </div>
 
     @push('scripts')
         <script>
