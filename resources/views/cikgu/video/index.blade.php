@@ -40,6 +40,18 @@
         }
     </style>
 
+    {{-- Search videos by title. Carries the current filters as hidden fields so searching keeps them. --}}
+    <form method="GET" action="{{ route('cikgu.video.index') }}" style="margin-bottom:18px">
+        @foreach (request()->except(['q', 'page']) as $k => $v)
+            @unless (is_array($v))<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endunless
+        @endforeach
+        <div style="position:relative;max-width:560px">
+            <span style="position:absolute;left:16px;top:0;bottom:0;display:flex;align-items:center;color:var(--tp-muted);pointer-events:none"><x-icon name="search" class="h-5 w-5" /></span>
+            <input type="search" name="q" value="{{ request('q') }}" placeholder="{{ __('Cari video...') }}" aria-label="{{ __('Cari video...') }}"
+                   style="width:100%;min-height:48px;padding:0 18px 0 46px;border:1.5px solid var(--tp-line-2);border-radius:14px;background:var(--tp-surface);color:var(--tp-ink);font-family:'Nunito',sans-serif;font-size:15px">
+        </div>
+    </form>
+
     {{-- Stat (total videos, all-time) beside the Tahun/Subjek/Bab filters, split by a divider. --}}
     <div class="tp-card bf-card" style="margin-bottom:18px">
         <div class="bf-stat">
@@ -53,7 +65,9 @@
         <div class="bf-div"></div>
 
         <div class="bf-filters">
-            <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.video.index')" />
+            <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.video.index')">
+                <x-slot:search><input type="hidden" name="q" value="{{ request('q') }}"></x-slot:search>
+            </x-year-subject-filter>
         </div>
     </div>
 

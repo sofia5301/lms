@@ -4,6 +4,18 @@
     heading-icon="quiz"
     :sub="__('Kuiz interaktif yang menanda sendiri, dan kuiz bercetak')">
 
+    {{-- Search quizzes by title. Carries the current filters as hidden fields so searching keeps them. --}}
+    <form method="GET" action="{{ route('cikgu.kuiz.index') }}" style="margin-bottom:18px">
+        @foreach (request()->except(['q', 'page']) as $k => $v)
+            @unless (is_array($v))<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endunless
+        @endforeach
+        <div style="position:relative;max-width:560px">
+            <span style="position:absolute;left:16px;top:0;bottom:0;display:flex;align-items:center;color:var(--tp-muted);pointer-events:none"><x-icon name="search" class="h-5 w-5" /></span>
+            <input type="search" name="q" value="{{ request('q') }}" placeholder="{{ __('Cari kuiz...') }}" aria-label="{{ __('Cari kuiz...') }}"
+                   style="width:100%;min-height:48px;padding:0 18px 0 46px;border:1.5px solid var(--tp-line-2);border-radius:14px;background:var(--tp-surface);color:var(--tp-ink);font-family:'Nunito',sans-serif;font-size:15px">
+        </div>
+    </form>
+
     {{-- Total quizzes created by this teacher (all-time, not the filtered count). --}}
     <div class="tp-stat" style="max-width:340px;margin-bottom:18px">
         <div style="display:flex;align-items:center;gap:10px">
@@ -15,6 +27,7 @@
     </div>
 
     <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.kuiz.index')">
+        <x-slot:search><input type="hidden" name="q" value="{{ request('q') }}"></x-slot:search>
         <div class="tp-newbtn-wrap" style="margin-left:auto">
             <a href="{{ route('cikgu.kuiz.mod') }}" class="tp-btn">
                 <x-icon name="plus" class="h-4 w-4" />

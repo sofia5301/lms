@@ -45,10 +45,12 @@ class LessonController extends Controller
     {
         $teacher = $request->user();
         $filter = \App\Support\ContentFilter::fromRequest($request);
+        $q = trim((string) $request->query('q', ''));
 
         $lessons = $filter->apply(
             $teacher->lessons()->with('chapter.subject', 'chapter.grade')
         )
+            ->when($q !== '', fn ($query) => $query->where('title', 'like', '%'.$q.'%'))
             ->latest('id')
             ->paginate(12)
             ->withQueryString();

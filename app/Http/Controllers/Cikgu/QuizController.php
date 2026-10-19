@@ -35,12 +35,14 @@ class QuizController extends Controller
             ->delete();
 
         $filter = \App\Support\ContentFilter::fromRequest($request);
+        $search = trim((string) $request->query('q', ''));
 
         $quizzes = $filter->apply(
             $teacher->quizzes()
                 ->with('chapter.subject', 'chapter.grade', 'questions.options')
                 ->withCount(['questions', 'attempts as completed_attempts_count' => fn ($q) => $q->whereNotNull('completed_at')])
         )
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', '%'.$search.'%'))
             ->latest('id')
             ->paginate(12)
             ->withQueryString();

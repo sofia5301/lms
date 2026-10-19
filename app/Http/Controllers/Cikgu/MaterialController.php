@@ -19,9 +19,11 @@ class MaterialController extends Controller
     {
         $teacher = $request->user();
         $filter = \App\Support\ContentFilter::fromRequest($request);
+        $search = trim((string) $request->query('q', ''));
 
-        // Counts for the type tabs reflect the Tahun/Subjek/Bab filter but not the type tab itself.
-        $countBase = fn () => $filter->apply($teacher->materials());
+        // Counts for the type tabs reflect the Tahun/Subjek/Bab filter + search, but not the type tab.
+        $countBase = fn () => $filter->apply($teacher->materials())
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', '%'.$search.'%'));
         $counts = [
             'semua' => $countBase()->count(),
             'slaid' => $countBase()->ofKind('slaid')->count(),
@@ -35,6 +37,7 @@ class MaterialController extends Controller
         $materials = $filter->apply(
             $teacher->materials()->with('chapter.subject', 'chapter.grade', 'lesson')
         )
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', '%'.$search.'%'))
             ->when($kind, fn ($q) => $q->ofKind($kind))
             ->when($sort === 'terbaru', fn ($q) => $q->latest('id'))
             ->when($sort === 'terlama', fn ($q) => $q->oldest('id'))
