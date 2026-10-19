@@ -155,10 +155,7 @@
                             <x-icon :name="$subject->iconName()" class="ic h-20 w-20" style="color:rgb({{ $subject->rgb }})" />
                         </div>
 
-                        <h3 class="bab-sec-h">{{ __('Tentang Bab Ini') }}</h3>
-                        <p class="bab-about" x-text="sel.description || '{{ __('Tiada penerangan untuk bab ini.') }}'"></p>
-
-                        <h3 class="bab-sec-h">{{ __('Kandungan Bab') }}</h3>
+                        <h3 class="bab-sec-h" style="margin-top:22px">{{ __('Kandungan Bab') }}</h3>
                         <div class="bab-stats">
                             <div class="bab-stat">
                                 <span class="sq" style="background:#DCF2EE;color:#17907B"><x-icon name="video" class="h-5 w-5" /></span>
@@ -166,7 +163,7 @@
                             </div>
                             <div class="bab-stat">
                                 <span class="sq" style="background:#E4EEF9;color:#2E6CA8"><x-icon name="file" class="h-5 w-5" /></span>
-                                <div><div class="n" x-text="sel.bahan"></div><div class="l">{{ __('Bahan bantuan mengajar') }}</div></div>
+                                <div><div class="n" x-text="sel.bahan"></div><div class="l">{{ __('Bahan pengajaran') }}</div></div>
                             </div>
                             <div class="bab-stat">
                                 <span class="sq" style="background:#EDE7F9;color:#7C5CBF"><x-icon name="help-circle" class="h-5 w-5" /></span>
