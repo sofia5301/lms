@@ -20,10 +20,26 @@ class MaterialController extends Controller
         $teacher = $request->user();
         $filter = \App\Support\ContentFilter::fromRequest($request);
 
+        // Counts for the type tabs reflect the Tahun/Subjek/Bab filter but not the type tab itself.
+        $countBase = fn () => $filter->apply($teacher->materials());
+        $counts = [
+            'semua' => $countBase()->count(),
+            'slaid' => $countBase()->ofKind('slaid')->count(),
+            'pdf' => $countBase()->ofKind('pdf')->count(),
+            'lembaran' => $countBase()->ofKind('lembaran')->count(),
+        ];
+
+        $kind = in_array($request->query('jenis'), ['slaid', 'pdf', 'lembaran'], true) ? $request->query('jenis') : null;
+        $sort = in_array($request->query('isih'), ['terbaru', 'terlama', 'muat-turun', 'nama'], true) ? $request->query('isih') : 'terbaru';
+
         $materials = $filter->apply(
             $teacher->materials()->with('chapter.subject', 'chapter.grade', 'lesson')
         )
-            ->latest('id')
+            ->when($kind, fn ($q) => $q->ofKind($kind))
+            ->when($sort === 'terbaru', fn ($q) => $q->latest('id'))
+            ->when($sort === 'terlama', fn ($q) => $q->oldest('id'))
+            ->when($sort === 'muat-turun', fn ($q) => $q->orderByDesc('download_count')->latest('id'))
+            ->when($sort === 'nama', fn ($q) => $q->orderBy('title'))
             ->paginate(15)
             ->withQueryString();
 
@@ -34,6 +50,9 @@ class MaterialController extends Controller
             'filter' => $filter,
             // All-time count of materials uploaded by this teacher (not the filtered page count).
             'totalMaterials' => $teacher->materials()->count(),
+            'counts' => $counts,
+            'kind' => $kind,
+            'sort' => $sort,
         ]);
     }
 

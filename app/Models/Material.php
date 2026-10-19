@@ -57,6 +57,26 @@ class Material extends Model
         return static::whereKey($this->id)->visibleToStudents()->exists();
     }
 
+    /**
+     * Filter by the Bahan-page file-type tabs. Matched on the uploaded filename's extension so it
+     * is reliable (mime types vary by browser): 'pdf' = *.pdf, 'slaid' = *.ppt/*.pptx, and
+     * 'lembaran' (Lembaran Kerja) is everything else - together the three cover every material.
+     */
+    public function scopeOfKind(Builder $query, string $kind): Builder
+    {
+        return match ($kind) {
+            'pdf' => $query->whereRaw('LOWER(original_name) LIKE ?', ['%.pdf']),
+            'slaid' => $query->where(fn (Builder $q) => $q
+                ->whereRaw('LOWER(original_name) LIKE ?', ['%.ppt'])
+                ->orWhereRaw('LOWER(original_name) LIKE ?', ['%.pptx'])),
+            'lembaran' => $query
+                ->whereRaw('LOWER(original_name) NOT LIKE ?', ['%.pdf'])
+                ->whereRaw('LOWER(original_name) NOT LIKE ?', ['%.ppt'])
+                ->whereRaw('LOWER(original_name) NOT LIKE ?', ['%.pptx']),
+            default => $query,
+        };
+    }
+
     public function chapter(): BelongsTo
     {
         return $this->belongsTo(Chapter::class);
