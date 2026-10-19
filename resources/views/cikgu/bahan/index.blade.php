@@ -33,7 +33,7 @@
 
         /* Stat + filters on one row, split by a divider (stacks on small screens). */
         .bf-card { display:flex; align-items:stretch; flex-wrap:wrap; }
-        .bf-stat { display:flex; align-items:center; gap:20px; padding:22px 60px 22px 32px; flex-shrink:0; }
+        .bf-stat { display:flex; align-items:center; gap:22px; padding:24px 80px 24px 36px; flex-shrink:0; }
         .bf-div { width:1px; background:var(--tp-line); align-self:stretch; margin:18px 0; flex-shrink:0; }
         .bf-filters { flex:1; min-width:280px; display:flex; align-items:center; padding:18px 28px; }
         /* The three dropdowns share the row evenly, so there's no empty gap on the right. */
@@ -53,10 +53,9 @@
     <div class="tp-card bf-card" style="margin-bottom:18px">
         <div class="bf-stat">
             <span style="width:52px;height:52px;border-radius:14px;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;flex-shrink:0"><x-icon name="file" class="h-6 w-6" /></span>
-            <div style="display:flex;flex-direction:column;gap:1px;min-width:0">
-                <span style="font-size:12.5px;font-weight:700;color:var(--tp-muted)">{{ __('Bahan Saya') }}</span>
-                <span style="font-family:'Geist',sans-serif;font-size:28px;font-weight:800;color:var(--tp-ink);line-height:1.05">{{ number_format($totalMaterials) }}</span>
-                <span style="font-size:12px;font-weight:700;color:var(--tp-muted)">{{ __('Bahan pengajaran') }}</span>
+            <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                <span style="font-size:12.5px;font-weight:700;color:var(--tp-muted);white-space:nowrap">{{ __('Bahan Pengajaran Saya') }}</span>
+                <span style="font-family:'Geist',sans-serif;font-size:30px;font-weight:800;color:var(--tp-ink);line-height:1.05">{{ number_format($totalMaterials) }}</span>
             </div>
         </div>
 
