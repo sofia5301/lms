@@ -5,6 +5,25 @@
     :sub="__('Kuiz interaktif yang menanda sendiri, dan kuiz bercetak')">
 
     <style>
+        /* Quiz list as a table: Kuis / Subjek / Tahun·Bab / Soalan / Percubaan / Tempoh / Tindakan.
+           Keeps a min-width and scrolls sideways inside .qt-wrap on narrow screens. */
+        .qt-wrap { overflow-x:auto; }
+        .qt-table { min-width:1040px; }
+        .qt-head, .qt-row { display:grid; grid-template-columns:minmax(0,2.6fr) minmax(0,1.05fr) minmax(0,1fr) minmax(0,0.72fr) minmax(0,0.95fr) minmax(0,0.62fr) 288px; gap:14px; align-items:center; }
+        .qt-head { padding:13px 22px; }
+        .qt-colh { font-family:'Geist',sans-serif; font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--tp-muted); }
+        .qt-row { padding:14px 22px; border-top:1px solid var(--tp-line); }
+        .qt-kuis { display:flex; align-items:center; gap:14px; min-width:0; }
+        .qt-ico { width:52px; height:52px; border-radius:14px; display:grid; place-items:center; flex-shrink:0; }
+        .qt-titlewrap { display:flex; align-items:center; gap:9px; flex-wrap:wrap; min-width:0; }
+        .qt-title { font-family:'Geist',sans-serif; font-weight:800; font-size:14.5px; color:var(--tp-ink); line-height:1.3; }
+        .qt-cell { font-size:13px; font-weight:700; color:var(--tp-muted-2); min-width:0; }
+        .qt-tind { display:flex; align-items:center; gap:10px; }
+        .qt-tind .tp-icon-action { border:1.5px solid var(--tp-line-2); }
+        .qt-tind .tp-icon-danger { border-color:rgba(194,73,54,.45); }
+        /* Centre every column except Kuis (header + data), so values sit centred in their column. */
+        .qt-head > :not(:first-child), .qt-row > :not(.qt-kuis) { justify-self:center; text-align:center; }
+
         /* Stat + filters on one row, split by a divider (stacks on small screens). */
         .bf-card { display:flex; align-items:stretch; flex-wrap:wrap; }
         .bf-stat { display:flex; align-items:center; gap:22px; padding:24px 80px 24px 36px; flex-shrink:0; min-width:350px; }
@@ -63,88 +82,103 @@
             <a href="{{ route('cikgu.kuiz.mod') }}" class="tp-btn" style="margin-top:6px">{{ __('Cipta Kuiz Pertama') }}</a>
         </div>
     @else
-        <div class="tp-list">
-            @foreach ($quizzes as $quiz)
-                @php($subject = $quiz->chapter->subject)
-                <div class="tp-listcard" style="padding:18px 20px">
-                    {{-- Subject icon square, colour-matched to the subject. --}}
-                    <span style="width:60px;height:60px;border-radius:14px;background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }});display:grid;place-items:center;flex-shrink:0"><x-icon :name="$subject->iconName()" class="h-7 w-7" /></span>
+        <div class="tp-card">
+            <div class="qt-wrap">
+                <div class="qt-table">
+                    <div class="qt-head">
+                        <span class="qt-colh">{{ __('Kuiz') }}</span>
+                        <span class="qt-colh">{{ __('Subjek') }}</span>
+                        <span class="qt-colh">{{ __('Tahun · Bab') }}</span>
+                        <span class="qt-colh">{{ __('Soalan') }}</span>
+                        <span class="qt-colh">{{ __('Percubaan') }}</span>
+                        <span class="qt-colh">{{ __('Tempoh') }}</span>
+                        <span class="qt-colh">{{ __('Tindakan') }}</span>
+                    </div>
 
-                    <div style="display:flex;flex-direction:column;gap:8px;min-width:0;flex:1">
-                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                            <span class="tp-g" style="font-weight:800;font-size:17px;color:var(--tp-ink)">{{ $quiz->localizedTitle() }}</span>
-                            @if ($quiz->isInteractive())
-                                <span class="tp-tag" style="background:#DCF2EE;color:#0F7A68">{{ __('Interaktif') }}</span>
-                            @else
-                                <span class="tp-tag" style="background:#E4EEF9;color:#2E6CA8">{{ __('Bercetak') }}</span>
-                            @endif
-                            @unless ($quiz->is_published)
-                                <span class="tp-tag" style="background:#FEF0CE;color:#8A6A12">{{ __('Draf') }}</span>
-                            @endunless
-                        </div>
-                        {{-- Detail row, each item led by an icon. --}}
-                        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-                            <span class="tp-tag" style="background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }})">{{ $subject->name }}</span>
-                            <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="graduation" class="h-4 w-4" style="color:#0F7A68" />{{ $quiz->chapter->grade->displayName() }}</span>
-                            <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="book" class="h-4 w-4" style="color:#0F7A68" />{{ __('Bab :n', ['n' => $quiz->chapter->number]) }}</span>
-                            @if ($quiz->isInteractive())
-                                <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="help-circle" class="h-4 w-4" style="color:#0F7A68" />{{ __(':count soalan', ['count' => $quiz->questions_count]) }}</span>
-                                <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="users" class="h-4 w-4" style="color:var(--tp-muted-2)" />{{ __(':count percubaan', ['count' => $quiz->completed_attempts_count]) }}</span>
-                                @if ($quiz->duration_minutes)
-                                    <span class="tp-meta" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="clock" class="h-4 w-4" style="color:var(--tp-muted-2)" />{{ __(':count min', ['count' => $quiz->duration_minutes]) }}</span>
+                    @foreach ($quizzes as $quiz)
+                        @php($subject = $quiz->chapter->subject)
+                        <div class="qt-row">
+                            {{-- KUIS: subject icon square + title + type/draft tags --}}
+                            <div class="qt-kuis">
+                                <span class="qt-ico" style="background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }})"><x-icon :name="$subject->iconName()" class="h-6 w-6" /></span>
+                                <div class="qt-titlewrap">
+                                    <span class="qt-title">{{ $quiz->localizedTitle() }}</span>
+                                    @if ($quiz->isInteractive())
+                                        <span class="tp-tag" style="background:#DCF2EE;color:#0F7A68">{{ __('Interaktif') }}</span>
+                                    @else
+                                        <span class="tp-tag" style="background:#E4EEF9;color:#2E6CA8">{{ __('Bercetak') }}</span>
+                                    @endif
+                                    @unless ($quiz->is_published)
+                                        <span class="tp-tag" style="background:#FEF0CE;color:#8A6A12">{{ __('Draf') }}</span>
+                                    @endunless
+                                    @if ($quiz->isInteractive() && $quiz->questions_count === 0)
+                                        <span class="tp-tag" style="background:#FDECEC;color:#C24936">{{ __('Tiada soalan') }}</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            {{-- SUBJEK --}}
+                            <div><span class="tp-tag" style="background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }})">{{ $subject->name }}</span></div>
+
+                            {{-- TAHUN · BAB --}}
+                            <div class="qt-cell">{{ $quiz->chapter->grade->displayName() }} · {{ __('Bab :n', ['n' => $quiz->chapter->number]) }}</div>
+
+                            {{-- SOALAN --}}
+                            <div class="qt-cell">{{ $quiz->isInteractive() ? __(':count soalan', ['count' => $quiz->questions_count]) : '—' }}</div>
+
+                            {{-- PERCUBAAN --}}
+                            <div class="qt-cell">{{ $quiz->isInteractive() ? __(':count percubaan', ['count' => $quiz->completed_attempts_count]) : '—' }}</div>
+
+                            {{-- TEMPOH --}}
+                            <div class="qt-cell">{{ $quiz->isInteractive() && $quiz->duration_minutes ? __(':count min', ['count' => $quiz->duration_minutes]) : '—' }}</div>
+
+                            {{-- TINDAKAN: Lihat Soalan / Fail + statistik + edit + delete --}}
+                            <div class="qt-tind">
+                                @if ($quiz->isInteractive())
+                                    <button type="button" class="tp-lihatbtn" style="flex-shrink:0;display:inline-flex;align-items:center;min-height:38px;border-radius:11px;border:1.5px solid #0F7A68;background:var(--tp-surface);color:#0F7A68;font-family:'Geist',sans-serif;font-weight:800;font-size:12.5px;padding:0 14px;cursor:pointer" @click="open(@js([
+                                        'title' => $quiz->localizedTitle(),
+                                        'subtitle' => collect([$quiz->chapter->subject->displayName(), $quiz->chapter->grade->displayName(), __(':count soalan', ['count' => $quiz->questions_count])])->filter()->implode(' · '),
+                                        'questions' => $quiz->questions->map(fn ($question) => [
+                                            'text' => $question->localizedText(),
+                                            'points' => $question->points,
+                                            'options' => $question->options->map(fn ($option) => [
+                                                'letter' => $option->letter(),
+                                                'text' => $option->localizedText($question->source_locale),
+                                                'correct' => (bool) $option->is_correct,
+                                            ])->all(),
+                                        ])->all(),
+                                    ]))">{{ __('Lihat Soalan') }}</button>
+                                    <a href="{{ route('cikgu.kuiz.statistik', $quiz) }}" class="tp-icon-action" title="{{ __('Statistik') }}">
+                                        <x-icon name="chart" class="h-[17px] w-[17px]" />
+                                        <span class="sr-only">{{ __('Statistik') }}</span>
+                                    </a>
+                                @else
+                                    <a href="{{ route('muat-turun.kuiz', $quiz) }}" class="tp-btn-ghost" style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;min-height:38px">
+                                        <x-icon name="download" class="h-4 w-4" />{{ __('Fail') }}
+                                    </a>
                                 @endif
-                            @endif
+
+                                <a href="{{ route('cikgu.kuiz.edit', $quiz) }}" class="tp-icon-action" title="{{ __('Sunting') }}">
+                                    <x-icon name="pencil" class="h-[17px] w-[17px]" />
+                                    <span class="sr-only">{{ __('Sunting :title', ['title' => $quiz->title]) }}</span>
+                                </a>
+
+                                @php($delMsg = __('Padam kuiz ":title"? Semua soalan dan percubaan murid akan dipadam sekali. Tindakan ini tidak boleh dibatalkan.', ['title' => $quiz->title]))
+                                <x-confirm-modal id="del-kuiz-{{ $quiz->id }}" :action="route('cikgu.kuiz.destroy', $quiz)"
+                                    :title="__('Padam kuiz?')" :message="$delMsg">
+                                    <button type="button" class="tp-icon-action tp-icon-danger" title="{{ __('Padam') }}">
+                                        <x-icon name="trash" class="h-[17px] w-[17px]" />
+                                        <span class="sr-only">{{ __('Padam :title', ['title' => $quiz->title]) }}</span>
+                                    </button>
+                                </x-confirm-modal>
+                            </div>
                         </div>
-                        @if ($quiz->isInteractive() && $quiz->questions_count === 0)
-                            <span style="font-size:13px;font-weight:700;color:#C24936">{{ __('Kuiz ini belum ada soalan, jadi murid belum boleh mencubanya.') }}</span>
-                        @endif
-                    </div>
-
-                    {{-- Actions: on mobile they drop to their own row below the details. --}}
-                    <div class="tp-listactions" style="display:flex;align-items:center;gap:14px;flex-shrink:0">
-                    @if ($quiz->isInteractive())
-                        <button type="button" class="tp-lihatbtn" style="flex-shrink:0;display:inline-flex;align-items:center;gap:7px;min-height:42px;border-radius:11px;border:1.5px solid #0F7A68;background:var(--tp-surface);color:#0F7A68;font-family:'Geist',sans-serif;font-weight:800;font-size:13px;padding:0 16px;cursor:pointer" @click="open(@js([
-                            'title' => $quiz->localizedTitle(),
-                            'subtitle' => collect([$quiz->chapter->subject->displayName(), $quiz->chapter->grade->displayName(), __(':count soalan', ['count' => $quiz->questions_count])])->filter()->implode(' · '),
-                            'questions' => $quiz->questions->map(fn ($question) => [
-                                'text' => $question->localizedText(),
-                                'points' => $question->points,
-                                'options' => $question->options->map(fn ($option) => [
-                                    'letter' => $option->letter(),
-                                    'text' => $option->localizedText($question->source_locale),
-                                    'correct' => (bool) $option->is_correct,
-                                ])->all(),
-                            ])->all(),
-                        ]))">{{ __('Lihat Soalan') }}</button>
-                        <a href="{{ route('cikgu.kuiz.statistik', $quiz) }}" class="tp-icon-action" style="flex-shrink:0;border:1.5px solid var(--tp-line-2)" title="{{ __('Statistik') }}">
-                            <x-icon name="chart" class="h-[18px] w-[18px]" />
-                            <span class="sr-only">{{ __('Statistik') }}</span>
-                        </a>
-                    @else
-                        <a href="{{ route('muat-turun.kuiz', $quiz) }}" class="tp-btn-ghost" style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px">
-                            <x-icon name="download" class="h-4 w-4" />{{ __('Fail') }}
-                        </a>
-                    @endif
-
-                    <a href="{{ route('cikgu.kuiz.edit', $quiz) }}" class="tp-icon-action" style="flex-shrink:0;border:1.5px solid var(--tp-line-2)" title="{{ __('Sunting') }}">
-                        <x-icon name="pencil" class="h-[18px] w-[18px]" />
-                        <span class="sr-only">{{ __('Sunting :title', ['title' => $quiz->title]) }}</span>
-                    </a>
-
-                    @php($delMsg = __('Padam kuiz ":title"? Semua soalan dan percubaan murid akan dipadam sekali. Tindakan ini tidak boleh dibatalkan.', ['title' => $quiz->title]))
-                    <x-confirm-modal id="del-kuiz-{{ $quiz->id }}" :action="route('cikgu.kuiz.destroy', $quiz)"
-                        :title="__('Padam kuiz?')" :message="$delMsg">
-                        <button type="button" class="tp-icon-action tp-icon-danger" title="{{ __('Padam') }}" style="flex-shrink:0;background:#FDECEC;border:none;border-radius:14px">
-                            <x-icon name="trash" class="h-[18px] w-[18px]" />
-                            <span class="sr-only">{{ __('Padam :title', ['title' => $quiz->title]) }}</span>
-                        </button>
-                    </x-confirm-modal>
-                    </div>
+                    @endforeach
                 </div>
-            @endforeach
+            </div>
         </div>
 
-        <div>{{ $quizzes->links('pagination.tp') }}</div>
+        <div style="margin-top:16px">{{ $quizzes->links('pagination.tp') }}</div>
     @endif
 
         {{-- Read-only question preview (WeLearn Admin design: gradient header + green body) --}}
