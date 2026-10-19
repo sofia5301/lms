@@ -4,6 +4,24 @@
     heading-icon="quiz"
     :sub="__('Kuiz interaktif yang menanda sendiri, dan kuiz bercetak')">
 
+    <style>
+        /* Stat + filters on one row, split by a divider (stacks on small screens). */
+        .bf-card { display:flex; align-items:stretch; flex-wrap:wrap; }
+        .bf-stat { display:flex; align-items:center; gap:22px; padding:24px 80px 24px 36px; flex-shrink:0; min-width:350px; }
+        .bf-div { width:1px; background:var(--tp-line); align-self:stretch; margin:18px 0; flex-shrink:0; }
+        .bf-filters { flex:1; min-width:280px; display:flex; align-items:center; padding:18px 28px; }
+        .bf-filters .ysf-form-cikgu { flex:1; min-width:0; }
+        .bf-filters .tp-field { flex:1 1 0; min-width:150px; }
+        .bf-filters .ss-wrap { display:block !important; width:100% !important; min-width:0 !important; }
+        .bf-filters .ss-trigger { width:100%; }
+        .bf-filters select.tp-filter-select { width:100%; min-width:0; }
+        @media (max-width:860px) {
+            .bf-div { display:none; }
+            .bf-stat { width:100%; min-width:0; border-bottom:1px solid var(--tp-line); }
+            .bf-filters { width:100%; }
+        }
+    </style>
+
     {{-- Search quizzes by title. Carries the current filters as hidden fields so searching keeps them. --}}
     <form method="GET" action="{{ route('cikgu.kuiz.index') }}" style="margin-bottom:18px">
         @foreach (request()->except(['q', 'page']) as $k => $v)
@@ -16,25 +34,24 @@
         </div>
     </form>
 
-    {{-- Total quizzes created by this teacher (all-time, not the filtered count). --}}
-    <div class="tp-stat" style="max-width:340px;margin-bottom:18px">
-        <div style="display:flex;align-items:center;gap:10px">
-            <span class="tp-stat-ico" style="background:#FEF0CE"><x-icon name="quiz" class="h-5 w-5" style="color:#8A6A12" /></span>
-            <span class="tp-stat-label">{{ __('Kuiz Saya') }}</span>
+    {{-- Stat (total quizzes, all-time) beside the Tahun/Subjek/Bab filters, split by a divider. --}}
+    <div class="tp-card bf-card" style="margin-bottom:18px">
+        <div class="bf-stat">
+            <span style="width:52px;height:52px;border-radius:14px;background:#FEF0CE;color:#8A6A12;display:grid;place-items:center;flex-shrink:0"><x-icon name="quiz" class="h-6 w-6" /></span>
+            <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                <span style="font-size:12.5px;font-weight:700;color:var(--tp-muted);white-space:nowrap">{{ __('Kuiz Saya') }}</span>
+                <span style="font-family:'Geist',sans-serif;font-size:30px;font-weight:800;color:var(--tp-ink);line-height:1.05">{{ number_format($totalQuizzes) }}</span>
+            </div>
         </div>
-        <span class="tp-stat-value">{{ number_format($totalQuizzes) }}</span>
-        <span style="font-size:12.5px;font-weight:700;color:var(--tp-muted)">{{ __('Fail & interaktif') }}</span>
-    </div>
 
-    <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.kuiz.index')">
-        <x-slot:search><input type="hidden" name="q" value="{{ request('q') }}"></x-slot:search>
-        <div class="tp-newbtn-wrap" style="margin-left:auto">
-            <a href="{{ route('cikgu.kuiz.mod') }}" class="tp-btn">
-                <x-icon name="plus" class="h-4 w-4" />
-                {{ __('Kuiz Baru') }}
-            </a>
+        <div class="bf-div"></div>
+
+        <div class="bf-filters">
+            <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.kuiz.index')">
+                <x-slot:search><input type="hidden" name="q" value="{{ request('q') }}"></x-slot:search>
+            </x-year-subject-filter>
         </div>
-    </x-year-subject-filter>
+    </div>
 
     <div x-data="{ quiz: null, open(data) { this.quiz = data }, close() { this.quiz = null } }">
 
