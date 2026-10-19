@@ -15,8 +15,9 @@
         .qt-row { padding:14px 22px; border-top:1px solid var(--tp-line); }
         .qt-kuis { display:flex; align-items:center; gap:14px; min-width:0; }
         .qt-ico { width:52px; height:52px; border-radius:14px; display:grid; place-items:center; flex-shrink:0; }
-        .qt-titlewrap { display:flex; align-items:center; gap:9px; flex-wrap:wrap; min-width:0; }
+        .qt-titlewrap { display:flex; flex-direction:column; align-items:flex-start; gap:7px; min-width:0; }
         .qt-title { font-family:'Geist',sans-serif; font-weight:800; font-size:14.5px; color:var(--tp-ink); line-height:1.3; }
+        .qt-tags { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
         .qt-cell { font-size:13px; font-weight:700; color:var(--tp-muted-2); min-width:0; }
         .qt-tind { display:flex; align-items:center; gap:10px; }
         .qt-tind .tp-icon-action { border:1.5px solid var(--tp-line-2); }
@@ -143,17 +144,19 @@
                                 <span class="qt-ico" style="background:rgb({{ $subject->rgb }} / .14);color:rgb({{ $subject->rgb }})"><x-icon :name="$subject->iconName()" class="h-6 w-6" /></span>
                                 <div class="qt-titlewrap">
                                     <span class="qt-title">{{ $quiz->localizedTitle() }}</span>
-                                    @if ($quiz->isInteractive())
-                                        <span class="tp-tag" style="background:#DCF2EE;color:#0F7A68">{{ __('Interaktif') }}</span>
-                                    @else
-                                        <span class="tp-tag" style="background:#E4EEF9;color:#2E6CA8">{{ __('Bercetak') }}</span>
-                                    @endif
-                                    @unless ($quiz->is_published)
-                                        <span class="tp-tag" style="background:#FEF0CE;color:#8A6A12">{{ __('Draf') }}</span>
-                                    @endunless
-                                    @if ($quiz->isInteractive() && $quiz->questions_count === 0)
-                                        <span class="tp-tag" style="background:#FDECEC;color:#C24936">{{ __('Tiada soalan') }}</span>
-                                    @endif
+                                    <div class="qt-tags">
+                                        @if ($quiz->isInteractive())
+                                            <span class="tp-tag" style="background:#DCF2EE;color:#0F7A68">{{ __('Interaktif') }}</span>
+                                        @else
+                                            <span class="tp-tag" style="background:#E4EEF9;color:#2E6CA8">{{ __('Bercetak') }}</span>
+                                        @endif
+                                        @unless ($quiz->is_published)
+                                            <span class="tp-tag" style="background:#FEF0CE;color:#8A6A12">{{ __('Draf') }}</span>
+                                        @endunless
+                                        @if ($quiz->isInteractive() && $quiz->questions_count === 0)
+                                            <span class="tp-tag" style="background:#FDECEC;color:#C24936">{{ __('Tiada soalan') }}</span>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
 
