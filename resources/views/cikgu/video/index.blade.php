@@ -20,19 +20,40 @@
         .vt-tind { display:flex; align-items:center; gap:6px; }
         /* Centre every column except Video (header + data), so titles sit centred in their column. */
         .vt-head > :not(:first-child), .vt-row > :not(.vt-video) { justify-self:center; text-align:center; }
+
+        /* Stat + filters on one row, split by a divider (stacks on small screens). */
+        .bf-card { display:flex; align-items:stretch; flex-wrap:wrap; }
+        .bf-stat { display:flex; align-items:center; gap:22px; padding:24px 80px 24px 36px; flex-shrink:0; }
+        .bf-div { width:1px; background:var(--tp-line); align-self:stretch; margin:18px 0; flex-shrink:0; }
+        .bf-filters { flex:1; min-width:280px; display:flex; align-items:center; padding:18px 28px; }
+        .bf-filters .ysf-form-cikgu { flex:1; min-width:0; }
+        .bf-filters .tp-field { flex:1 1 0; min-width:150px; }
+        .bf-filters .ss-wrap { display:block !important; width:100% !important; min-width:0 !important; }
+        .bf-filters .ss-trigger { width:100%; }
+        .bf-filters select.tp-filter-select { width:100%; min-width:0; }
+        @media (max-width:860px) {
+            .bf-div { display:none; }
+            .bf-stat { width:100%; border-bottom:1px solid var(--tp-line); }
+            .bf-filters { width:100%; }
+        }
     </style>
 
-    {{-- Total videos uploaded by this teacher (all-time, not the filtered count). --}}
-    <div class="tp-stat" style="max-width:340px;margin-bottom:18px">
-        <div style="display:flex;align-items:center;gap:10px">
-            <span class="tp-stat-ico" style="background:#E4EEF9"><x-icon name="video" class="h-5 w-5" style="color:#2E6CA8" /></span>
-            <span class="tp-stat-label">{{ __('Video Saya') }}</span>
+    {{-- Stat (total videos, all-time) beside the Tahun/Subjek/Bab filters, split by a divider. --}}
+    <div class="tp-card bf-card" style="margin-bottom:18px">
+        <div class="bf-stat">
+            <span style="width:52px;height:52px;border-radius:14px;background:#E4EEF9;color:#2E6CA8;display:grid;place-items:center;flex-shrink:0"><x-icon name="video" class="h-6 w-6" /></span>
+            <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                <span style="font-size:12.5px;font-weight:700;color:var(--tp-muted);white-space:nowrap">{{ __('Video Saya') }}</span>
+                <span style="font-family:'Geist',sans-serif;font-size:30px;font-weight:800;color:var(--tp-ink);line-height:1.05">{{ number_format($totalVideos) }}</span>
+            </div>
         </div>
-        <span class="tp-stat-value">{{ number_format($totalVideos) }}</span>
-        <span style="font-size:12.5px;font-weight:700;color:var(--tp-muted)">{{ __('Jumlah tontonan: :count', ['count' => number_format($viewCount)]) }}</span>
-    </div>
 
-    <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.video.index')" />
+        <div class="bf-div"></div>
+
+        <div class="bf-filters">
+            <x-year-subject-filter :subjects="$subjects" :grades="$grades" :filter="$filter" with-chapter :action="route('cikgu.video.index')" />
+        </div>
+    </div>
 
     {{-- Clicking a video opens a preview here instead of navigating to the watch page - the same
          look the admin content page uses. A look, not a lesson: no view is counted. --}}
