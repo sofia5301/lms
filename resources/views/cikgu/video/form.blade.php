@@ -146,7 +146,7 @@
                 {{-- YouTube --}}
                 <div id="panel-youtube" role="group" aria-label="{{ __('Pautan YouTube') }}"
                      style="grid-area:1 / 1"
-                     :style="source === 'youtube' ? {} : { visibility: 'hidden', pointerEvents: 'none' }"
+                     :style="source === 'youtube' ? {} : { display: 'none' }"
                      :aria-hidden="source !== 'youtube'" class="tp-field">
                     <label for="youtube_url" class="tp-label">{{ __('Pautan YouTube') }}</label>
                     <input id="youtube_url" name="youtube_url" type="url"
@@ -160,7 +160,7 @@
                 {{-- Upload --}}
                 <div id="panel-upload" role="group" aria-label="{{ __('Muat Naik Video') }}"
                      style="grid-area:1 / 1"
-                     :style="source === 'upload' ? {} : { visibility: 'hidden', pointerEvents: 'none' }"
+                     :style="source === 'upload' ? {} : { display: 'none' }"
                      :aria-hidden="source !== 'upload'" class="tp-field">
                     <label class="tp-label">{{ $editing ? __('Fail video') : __('Fail video') }}</label>
 
