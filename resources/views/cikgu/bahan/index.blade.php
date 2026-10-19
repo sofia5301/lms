@@ -33,7 +33,7 @@
 
         /* Stat + filters on one row, split by a divider (stacks on small screens). */
         .bf-card { display:flex; align-items:stretch; flex-wrap:wrap; }
-        .bf-stat { display:flex; align-items:center; gap:18px; padding:20px 40px 20px 28px; flex-shrink:0; }
+        .bf-stat { display:flex; align-items:center; gap:20px; padding:22px 60px 22px 32px; flex-shrink:0; }
         .bf-div { width:1px; background:var(--tp-line); align-self:stretch; margin:18px 0; flex-shrink:0; }
         .bf-filters { flex:1; min-width:280px; display:flex; align-items:center; padding:18px 28px; }
         /* The three dropdowns share the row evenly, so there's no empty gap on the right. */
