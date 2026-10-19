@@ -62,6 +62,9 @@
             .bsec-card .tp-listcard { border:none; border-radius:0; box-shadow:none; border-top:1px solid var(--tp-line); }
             .bsec-card .tp-list .tp-listcard:first-child { border-top:none; }
             .bsec-card .tp-empty { border:none; }
+            /* Bahan section: the "Lihat" buttons take the rose accent, matching "Bahan Baru". */
+            .bsec-bahan .tp-btn-outline { border-color:#B84A75; color:#B84A75; }
+            .bsec-bahan .tp-btn-outline:hover { background:#FBE4ED; }
         </style>
 
         <a href="{{ route('cikgu.bab.index', ['subjek' => $subject->slug, 'tahun' => $grade->level]) }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Semua Bab') }}</a>
@@ -162,7 +165,7 @@
         </div>
 
         {{-- Materials --}}
-        <div class="bsec-card" x-show="tab==='bahan'" x-cloak>
+        <div class="bsec-card bsec-bahan" x-show="tab==='bahan'" x-cloak>
             <div class="bsec-head" style="background:rgba(184,74,117,.05)">
                 <span class="bsec-tile" style="background:#FBE4ED;color:#B84A75"><x-icon name="file" class="h-6 w-6" /></span>
                 <div class="bsec-ht"><span class="bsec-title">{{ __('Bahan') }}</span><span class="bsec-sub">{{ __('Muat turun pada bahan anda') }}</span></div>
