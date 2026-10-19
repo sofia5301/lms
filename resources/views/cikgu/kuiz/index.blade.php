@@ -9,7 +9,7 @@
            Keeps a min-width and scrolls sideways inside .qt-wrap on narrow screens. */
         .qt-wrap { overflow-x:auto; }
         .qt-table { min-width:1040px; }
-        .qt-head, .qt-row { display:grid; grid-template-columns:minmax(0,2.6fr) minmax(0,1.05fr) minmax(0,1fr) minmax(0,0.72fr) minmax(0,0.95fr) minmax(0,0.62fr) 288px; gap:14px; align-items:center; }
+        .qt-head, .qt-row { display:grid; grid-template-columns:minmax(0,2.8fr) minmax(0,1.1fr) minmax(0,1.05fr) minmax(0,0.75fr) minmax(0,1fr) minmax(0,0.65fr) max-content; gap:14px; align-items:center; }
         .qt-head { padding:13px 22px; }
         .qt-colh { font-family:'Geist',sans-serif; font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--tp-muted); }
         .qt-row { padding:14px 22px; border-top:1px solid var(--tp-line); }
