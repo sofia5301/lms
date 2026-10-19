@@ -18,7 +18,8 @@
         .bt-title { text-align:left; background:none; border:none; padding:0; cursor:pointer; font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-ink); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
         .bt-cell { font-size:13px; font-weight:700; color:var(--tp-muted-2); min-width:0; }
         .bt-type { background:#EAEBFB; color:#4F46E5; border-radius:999px; padding:4px 12px; font-family:'Geist',sans-serif; font-size:11.5px; font-weight:800; }
-        .bt-tind { display:flex; align-items:center; gap:6px; }
+        .bt-tind { display:flex; align-items:center; gap:7px; }
+        .bt-tind .tp-icon-action { border:1.5px solid var(--tp-line-2); }
         /* Centre every column except Bahan (header + data), so titles sit centred in their column. */
         .bt-head > :not(:first-child), .bt-row > :not(.bt-item) { justify-self:center; text-align:center; }
 
