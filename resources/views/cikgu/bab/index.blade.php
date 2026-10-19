@@ -134,11 +134,6 @@
                                             <span class="tp-tag" style="background:#FEF0CE;color:#8A6A12">{{ __('Tidak aktif') }}</span>
                                         @endunless
                                     </span>
-                                    <span class="bab-itmeta">
-                                        <span class="bab-m"><x-icon name="video" class="h-4 w-4" style="color:#17907B" />{{ $chapter->lessons_count }} video</span>
-                                        <span class="bab-m"><x-icon name="file" class="h-4 w-4" style="color:#2E6CA8" />{{ $chapter->materials_count }} {{ __('bahan') }}</span>
-                                        <span class="bab-m"><x-icon name="help-circle" class="h-4 w-4" style="color:#7C5CBF" />{{ $chapter->quizzes_count }} {{ __('kuiz') }}</span>
-                                    </span>
                                 </span>
                                 <span class="bab-chev"><x-icon name="chevron-right" class="h-5 w-5" /></span>
                             </button>
