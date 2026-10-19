@@ -146,8 +146,8 @@
                         <h2 class="bab-title" x-text="sel.title"></h2>
 
                         <div class="bab-headmeta">
-                            <span class="bab-tag" style="background:var(--acc-tint);color:var(--acc)">{{ __('Bab') }} <span x-text="sel.number" style="margin-left:4px"></span></span>
                             <span class="tp-tag" style="background:var(--acc-tint);color:var(--acc)">{{ $subject->name }}</span>
+                            <span class="bab-tag" style="background:var(--acc-tint);color:var(--acc)">{{ __('Bab') }} <span x-text="sel.number" style="margin-left:4px"></span></span>
                         </div>
 
                         {{-- Hero banner: a subject-tinted panel with the subject glyph (no illustration). --}}
