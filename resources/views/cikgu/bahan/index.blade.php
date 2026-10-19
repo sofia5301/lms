@@ -20,6 +20,8 @@
         .bt-type { background:#EAEBFB; color:#4F46E5; border-radius:999px; padding:4px 12px; font-family:'Geist',sans-serif; font-size:11.5px; font-weight:800; }
         .bt-tind { display:flex; align-items:center; gap:7px; }
         .bt-tind .tp-icon-action { border:1.5px solid var(--tp-line-2); }
+        .bt-tind .bt-dl { border-color:#0F7A68; }
+        .bt-tind .tp-icon-danger { border-color:#C24936; }
         /* Centre every column except Bahan (header + data), so titles sit centred in their column. */
         .bt-head > :not(:first-child), .bt-row > :not(.bt-item) { justify-self:center; text-align:center; }
 
@@ -167,7 +169,7 @@
 
                                     {{-- TINDAKAN: download + edit + delete --}}
                                     <div class="bt-tind">
-                                        <a href="{{ route('muat-turun.bahan', $material) }}" class="tp-icon-action" style="color:#0F7A68" title="{{ __('Muat turun') }}">
+                                        <a href="{{ route('muat-turun.bahan', $material) }}" class="tp-icon-action bt-dl" style="color:#0F7A68" title="{{ __('Muat turun') }}">
                                             <x-icon name="download" class="h-[17px] w-[17px]" />
                                             <span class="sr-only">{{ __('Muat turun :title', ['title' => $material->title]) }}</span>
                                         </a>
