@@ -19,9 +19,11 @@
         .vf-step::before { content:''; position:absolute; left:14px; top:30px; height:calc(100% - 30px); width:2px; background:var(--tp-line); }
         .vf-step:last-child::before { display:none; }
         .vf-step .num { width:30px; height:30px; border-radius:50%; background:var(--tp-surface); color:var(--tp-muted); border:1.5px solid var(--tp-line-2); display:grid; place-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:13px; flex-shrink:0; position:relative; z-index:1; }
+        /* Completed: green ring + tick. Active (current section): solid teal - wins when a step is both. */
+        .vf-step.is-done .num { background:#DCF2EE; color:#0F7A68; border-color:#0F7A68; }
         .vf-step.is-on .num { background:var(--tp-teal); color:#fff; border-color:var(--tp-teal); }
         .vf-step .lbl { font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-ink); line-height:1.3; margin-top:4px; }
-        .vf-step:not(.is-on) .lbl { color:var(--tp-muted); }
+        .vf-step:not(.is-on):not(.is-done) .lbl { color:var(--tp-muted); }
 
         /* Source choice tiles. */
         .vf-src { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -54,38 +56,48 @@
 
     <a href="{{ route('cikgu.video.index') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:16px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Video') }}</a>
 
-    <div class="vf-layout">
-        {{-- Step rail (visual; each step scrolls to its section). --}}
+    <div class="vf-layout"
+         x-data="videoForm({{ Js::from([
+             'source' => old('source', $lesson->source ?? 'youtube'),
+             'maxMb' => config('lms.video_max_mb'),
+             'maxVideos' => \App\Http\Requests\LessonRequest::MAX_VIDEOS,
+             'editing' => $editing,
+             'hasVideo' => (bool) $lesson->video_path,
+             'fallbackUrl' => route('cikgu.video.index'),
+             'labels' => [
+                 'tooBig' => __('Saiz video :size MB melebihi had :max MB. Sila muat naik ke YouTube (Unlisted) dan tampal pautannya.'),
+                 'serverTooBig' => __('Fail terlalu besar untuk server. Sila guna pautan YouTube.'),
+                 'uploadFailed' => __('Muat naik gagal (ralat :status). Sila cuba lagi.'),
+                 'networkFailed' => __('Muat naik gagal. Sila semak sambungan internet anda dan cuba lagi.'),
+                 'thumbReady' => __('Gambar kecil diambil daripada video anda.'),
+                 'thumbFailed' => __('Gambar kecil tidak dapat diambil daripada video ini. Anda boleh muat naik gambar sendiri.'),
+                 'notVideo' => __('":name" bukan fail video. Guna MP4 atau WEBM.'),
+                 'tooManyFiles' => __('Had :max video sekali muat naik.'),
+                 'videoCount' => __(':count video dipilih'),
+             ],
+         ]) }})"
+         @input="refresh()" @change="refresh()" @chapter-changed="refresh()" @scroll.window.passive="activeFromScroll()">
+        {{-- Step rail: highlights the section you are in and shows a check once a step's required
+             fields are filled. Clicking a step scrolls to its section. --}}
         <aside class="vf-steps">
-            <a href="#sec-maklumat" class="vf-step is-on"><span class="num">1</span><span class="lbl">{{ __('Maklumat Video') }}</span></a>
-            <a href="#sec-sumber" class="vf-step"><span class="num">2</span><span class="lbl">{{ __('Sumber Video') }}</span></a>
-            <a href="#sec-gambar" class="vf-step"><span class="num">3</span><span class="lbl">{{ __('Gambar Kecil & Fail') }}</span></a>
-            <a href="#sec-terbit" class="vf-step"><span class="num">4</span><span class="lbl">{{ __('Semakan') }}</span></a>
+            <a href="#sec-maklumat" class="vf-step" :class="{ 'is-on': active === 1, 'is-done': f1 }">
+                <span class="num"><span x-show="! f1">1</span><x-icon name="check" class="h-4 w-4" x-show="f1" x-cloak /></span><span class="lbl">{{ __('Maklumat Video') }}</span>
+            </a>
+            <a href="#sec-sumber" class="vf-step" :class="{ 'is-on': active === 2, 'is-done': f2 }">
+                <span class="num"><span x-show="! f2">2</span><x-icon name="check" class="h-4 w-4" x-show="f2" x-cloak /></span><span class="lbl">{{ __('Sumber Video') }}</span>
+            </a>
+            <a href="#sec-gambar" class="vf-step" :class="{ 'is-on': active === 3, 'is-done': f3 }">
+                <span class="num"><span x-show="! f3">3</span><x-icon name="check" class="h-4 w-4" x-show="f3" x-cloak /></span><span class="lbl">{{ __('Gambar Kecil & Fail') }}</span>
+            </a>
+            <a href="#sec-terbit" class="vf-step" :class="{ 'is-on': active === 4, 'is-done': f4 }">
+                <span class="num"><span x-show="! f4">4</span><x-icon name="check" class="h-4 w-4" x-show="f4" x-cloak /></span><span class="lbl">{{ __('Penerbitan') }}</span>
+            </a>
         </aside>
 
         <form method="POST"
               action="{{ $editing ? route('cikgu.video.update', $lesson) : route('cikgu.video.store') }}"
               enctype="multipart/form-data"
               class="tp-formwrap"
-              x-data="videoForm({{ Js::from([
-                  'source' => old('source', $lesson->source ?? 'youtube'),
-                  'maxMb' => config('lms.video_max_mb'),
-                  'maxVideos' => \App\Http\Requests\LessonRequest::MAX_VIDEOS,
-                  'editing' => $editing,
-                  'hasVideo' => (bool) $lesson->video_path,
-                  'fallbackUrl' => route('cikgu.video.index'),
-                  'labels' => [
-                      'tooBig' => __('Saiz video :size MB melebihi had :max MB. Sila muat naik ke YouTube (Unlisted) dan tampal pautannya.'),
-                      'serverTooBig' => __('Fail terlalu besar untuk server. Sila guna pautan YouTube.'),
-                      'uploadFailed' => __('Muat naik gagal (ralat :status). Sila cuba lagi.'),
-                      'networkFailed' => __('Muat naik gagal. Sila semak sambungan internet anda dan cuba lagi.'),
-                      'thumbReady' => __('Gambar kecil diambil daripada video anda.'),
-                      'thumbFailed' => __('Gambar kecil tidak dapat diambil daripada video ini. Anda boleh muat naik gambar sendiri.'),
-                      'notVideo' => __('":name" bukan fail video. Guna MP4 atau WEBM.'),
-                      'tooManyFiles' => __('Had :max video sekali muat naik.'),
-                      'videoCount' => __(':count video dipilih'),
-                  ],
-              ]) }})"
               @submit.prevent="submit($event)">
             @csrf
             @if ($editing) @method('PUT') @endif
@@ -403,9 +415,49 @@
                     // named by video_titles[i] on the server.
                     videos: [], nextKey: 0,
 
+                    // Step rail: which section is in view (1-4) and which steps are complete. These
+                    // only drive the left rail's highlight + ticks; they never gate submission.
+                    active: 1, f1: false, f2: false, f3: false, f4: false,
+
                     /** Creating on the upload tab: one lesson per file, each titled by its row. */
                     get batch() {
                         return ! this.editing && this.source === 'upload';
+                    },
+
+                    /** Alpine calls this on component init. Seed the rail from any prefilled values
+                     *  (edit mode) once the chapter picker has applied its saved selection. */
+                    init() {
+                        this.$nextTick(() => { this.refresh(); this.activeFromScroll(); });
+                        setTimeout(() => this.refresh(), 500);
+                    },
+
+                    /** Recompute step completion from the current fields. Step 1 (chapter + title)
+                     *  and step 2 (a link or a file) are required; step 3 (thumbnail) is optional and
+                     *  auto-captured; step 4 is "ready to publish" once 1 and 2 are done. */
+                    refresh() {
+                        const val = (id) => (document.getElementById(id)?.value || '').trim();
+                        this.f1 = !! val('chapter_id') && !! val('title');
+
+                        let hasSource;
+                        if (this.source === 'youtube') hasSource = val('youtube_url').length > 0;
+                        else if (this.editing) hasSource = !! (this.$refs.video?.files?.length) || this.hasVideo;
+                        else hasSource = this.videos.length > 0;
+                        this.f2 = hasSource;
+
+                        this.f3 = !! this.thumbName || this.autoThumb;
+                        this.f4 = this.f1 && this.f2;
+                    },
+
+                    /** Highlight the section currently in view (its top has scrolled past ~35% down). */
+                    activeFromScroll() {
+                        const ids = ['sec-maklumat', 'sec-sumber', 'sec-gambar', 'sec-terbit'];
+                        const mid = window.innerHeight * 0.35;
+                        let current = 1;
+                        ids.forEach((id, index) => {
+                            const el = document.getElementById(id);
+                            if (el && el.offsetParent !== null && el.getBoundingClientRect().top <= mid) current = index + 1;
+                        });
+                        this.active = current;
                     },
 
                     /** Switch the video source. Both panels share one grid cell, so the box
@@ -415,6 +467,7 @@
                         if (this.source === next) return;
                         const y = window.scrollY;
                         this.source = next;
+                        this.refresh();
                         this.$nextTick(() => window.scrollTo(0, y));
                     },
 
@@ -588,6 +641,7 @@
                         }
 
                         this.thumbBusy = false;
+                        this.refresh();
                     },
 
                     /**
