@@ -7,10 +7,10 @@
         /* Question builder: the questions (left) + a guide sidebar (right); Tambah Soalan and the
            save footer span the full width below. */
         .qs-top { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
-        .qs-grid { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:20px; align-items:start; }
+        .qs-grid { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:20px; align-items:stretch; }
         @media (max-width:980px) { .qs-grid { grid-template-columns:1fr; } }
         .qs-main { display:flex; flex-direction:column; gap:18px; min-width:0; }
-        .qs-guide { background:var(--tp-surface); border:1px solid var(--tp-line); border-radius:18px; box-shadow:0 2px 10px rgba(46,44,80,.04); padding:16px; display:flex; flex-direction:column; gap:14px; position:sticky; top:14px; }
+        .qs-guide { background:var(--tp-surface); border:1px solid var(--tp-line); border-radius:18px; box-shadow:0 2px 10px rgba(46,44,80,.04); padding:16px; display:flex; flex-direction:column; gap:14px; }
 
         .qs-banner { height:130px; border-radius:14px; overflow:hidden; display:grid; place-items:center; background:linear-gradient(135deg, rgba(23,144,123,.16), rgba(23,144,123,.04)); }
         .qs-banner img { width:100%; height:100%; object-fit:cover; }
