@@ -8,9 +8,10 @@
         // is one invalid declaration that takes both properties down with it.
         $input = "min-height:46px;border:1.5px solid var(--tp-line-2);border-radius:12px;padding:0 14px;background:var(--tp-input);font-family:'Nunito',sans-serif;font-size:14.5px;color:var(--tp-ink);box-sizing:border-box;width:100%;";
         $field = "display:flex;flex-direction:column;gap:6px";
-        // Small lavender icon tile beside each field label (see the image).
-        $ftile = "width:30px;height:30px;border-radius:9px;background:#ECE9F7;color:#7C5CBF;display:grid;place-items:center;flex-shrink:0";
-        $flabel = "display:flex;align-items:center;gap:10px;margin-bottom:2px";
+        // Lavender icon tile to the LEFT of each field (icon | label+input), see the image.
+        $ftile = "width:36px;height:36px;border-radius:11px;background:#ECE9F7;color:#7C5CBF;display:grid;place-items:center;flex-shrink:0;margin-top:2px";
+        $frow = "display:flex;gap:13px;align-items:flex-start";
+        $fcol = "display:flex;flex-direction:column;gap:6px;flex:1;min-width:0";
         $primary = "align-self:flex-start;min-height:46px;border:none;cursor:pointer;border-radius:12px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:14px;padding:0 22px;display:inline-flex;align-items:center;gap:9px";
         $err = "margin:0;font-size:12.5px;font-weight:700;color:#C24936";
         // Admin-maintained fields. Styled like an input - same box, same ink - because the teacher
@@ -40,7 +41,7 @@
         }
     </style>
 
-    <div style="display:flex;flex-direction:column;gap:20px;max-width:1040px">
+    <div style="display:flex;flex-direction:column;gap:20px;max-width:1280px">
 
         {{-- Account details. Only the display name, photo and phone are editable; the rest is the
              school's record, shown for reference and changed by the admin. --}}
@@ -92,58 +93,83 @@
 
             <div class="pf-grid2">
                 {{-- Read-only: the school's record of the teacher's name. --}}
-                <div style="{{ $field }}">
-                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="user" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Nama penuh') }}</span></div>
-                    <span style="{{ $locked }}">{{ $user->name }}</span>
+                {{-- Read-only: the school's record of the teacher's name. --}}
+                <div style="{{ $frow }}">
+                    <span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span>
+                    <div style="{{ $fcol }}">
+                        <span style="{{ $label }}">{{ __('Nama penuh') }}</span>
+                        <span style="{{ $locked }}">{{ $user->name }}</span>
+                    </div>
                 </div>
 
-                <div style="{{ $field }}">
-                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="user" class="h-[16px] w-[16px]" /></span><label for="username" style="{{ $label }}">{{ __('Nama pengguna (nama paparan)') }}</label></div>
-                    <input id="username" name="username" type="text" value="{{ old('username', $user->username) }}" required style="{{ $input }}">
-                    <span style="{{ $note }}">{{ __('Nama ini dipaparkan di papan pemuka anda. Anda boleh menukarnya bila-bila masa.') }}</span>
-                    @error('username')<p style="{{ $err }}">{{ $message }}</p>@enderror
+                <div style="{{ $frow }}">
+                    <span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span>
+                    <div style="{{ $fcol }}">
+                        <label for="username" style="{{ $label }}">{{ __('Nama pengguna (nama paparan)') }}</label>
+                        <input id="username" name="username" type="text" value="{{ old('username', $user->username) }}" required style="{{ $input }}">
+                        <span style="{{ $note }}">{{ __('Nama ini dipaparkan di papan pemuka anda. Anda boleh menukarnya bila-bila masa.') }}</span>
+                        @error('username')<p style="{{ $err }}">{{ $message }}</p>@enderror
+                    </div>
                 </div>
 
                 {{-- Read-only: email is the sign-in identifier, set by the admin. --}}
-                <div style="{{ $field }}">
-                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="mail" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('E-mel (untuk log masuk)') }}</span></div>
-                    <span style="{{ $locked }}">{{ $user->email }}</span>
-                    <span style="{{ $note }}">{{ __('Emel log masuk anda tidak boleh diubah. Hubungi pentadbir sekolah jika ia perlu ditukar.') }}</span>
+                <div style="{{ $frow }}">
+                    <span style="{{ $ftile }}"><x-icon name="mail" class="h-[18px] w-[18px]" /></span>
+                    <div style="{{ $fcol }}">
+                        <span style="{{ $label }}">{{ __('E-mel (untuk log masuk)') }}</span>
+                        <span style="{{ $locked }}">{{ $user->email }}</span>
+                        <span style="{{ $note }}">{{ __('Emel log masuk anda tidak boleh diubah. Hubungi pentadbir sekolah jika ia perlu ditukar.') }}</span>
+                    </div>
                 </div>
 
-                <div style="{{ $field }}">
-                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="phone" class="h-[16px] w-[16px]" /></span><label for="phone" style="{{ $label }}">{{ __('Nombor telefon') }}</label></div>
-                    <input id="phone" name="phone" type="tel" value="{{ old('phone', $user->phone) }}" placeholder="+60 12-345 6789" style="{{ $input }}">
-                    @error('phone')<p style="{{ $err }}">{{ $message }}</p>@enderror
+                <div style="{{ $frow }}">
+                    <span style="{{ $ftile }}"><x-icon name="phone" class="h-[18px] w-[18px]" /></span>
+                    <div style="{{ $fcol }}">
+                        <label for="phone" style="{{ $label }}">{{ __('Nombor telefon') }}</label>
+                        <input id="phone" name="phone" type="tel" value="{{ old('phone', $user->phone) }}" placeholder="+60 12-345 6789" style="{{ $input }}">
+                        @error('phone')<p style="{{ $err }}">{{ $message }}</p>@enderror
+                    </div>
                 </div>
 
-                <div style="{{ $field }}">
-                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="briefcase" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Jawatan') }}</span></div>
-                    <span style="{{ $locked }}">{{ $user->position ?: __('Belum ditetapkan') }}</span>
+                <div style="{{ $frow }}">
+                    <span style="{{ $ftile }}"><x-icon name="briefcase" class="h-[18px] w-[18px]" /></span>
+                    <div style="{{ $fcol }}">
+                        <span style="{{ $label }}">{{ __('Jawatan') }}</span>
+                        <span style="{{ $locked }}">{{ $user->position ?: __('Belum ditetapkan') }}</span>
+                    </div>
                 </div>
 
-                <div style="{{ $field }}">
-                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="building" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Sekolah') }}</span></div>
-                    <span style="{{ $locked }}">{{ $user->school?->name ?: __('Belum ditetapkan') }}</span>
+                <div style="{{ $frow }}">
+                    <span style="{{ $ftile }}"><x-icon name="building" class="h-[18px] w-[18px]" /></span>
+                    <div style="{{ $fcol }}">
+                        <span style="{{ $label }}">{{ __('Sekolah') }}</span>
+                        <span style="{{ $locked }}">{{ $user->school?->name ?: __('Belum ditetapkan') }}</span>
+                    </div>
                 </div>
 
-                <div style="{{ $field }}">
-                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="users" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Kelas guru kelas') }}</span></div>
-                    <span style="{{ $locked }}">{{ $user->homeroomClass?->label() ?: __('Bukan guru kelas') }}</span>
+                <div style="{{ $frow }}">
+                    <span style="{{ $ftile }}"><x-icon name="users" class="h-[18px] w-[18px]" /></span>
+                    <div style="{{ $fcol }}">
+                        <span style="{{ $label }}">{{ __('Kelas guru kelas') }}</span>
+                        <span style="{{ $locked }}">{{ $user->homeroomClass?->label() ?: __('Bukan guru kelas') }}</span>
+                    </div>
                 </div>
 
                 {{-- Subjects taught: the ones assigned, as coloured chips. --}}
-                <div style="{{ $field }}">
-                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="book" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Subjek diajar') }}</span></div>
-                    @if ($user->subjects->isEmpty())
-                        <span style="{{ $locked }}">{{ __('Belum ditetapkan') }}</span>
-                    @else
-                        <div style="display:flex;flex-wrap:wrap;gap:8px">
-                            @foreach ($user->subjects as $subject)
-                                <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 13px;font-family:'Nunito',sans-serif;font-size:13.5px;background:rgb({{ $subject->rgb }} / .12);color:rgb({{ $subject->rgb }})">{{ $subject->displayName() }}</span>
-                            @endforeach
-                        </div>
-                    @endif
+                <div style="{{ $frow }}">
+                    <span style="{{ $ftile }}"><x-icon name="book" class="h-[18px] w-[18px]" /></span>
+                    <div style="{{ $fcol }}">
+                        <span style="{{ $label }}">{{ __('Subjek diajar') }}</span>
+                        @if ($user->subjects->isEmpty())
+                            <span style="{{ $locked }}">{{ __('Belum ditetapkan') }}</span>
+                        @else
+                            <div style="display:flex;flex-wrap:wrap;gap:8px">
+                                @foreach ($user->subjects as $subject)
+                                    <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 13px;font-family:'Nunito',sans-serif;font-size:13.5px;background:rgb({{ $subject->rgb }} / .12);color:rgb({{ $subject->rgb }})">{{ $subject->displayName() }}</span>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
 
