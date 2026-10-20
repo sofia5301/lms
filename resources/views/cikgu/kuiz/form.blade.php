@@ -233,7 +233,7 @@
                 <a href="{{ route('cikgu.kuiz.soalan', $quiz) }}" class="tp-btn-outline" style="min-height:48px;display:inline-flex;align-items:center;gap:8px"><x-icon name="pencil" class="h-4 w-4" /> {{ __('Sunting Soalan') }}</a>
             @endif
 
-            <a href="{{ route('cikgu.kuiz.index') }}" class="tp-btn-outline" style="min-height:48px">{{ __('Batal') }}</a>
+            <a href="{{ (! $editing && ($chapter ?? null)) ? route('cikgu.bab.show', $chapter) : route('cikgu.kuiz.index') }}" class="tp-btn-outline" style="min-height:48px">{{ __('Batal') }}</a>
 
             <button type="submit" class="tp-btn" style="min-height:48px;display:inline-flex;align-items:center;gap:9px">
                 <span x-show="type === 'interactive' && ! {{ $editing ? 'true' : 'false' }}" x-cloak>{{ __('Seterusnya: Tambah Soalan') }}</span>
