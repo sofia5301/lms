@@ -103,7 +103,7 @@
         </div>
 
         {{-- Per-question correctness --}}
-        <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:30px">
             <h2 class="st-sech"><span class="shi"><x-icon name="chart" class="h-5 w-5" /></span>{{ __('Kadar betul setiap soalan') }}</h2>
 
             @if ($completedCount === 0)
@@ -144,7 +144,7 @@
         </div>
 
         {{-- Attempts --}}
-        <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:30px">
             <div class="st-atthead">
                 <h2 class="st-sech"><span class="shi"><x-icon name="users" class="h-5 w-5" /></span>{{ __('Percubaan murid') }}</h2>
                 @if ($completedCount > 0)
