@@ -143,22 +143,25 @@
 
         {{-- Account info card (flat, like the teacher profile): header + avatar top-right, a
              two-column icon-labelled grid, and a green save bar. --}}
-        <section class="wl-acccard" style="{{ $cardStyle }}">
-            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:20px" x-data="{ fname: '', preview: '' }">
+        <section class="wl-acccard" style="{{ $cardStyle }}" x-data="{ open: @js($errors->getBag('default')->any()) }">
+            {{-- Collapsed by default: the whole header is the toggle (icon + title + chevron) and the
+                 form drops down on click. It opens itself if the last save returned errors. --}}
+            <button type="button" @click="open = ! open" :aria-expanded="open ? 'true' : 'false'" aria-controls="akaun-panel"
+                    style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;background:none;border:none;padding:0;margin:0;cursor:pointer;text-align:left">
+                <span style="display:flex;align-items:center;gap:12px;min-width:0">
+                    <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><x-icon name="user" class="h-5 w-5" /></span>
+                    <h2 style="{{ $h2Style }};margin:0">{{ __('Maklumat akaun') }}</h2>
+                </span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--wl-muted);transition:transform .15s" :style="{ transform: open ? 'rotate(180deg)' : 'none' }"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+
+            <form id="akaun-panel" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:20px;margin-top:16px">
                 @csrf
                 @method('PATCH')
 
-                {{-- Header: title (left) + avatar & upload box (right). Clicking the circle or the box
-                     opens the one hidden input; the chosen image previews in the circle. --}}
-                <div class="pf-tophead">
-                    <div class="pf-head" style="align-items:flex-start">
-                        <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><x-icon name="user" class="h-5 w-5" /></span>
-                        <div style="display:flex;flex-direction:column;gap:2px">
-                            <h2 style="{{ $h2Style }};margin:0">{{ __('Maklumat akaun') }}</h2>
-                            <span style="{{ $noteStyle }};margin:0">{{ __('Maklumat peribadi dan sekolah anda.') }}</span>
-                        </div>
-                    </div>
-
+                {{-- Avatar + upload box. Clicking the circle or the box opens the one hidden input;
+                     the chosen image previews in the circle. --}}
+                <div x-data="{ fname: '', preview: '' }">
                     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
                         <label for="avatar" title="{{ $user->avatarUrl() ? __('Tukar gambar profil') : __('Tambah gambar profil') }}"
                                style="width:64px;height:64px;border-radius:50%;background:#DCF2EE;color:#0F7A68;display:flex;align-items:center;justify-content:center;font-family:'Geist',sans-serif;font-weight:800;font-size:20px;line-height:1;flex-shrink:0;overflow:hidden;cursor:pointer;position:relative">
@@ -185,8 +188,8 @@
                     <input type="file" id="avatar" name="avatar" accept="image/*" class="sr-only"
                            x-on:change="fname = $event.target.files[0]?.name || ''; preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : ''"
                            @error('avatar') aria-invalid="true" @enderror>
+                    @error('avatar')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
                 </div>
-                @error('avatar')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
 
                 <div style="border-top:1px solid var(--wl-line)"></div>
 
