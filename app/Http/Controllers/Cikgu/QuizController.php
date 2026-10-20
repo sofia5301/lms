@@ -80,11 +80,17 @@ class QuizController extends Controller
     /**
      * Step 1 of creating a quiz: choose between a printable file and a built-in MCQ quiz.
      */
-    public function mode(): View
+    public function mode(Request $request): View
     {
         $this->authorize('create', Quiz::class);
 
-        return view('cikgu.kuiz.mod');
+        // Reached from a chapter's page with ?chapter=, so the back link can return there and the
+        // chapter carries forward into the builder.
+        $chapter = $request->filled('chapter')
+            ? \App\Models\Chapter::with('subject', 'grade')->find($request->integer('chapter'))
+            : null;
+
+        return view('cikgu.kuiz.mod', ['chapter' => $chapter]);
     }
 
     public function create(Request $request): View

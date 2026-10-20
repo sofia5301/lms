@@ -217,7 +217,7 @@
             <div class="bsec-head" style="background:rgba(138,106,18,.05)">
                 <span class="bsec-tile" style="background:#FEF0CE;color:#8A6A12"><x-icon name="quiz" class="h-6 w-6" /></span>
                 <div class="bsec-ht"><span class="bsec-title">{{ __('Kuiz') }}</span><span class="bsec-sub">{{ __('Kuiz interaktif yang menanda sendiri, dan kuiz bercetak') }}</span></div>
-                <a href="{{ route('cikgu.kuiz.mod') }}" class="bsec-new" style="background:linear-gradient(135deg,#D9862B,#BE7020)"><x-icon name="plus" class="h-4 w-4" />{{ __('Kuiz Baru') }}</a>
+                <a href="{{ route('cikgu.kuiz.mod', ['chapter' => $chapter->id]) }}" class="bsec-new" style="background:linear-gradient(135deg,#D9862B,#BE7020)"><x-icon name="plus" class="h-4 w-4" />{{ __('Kuiz Baru') }}</a>
             </div>
             <div class="bsec-body">
 

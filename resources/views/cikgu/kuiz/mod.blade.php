@@ -9,16 +9,18 @@
         $iconInteractive = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m8.3 12 1.1 1.1 2-2.1"/><path d="m8.3 16.4 1.1 1.1 2-2.1"/><line x1="13.6" y1="12" x2="16" y2="12"/><line x1="13.6" y1="16.5" x2="16" y2="16.5"/></svg>';
         $iconFile = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>';
 
+        $chapter = $chapter ?? null;
+
         $cards = [
             [
-                'href' => route('cikgu.kuiz.create', ['jenis' => 'interactive']),
+                'href' => route('cikgu.kuiz.create', array_filter(['jenis' => 'interactive', 'chapter' => $chapter?->id])),
                 'title' => __('Bina Kuiz Interaktif'),
                 'desc' => __('Bina soalan aneka pilihan terus dalam sistem. Murid menjawab dalam talian dan mendapat markah serta-merta. Kuiz jenis ini memberi mata ranking.'),
                 'icon' => $iconInteractive,
                 'ink' => '#17907B', 'tile' => '#DCF2EE', 'blob' => '#B7E4D8', 'btn' => '#E7F4EF', 'leaf' => '',
             ],
             [
-                'href' => route('cikgu.kuiz.create', ['jenis' => 'file']),
+                'href' => route('cikgu.kuiz.create', array_filter(['jenis' => 'file', 'chapter' => $chapter?->id])),
                 'title' => __('Muat Naik Fail Kuiz'),
                 'desc' => __('Muat naik kuiz sedia ada sebagai fail PDF atau Word untuk dicetak. Murid hanya boleh melihat dan memuat turun. Tiada penandaan automatik dan tiada mata ranking.'),
                 'icon' => $iconFile,
@@ -28,7 +30,11 @@
     @endphp
 
     <div class="tp-formwrap">
-        <a href="{{ route('cikgu.kuiz.index') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Kembali') }}</a>
+        @if ($chapter)
+            <a href="{{ route('cikgu.bab.show', $chapter) }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Bab :number', ['number' => $chapter->number]) }}</a>
+        @else
+            <a href="{{ route('cikgu.kuiz.index') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Kembali') }}</a>
+        @endif
     </div>
 
     {{-- Cards centred in the wide content column; the back link above keeps its original left spot. --}}
