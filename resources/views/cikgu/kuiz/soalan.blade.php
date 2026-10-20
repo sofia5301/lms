@@ -195,7 +195,7 @@
                 {{-- Guide sidebar. --}}
                 <aside class="qs-guide">
                     <div class="qs-ghero">
-                        <div class="banner"><x-icon name="quiz" class="h-16 w-16" style="color:#17907B" /></div>
+                        <div class="banner"><img src="{{ asset('images/new-quiz.png') }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
                         <div class="body">
                             <div class="t">{{ __('Soalan Kuiz') }}</div>
                             <div class="s">{{ __('Lengkapkan maklumat soalan di sebelah.') }}</div>
