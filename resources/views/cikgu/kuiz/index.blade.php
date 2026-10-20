@@ -64,6 +64,17 @@
         </div>
     </form>
 
+    {{-- Page title, moved below the search bar. The layout's own heading is hidden (its controls
+         keep their top-right spot). --}}
+    <style>.tp-head .tp-heading { display:none; } .tp-head .tp-topbar { margin-left:auto; }</style>
+    <div class="tp-heading" style="margin-bottom:20px">
+        <span class="hi-tile" style="width:48px;height:48px;border-radius:14px;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;flex-shrink:0;align-self:flex-start"><x-icon name="quiz" style="width:24px;height:24px" /></span>
+        <div style="display:flex;flex-direction:column;gap:2px">
+            <h1 class="tp-h1">{{ __('Kuiz Saya') }}</h1>
+            <span class="tp-hsub">{{ __('Kuiz interaktif yang menanda sendiri, dan kuiz bercetak') }}</span>
+        </div>
+    </div>
+
     {{-- Stat (total quizzes, all-time) beside the Tahun/Subjek/Bab filters, split by a divider. --}}
     <div class="tp-card bf-card" style="margin-bottom:18px">
         <div class="bf-stat">
