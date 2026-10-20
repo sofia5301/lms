@@ -28,8 +28,8 @@
         .bm-chip .sq { width:40px; height:40px; border-radius:11px; display:grid; place-items:center; }
         .bm-chip .cl { font-size:10.5px; font-weight:800; color:var(--tp-muted); }
         .bm-gcard { border-radius:16px; border:1px solid var(--tp-line); padding:16px 18px; }
-        .bm-gcard.g2 { background:rgba(46,108,168,.1); }
-        .bm-gcard.g3 { background:rgba(217,134,43,.1); }
+        .bm-gcard.g2 { background:rgba(46,108,168,.22); }
+        .bm-gcard.g3 { background:rgba(217,134,43,.22); }
         .bm-gh { display:flex; align-items:center; gap:9px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; color:var(--tp-ink); margin-bottom:12px; }
         .bm-gh .gi { width:30px; height:30px; border-radius:9px; display:grid; place-items:center; flex-shrink:0; }
         .bm-gli { display:flex; align-items:flex-start; gap:9px; font-size:12.5px; font-weight:700; color:var(--tp-ink); line-height:1.45; }
