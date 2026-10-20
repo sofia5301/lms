@@ -155,12 +155,7 @@
         {{-- Guide sidebar. --}}
         <aside class="bm-guide">
             <div class="bm-ghero">
-                <div class="banner">
-                    <span class="fg" style="color:#D23B3B"><x-icon name="file-pdf" class="h-6 w-6" /></span>
-                    <span class="fg" style="color:#C76A2B"><x-icon name="presentation" class="h-6 w-6" /></span>
-                    <span class="fg" style="color:#2E6CA8"><x-icon name="file-text" class="h-6 w-6" /></span>
-                    <span class="fg" style="color:#1E7A58"><x-icon name="table" class="h-6 w-6" /></span>
-                </div>
+                <div class="banner"><img src="{{ asset('images/document.png') }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
                 <div class="body">
                     <div class="t">{{ __('Jenis Bahan yang Disokong') }}</div>
                     <div class="s">{{ __('Muat naik slaid, lembaran kerja, nota atau bahan tambahan yang berkaitan dengan video pembelajaran anda.') }}</div>
