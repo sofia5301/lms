@@ -30,7 +30,7 @@
         .wl-avatarbtn:hover { background:#2BB39B; }
         .pf-tophead { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; }
         .pf-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px 24px; align-items:start; }
-        .pf-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:stretch; }
+        .pf-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
         .pf-tile  { width:40px; height:40px; border-radius:12px; display:grid; place-items:center; flex-shrink:0; }
         .pf-head  { display:flex; align-items:center; gap:12px; }
         .pf-eye   { position:absolute; right:7px; top:50%; transform:translateY(-50%); width:32px; height:32px; border:none; background:transparent; cursor:pointer; color:var(--tp-muted-2); display:grid; place-items:center; }
