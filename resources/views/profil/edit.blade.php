@@ -194,7 +194,7 @@
                 <div style="border-top:1px solid var(--wl-line)"></div>
 
                 {{-- Single column, each field led by its icon tile. --}}
-                <div style="display:flex;flex-direction:column;gap:18px">
+                <div style="display:flex;flex-direction:column;gap:18px;margin-top:10px">
                     {{-- Nama penuh --}}
                     <div style="{{ $frow }}">
                         <span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span>
