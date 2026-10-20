@@ -103,11 +103,17 @@ class QuizController extends Controller
             $type = Quiz::TYPE_INTERACTIVE;
         }
 
+        // Carried through from a chapter's page (via the quiz-mode step): pre-fills the Bab and lets
+        // the back link return there.
+        $chapter = $request->filled('chapter')
+            ? \App\Models\Chapter::with('subject', 'grade')->find($request->integer('chapter'))
+            : null;
+
         return view('cikgu.kuiz.form', [
             'quiz' => new Quiz(['type' => $type, 'is_published' => true]),
             'subjects' => Subject::orderBy('sort_order')->get(),
             'grades' => Grade::orderBy('level')->get(),
-            'chapter' => null,
+            'chapter' => $chapter,
             'translatorEnabled' => app(QuestionTranslator::class)->enabled(),
         ]);
     }

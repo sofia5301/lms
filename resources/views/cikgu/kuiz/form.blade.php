@@ -30,8 +30,13 @@
         @if ($editing) @method('PUT') @endif
         <input type="hidden" name="type" :value="type">
 
-        {{-- Editing came from the quizzes list; creating came through the quiz-mode step. --}}
-        <a href="{{ $editing ? route('cikgu.kuiz.index') : route('cikgu.kuiz.mod') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Kembali') }}</a>
+        {{-- Back: to the chapter it came from (when created from a Bab), else the quiz-mode step or
+             the quizzes list. --}}
+        @if (! $editing && ($chapter ?? null))
+            <a href="{{ route('cikgu.bab.show', $chapter) }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Bab :number', ['number' => $chapter->number]) }}</a>
+        @else
+            <a href="{{ $editing ? route('cikgu.kuiz.index') : route('cikgu.kuiz.mod') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Kembali') }}</a>
+        @endif
 
         @if ($editing && ($hasAttempts ?? false))
             <div style="display:flex;gap:10px;background:#FEF0CE;border:1px solid rgba(138,106,18,.25);border-radius:14px;padding:14px 18px;font-size:13.5px;color:#8A6A12">
@@ -40,12 +45,23 @@
             </div>
         @endif
 
+        {{-- Progress rail (visual) across the four sections of the form. --}}
+        <div class="kf-steps">
+            <div class="kf-step is-on"><span class="n">1</span><span class="l">{{ __('Jenis kuiz') }}</span></div>
+            <div class="kf-step"><span class="n">2</span><span class="l">{{ __('Butiran kuiz') }}</span></div>
+            <div class="kf-step"><span class="n">3</span><span class="l">{{ __('Lokasi kuiz') }}</span></div>
+            <div class="kf-step"><span class="n">4</span><span class="l">{{ __('Tetapan') }}</span></div>
+        </div>
+
         <div class="kf-grid">
             {{-- ── Left column: type + details ─────────────────────────────────────────── --}}
             <div class="kf-col">
                 {{-- 1. Quiz type --}}
-                <div class="kf-card">
-                    <div class="kf-head"><span class="kf-badge">1</span><h2 class="kf-title tp-g">{{ __('Jenis kuiz') }}</h2></div>
+                <div class="kf-card kf-c1">
+                    <div class="kf-band">
+                        <span class="kf-badge">1</span>
+                        <div><h2 class="kf-title tp-g">{{ __('Jenis kuiz') }}</h2><span class="kf-sub">{{ __('Pilih jenis kuiz yang ingin anda buat.') }}</span></div>
+                    </div>
 
                     <div class="kf-types">
                         <button type="button" @click="type = 'interactive'" class="kf-type" :class="{ 'is-on': type === 'interactive' }" :aria-pressed="type === 'interactive'">
@@ -70,8 +86,12 @@
                 </div>
 
                 {{-- 2. Details --}}
-                <div class="kf-card">
-                    <div class="kf-head"><span class="kf-badge">2</span><h2 class="kf-title tp-g">{{ __('Butiran kuiz') }}</h2></div>
+                <div class="kf-card kf-c2">
+                    <div class="kf-band">
+                        <span class="kf-badge">2</span>
+                        <div><h2 class="kf-title tp-g">{{ __('Butiran kuiz') }}</h2><span class="kf-sub">{{ __('Masukkan maklumat kuiz anda.') }}</span></div>
+                        <span class="kf-bandic"><x-icon name="pencil" class="h-6 w-6" /></span>
+                    </div>
 
                     {{-- A single shared title for an interactive quiz (and when editing any quiz). Printed
                          quizzes created in a batch are titled per file in the drop zone below instead. --}}
@@ -166,20 +186,25 @@
             {{-- ── Right column: location + settings ───────────────────────────────────── --}}
             <div class="kf-col">
                 {{-- 3. Location --}}
-                <div class="kf-card">
-                    <div class="kf-head">
+                <div class="kf-card kf-c3">
+                    <div class="kf-band">
                         <span class="kf-badge">3</span>
                         <div>
                             <h2 class="kf-title tp-g">{{ __('Lokasi kuiz') }}</h2>
                             <span class="kf-sub">{{ __('Kuiz ini akan dipaparkan pada halaman Bab tersebut.') }}</span>
                         </div>
+                        <span class="kf-bandic"><x-icon name="map-pin" class="h-6 w-6" /></span>
                     </div>
                     <x-chapter-picker :subjects="$subjects" :grades="$grades" :chapter="$chapter" />
                 </div>
 
                 {{-- 4. Settings --}}
-                <div class="kf-card">
-                    <div class="kf-head"><span class="kf-badge">4</span><h2 class="kf-title tp-g">{{ __('Tetapan') }}</h2></div>
+                <div class="kf-card kf-c4">
+                    <div class="kf-band">
+                        <span class="kf-badge">4</span>
+                        <div><h2 class="kf-title tp-g">{{ __('Tetapan') }}</h2><span class="kf-sub">{{ __('Tetapkan pilihan tambahan untuk kuiz ini.') }}</span></div>
+                        <span class="kf-bandic"><x-icon name="settings" class="h-6 w-6" /></span>
+                    </div>
 
                     <label for="shuffle_options" class="kf-setrow" x-show="type === 'interactive'" x-cloak>
                         <input id="shuffle_options" name="shuffle_options" type="checkbox" value="1" @checked(old('shuffle_options', $quiz->shuffle_options ?? false)) style="width:20px;height:20px;margin-top:1px;accent-color:#17907B;flex-shrink:0">
@@ -219,6 +244,26 @@
 
     @once
         <style>
+            /* Top progress rail. */
+            .kf-steps { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin:0 auto 22px; max-width:900px; }
+            .kf-step { flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; }
+            .kf-step:not(:last-child)::after { content:''; position:absolute; top:17px; left:50%; width:100%; height:2px; background:var(--tp-line); z-index:0; }
+            .kf-step .n { position:relative; z-index:1; width:36px; height:36px; border-radius:50%; background:var(--tp-surface); border:1.5px solid var(--tp-line-2); color:var(--tp-muted); display:grid; place-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; }
+            .kf-step.is-on .n { background:var(--tp-teal); color:#fff; border-color:var(--tp-teal); }
+            .kf-step .l { font-family:'Geist',sans-serif; font-weight:800; font-size:13px; color:var(--tp-muted); text-align:center; }
+            .kf-step.is-on .l { color:var(--tp-teal); }
+            @media (max-width:640px) { .kf-step .l { font-size:11px; } }
+
+            /* Coloured header band per card. */
+            .kf-band { display:flex; align-items:center; gap:13px; padding:14px 16px; border-radius:14px; }
+            .kf-band > div { min-width:0; }
+            .kf-band .kf-badge { width:36px; height:36px; font-size:15px; }
+            .kf-bandic { margin-left:auto; flex-shrink:0; }
+            .kf-c1 .kf-band { background:rgba(23,144,123,.1); } .kf-c1 .kf-badge { background:#DCF2EE; color:#0F7A68; } .kf-c1 .kf-bandic { color:#0F7A68; }
+            .kf-c2 .kf-band { background:rgba(217,134,43,.1); } .kf-c2 .kf-badge { background:#F7E6C6; color:#BE922F; } .kf-c2 .kf-bandic { color:#BE922F; }
+            .kf-c3 .kf-band { background:rgba(46,108,168,.1); } .kf-c3 .kf-badge { background:#E4EEF9; color:#2E6CA8; } .kf-c3 .kf-bandic { color:#2E6CA8; }
+            .kf-c4 .kf-band { background:rgba(23,144,123,.1); } .kf-c4 .kf-badge { background:#DCF2EE; color:#0F7A68; } .kf-c4 .kf-bandic { color:#0F7A68; }
+
             .kf-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
             .kf-col  { display:flex; flex-direction:column; gap:20px; min-width:0; }
             .kf-card {
