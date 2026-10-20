@@ -10,7 +10,7 @@
 
     <form method="POST"
           action="{{ $editing ? route('cikgu.kuiz.update', $quiz) : route('cikgu.kuiz.store') }}"
-          enctype="multipart/form-data" class="tp-formwrap" style="max-width:1140px"
+          enctype="multipart/form-data" class="tp-formwrap" style="max-width:1140px;margin-left:auto;margin-right:auto;width:100%"
           x-data="quizForm({{ Js::from([
               'type' => $type,
               'translate' => [
@@ -264,11 +264,13 @@
             .kf-c3 .kf-band { background:rgba(46,108,168,.1); } .kf-c3 .kf-badge { background:#E4EEF9; color:#2E6CA8; } .kf-c3 .kf-bandic { color:#2E6CA8; }
             .kf-c4 .kf-band { background:rgba(23,144,123,.1); } .kf-c4 .kf-badge { background:#DCF2EE; color:#0F7A68; } .kf-c4 .kf-bandic { color:#0F7A68; }
 
-            .kf-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
-            .kf-col  { display:flex; flex-direction:column; gap:20px; min-width:0; }
+            /* Four cards on a 2x2 grid, filled column-by-column (card1/card2 left, card3/card4 right).
+               Each grid row stretches its two cards to equal height: card1=card3, card2=card4. */
+            .kf-grid { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto; grid-auto-flow:column; gap:20px; }
+            .kf-col  { display:contents; }
             .kf-card {
                 background:var(--tp-surface); border:1px solid var(--tp-line); border-radius:18px;
-                padding:22px 24px; display:flex; flex-direction:column; gap:16px;
+                padding:22px 24px; display:flex; flex-direction:column; gap:16px; min-width:0;
                 box-shadow:0 2px 10px rgba(46,44,80,.04);
             }
             .kf-head  { display:flex; align-items:flex-start; gap:12px; }
@@ -324,7 +326,7 @@
             .kf-actionbar > a, .kf-actionbar > button { position:relative; z-index:1; }
 
             @media (max-width:820px) {
-                .kf-grid  { grid-template-columns:1fr; }
+                .kf-grid  { grid-template-columns:1fr; grid-template-rows:none; grid-auto-flow:row; }
                 .kf-types { grid-template-columns:1fr; }
             }
             @media (max-width:900px) {
