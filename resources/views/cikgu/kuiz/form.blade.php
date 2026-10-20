@@ -25,7 +25,8 @@
               'titleT' => old('title_translated', $quiz->title_translated),
               'descriptionT' => old('description_translated', $quiz->description_translated),
               'sourceLocale' => old('source_locale', $quiz->source_locale),
-          ]) }})">
+          ]) }})"
+          @input="refresh()" @change="refresh()" @chapter-changed="refresh()">
         @csrf
         @if ($editing) @method('PUT') @endif
         <input type="hidden" name="type" :value="type">
@@ -47,10 +48,10 @@
 
         {{-- Progress rail (visual) across the four sections of the form. --}}
         <div class="kf-steps">
-            <div class="kf-step is-on"><span class="n">1</span><span class="l">{{ __('Jenis kuiz') }}</span></div>
-            <div class="kf-step"><span class="n">2</span><span class="l">{{ __('Butiran kuiz') }}</span></div>
-            <div class="kf-step"><span class="n">3</span><span class="l">{{ __('Lokasi kuiz') }}</span></div>
-            <div class="kf-step"><span class="n">4</span><span class="l">{{ __('Tetapan') }}</span></div>
+            <div class="kf-step" :class="{ 'is-on': active === 1, 'is-done': f1 }"><span class="n"><span x-show="! f1">1</span><x-icon name="check" class="h-[15px] w-[15px]" x-show="f1" x-cloak /></span><span class="l">{{ __('Jenis kuiz') }}</span></div>
+            <div class="kf-step" :class="{ 'is-on': active === 2, 'is-done': f2 }"><span class="n"><span x-show="! f2">2</span><x-icon name="check" class="h-[15px] w-[15px]" x-show="f2" x-cloak /></span><span class="l">{{ __('Butiran kuiz') }}</span></div>
+            <div class="kf-step" :class="{ 'is-on': active === 3, 'is-done': f3 }"><span class="n"><span x-show="! f3">3</span><x-icon name="check" class="h-[15px] w-[15px]" x-show="f3" x-cloak /></span><span class="l">{{ __('Lokasi kuiz') }}</span></div>
+            <div class="kf-step" :class="{ 'is-on': active === 4, 'is-done': f4 }"><span class="n"><span x-show="! f4">4</span><x-icon name="check" class="h-[15px] w-[15px]" x-show="f4" x-cloak /></span><span class="l">{{ __('Tetapan') }}</span></div>
         </div>
 
         <div class="kf-grid">
@@ -64,7 +65,7 @@
                     </div>
 
                     <div class="kf-types">
-                        <button type="button" @click="type = 'interactive'" class="kf-type" :class="{ 'is-on': type === 'interactive' }" :aria-pressed="type === 'interactive'">
+                        <button type="button" @click="type = 'interactive'; refresh()" class="kf-type" :class="{ 'is-on': type === 'interactive' }" :aria-pressed="type === 'interactive'">
                             <span class="kf-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                             <span class="kf-type-row">
                                 <x-icon name="quiz" class="h-[19px] w-[19px]" style="color:#17907B;flex-shrink:0" />
@@ -73,7 +74,7 @@
                             <span class="kf-type-desc">{{ __('Ditanda secara automatik. Memberi mata ranking.') }}</span>
                         </button>
 
-                        <button type="button" @click="type = 'file'" class="kf-type" :class="{ 'is-on': type === 'file' }" :aria-pressed="type === 'file'">
+                        <button type="button" @click="type = 'file'; refresh()" class="kf-type" :class="{ 'is-on': type === 'file' }" :aria-pressed="type === 'file'">
                             <span class="kf-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                             <span class="kf-type-row">
                                 <x-icon name="file-text" class="h-[19px] w-[19px]" style="color:#2E6CA8;flex-shrink:0" />
@@ -250,9 +251,11 @@
             .kf-step .l { white-space:nowrap; }
             .kf-step:not(:last-child)::after { content:''; position:absolute; top:17px; left:50%; width:100%; height:2px; background:var(--tp-line); z-index:0; }
             .kf-step .n { position:relative; z-index:1; width:36px; height:36px; border-radius:50%; background:var(--tp-surface); border:1.5px solid var(--tp-line-2); color:var(--tp-muted); display:grid; place-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; }
+            /* Done: green ring + tick. Active (current section): solid teal - wins when a step is both. */
+            .kf-step.is-done .n { background:#DCF2EE; color:#0F7A68; border-color:#0F7A68; }
             .kf-step.is-on .n { background:var(--tp-teal); color:#fff; border-color:var(--tp-teal); }
             .kf-step .l { font-family:'Geist',sans-serif; font-weight:800; font-size:13px; color:var(--tp-muted); text-align:center; }
-            .kf-step.is-on .l { color:var(--tp-teal); }
+            .kf-step.is-on .l, .kf-step.is-done .l { color:var(--tp-teal); }
             @media (max-width:640px) { .kf-step .l { font-size:11px; white-space:normal; } }
 
             /* Coloured header band per card. */
@@ -356,6 +359,32 @@
                     sourceLocale: sourceLocale ?? '',
                     translating: false,
                     translateError: '',
+
+                    // Step rail: which step is current (1-4) and which are complete. Display only -
+                    // these never gate submission.
+                    active: 1, f1: false, f2: false, f3: false, f4: false,
+
+                    init() {
+                        this.$nextTick(() => this.refresh());
+                        setTimeout(() => this.refresh(), 500);
+                    },
+
+                    fileChosen() {
+                        return Array.from(document.querySelectorAll('input[type=file]')).some((i) => i.files && i.files.length);
+                    },
+
+                    /** Recompute step completion. 1 Jenis (a type is chosen), 2 Butiran (title for an
+                     *  interactive quiz, or a file for a printed one), 3 Lokasi (a Bab is picked),
+                     *  4 Tetapan (ready once 1-3 are done). Active = the first step not yet complete. */
+                    refresh() {
+                        const val = (id) => (document.getElementById(id)?.value || '').trim();
+                        this.f1 = !! this.type;
+                        this.f2 = this.type === 'interactive' ? !! val('title') : this.fileChosen();
+                        this.f3 = !! val('chapter_id');
+                        this.f4 = this.f1 && this.f2 && this.f3;
+                        this.active = ! this.f1 ? 1 : (! this.f2 ? 2 : (! this.f3 ? 3 : 4));
+                    },
+
                     csrf() { return document.querySelector('input[name="_token"]')?.value ?? ''; },
                     async translateMeta() {
                         if (! this.translate.enabled || this.translating) return;
