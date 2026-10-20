@@ -90,48 +90,26 @@ class MaterialController extends Controller
     {
         $this->authorize('create', Material::class);
 
-        $created = $this->createMaterials($request, $request->integer('chapter_id'), $request->input('lesson_id') ?: null);
+        $file = $request->file('file');
 
-        // Materials are visible to students the moment they exist, so announce each to the school + Tahun.
-        foreach ($created as $material) {
-            \App\Models\ContentNotification::announce($material, \App\Models\ContentNotification::TYPE_MATERIAL);
-        }
+        $material = Material::create([
+            'chapter_id' => $request->integer('chapter_id'),
+            'lesson_id' => $request->input('lesson_id') ?: null,
+            'teacher_id' => $request->user()->id,
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'file_path' => Uploads::store($file, 'materials'),
+            'original_name' => $file->getClientOriginalName(),
+            'mime_type' => $file->getClientMimeType(),
+            'size_kb' => Uploads::sizeKb($file),
+        ]);
 
-        $status = count($created) === 1
-            ? __('Bahan ":title" berjaya dimuat naik.', ['title' => $created[0]->title])
-            : __(':count bahan berjaya dimuat naik.', ['count' => count($created)]);
+        // Materials are visible to students the moment they exist, so announce to the school + Tahun.
+        \App\Models\ContentNotification::announce($material, \App\Models\ContentNotification::TYPE_MATERIAL);
 
-        return redirect()->route('cikgu.bahan.index')->with('status', $status);
-    }
-
-    /**
-     * Create one material per uploaded files[] entry in the chapter, titles paired by position -
-     * a blank title falls back to the file's own name with the extension dropped. Shared by
-     * store() and update(): the edit page can also drop in more files, each a new material.
-     *
-     * @return array<int, Material>
-     */
-    private function createMaterials(MaterialRequest $request, int $chapterId, ?int $lessonId): array
-    {
-        $titles = $request->input('titles', []);
-        $created = [];
-
-        foreach ($request->file('files', []) as $index => $file) {
-            $given = trim((string) ($titles[$index] ?? ''));
-
-            $created[] = Material::create([
-                'chapter_id' => $chapterId,
-                'lesson_id' => $lessonId,
-                'teacher_id' => $request->user()->id,
-                'title' => $given !== '' ? $given : pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
-                'file_path' => Uploads::store($file, 'materials'),
-                'original_name' => $file->getClientOriginalName(),
-                'mime_type' => $file->getClientMimeType(),
-                'size_kb' => Uploads::sizeKb($file),
-            ]);
-        }
-
-        return $created;
+        return redirect()
+            ->route('cikgu.bahan.index')
+            ->with('status', __('Bahan ":title" berjaya dimuat naik.', ['title' => $material->title]));
     }
 
     public function edit(Request $request, Material $material): View
@@ -158,6 +136,7 @@ class MaterialController extends Controller
             'chapter_id' => $request->integer('chapter_id'),
             'lesson_id' => $request->input('lesson_id') ?: null,
             'title' => $request->input('title'),
+            'description' => $request->input('description'),
         ];
 
         // A replacement file takes the place of the current one - the old file is removed from disk

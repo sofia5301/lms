@@ -32,28 +32,13 @@ class MaterialRequest extends FormRequest
             'lesson_id' => ['nullable', 'integer', Rule::exists('lessons', 'id')->where('teacher_id', $this->user()?->id)],
         ];
 
-        // Creating takes any number of files at once, each with its own title. Editing stays a
-        // single file: it replaces what one material points at, which has no plural meaning.
-        if ($isCreate) {
-            return $shared + [
-                'files' => ['required', 'array', 'min:1', 'max:'.self::MAX_FILES],
-                'files.*' => [
-                    'file',
-                    'mimes:'.implode(',', config('lms.material_mimes')),
-                    "max:{$max}",
-                ],
-                'titles' => ['nullable', 'array', 'max:'.self::MAX_FILES],
-                'titles.*' => ['nullable', 'string', 'max:255'],
-            ];
-        }
-
-        // Editing: rename/relocate this material and optionally replace its single file. A new file
-        // takes the place of the old one (which is deleted on save); leaving it empty keeps the
-        // current file. Deleting a material is done from the Bahan list, not this form.
+        // One material, one file, one title + optional description. Creating requires the file;
+        // editing keeps the current file when the replace field is left empty.
         return $shared + [
             'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:2000'],
             'file' => [
-                'nullable',
+                $isCreate ? 'required' : 'nullable',
                 'file',
                 'mimes:'.implode(',', config('lms.material_mimes')),
                 "max:{$max}",

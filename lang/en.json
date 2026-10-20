@@ -1476,5 +1476,22 @@
     "Elakkan maklumat peribadi murid": "Avoid students' personal information",
     "Pastikan bahasa yang digunakan sesuai": "Ensure the language used is appropriate",
     "Jangan muat naik video yang tidak berkaitan pembelajaran": "Do not upload videos unrelated to learning",
-    "Penerbitan": "Publishing"
+    "Penerbitan": "Publishing",
+    "Maklumat Bahan": "Material Information",
+    "Masukkan maklumat asas bahan anda.": "Enter your material's basic information.",
+    "Masukkan tajuk bahan": "Enter material title",
+    "Terangkan kandungan bahan ini. Contoh: Lembaran kerja aktiviti, slaid pembelajaran, nota ringkas...": "Describe this material. e.g. Activity worksheet, lesson slides, brief notes...",
+    "Muat Naik Fail": "Upload File",
+    "Sokongan fail: PDF, PowerPoint, Word, Excel, imej (JPG, PNG). Maksimum saiz :max MB setiap fail.": "Supported files: PDF, PowerPoint, Word, Excel, image (JPG, PNG). Maximum size :max MB per file.",
+    "Jenis Bahan yang Disokong": "Supported Material Types",
+    "Muat naik slaid, lembaran kerja, nota atau bahan tambahan yang berkaitan dengan video pembelajaran anda.": "Upload slides, worksheets, notes or extra material related to your learning videos.",
+    "Imej": "Image",
+    "Tips Memuat Naik Bahan": "Material Upload Tips",
+    "Pastikan fail tidak melebihi :max MB.": "Make sure the file does not exceed :max MB.",
+    "Gunakan nama fail yang jelas dan mudah difahami.": "Use a clear, easy-to-understand file name.",
+    "Pastikan kandungan bahan sesuai dengan bab yang dipilih.": "Make sure the material fits the chosen chapter.",
+    "Bahan yang dimuat naik akan dipaparkan di halaman Bab untuk murid.": "Uploaded material appears on the Chapter page for students.",
+    "Jangan muat naik fail yang mengandungi maklumat peribadi murid.": "Do not upload files containing students' personal information.",
+    "Elakkan bahan yang melanggar hak cipta.": "Avoid material that infringes copyright.",
+    "Pastikan kandungan sesuai untuk murid sekolah rendah.": "Ensure content is suitable for primary school students."
 }

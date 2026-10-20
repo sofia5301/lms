@@ -20,6 +20,7 @@ class Material extends Model
         'lesson_id',
         'teacher_id',
         'title',
+        'description',
         'file_path',
         'original_name',
         'mime_type',
