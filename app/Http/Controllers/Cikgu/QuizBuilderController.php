@@ -151,7 +151,7 @@ class QuizBuilderController extends Controller
         }
 
         return redirect()
-            ->route('cikgu.kuiz.index')
+            ->route('cikgu.bab.show', $quiz->chapter_id)
             ->with('status', __('Soalan kuiz berjaya disimpan.'));
     }
 
