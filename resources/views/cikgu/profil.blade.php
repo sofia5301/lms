@@ -242,7 +242,7 @@
                     <x-icon name="chevron-down" class="h-4 w-4" ::style="open ? 'transform:rotate(180deg)' : ''" style="transition:transform .15s" />
                 </button>
 
-                <form method="POST" action="{{ route('profile.password') }}" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:16px">
+                <form method="POST" action="{{ route('profile.password') }}" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:22px">
                 @csrf
                 @method('PUT')
                 @foreach ([
