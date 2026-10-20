@@ -81,16 +81,16 @@
              fields are filled. Clicking a step scrolls to its section. --}}
         <aside class="vf-steps">
             <a href="#sec-maklumat" class="vf-step" :class="{ 'is-on': active === 1, 'is-done': f1 }">
-                <span class="num"><span x-show="! f1">1</span><x-icon name="check" class="h-4 w-4" x-show="f1" x-cloak /></span><span class="lbl">1. {{ __('Maklumat Video') }}</span>
+                <span class="num"><span x-show="! f1">1</span><x-icon name="check" class="h-4 w-4" x-show="f1" x-cloak /></span><span class="lbl">{{ __('Maklumat Video') }}</span>
             </a>
             <a href="#sec-sumber" class="vf-step" :class="{ 'is-on': active === 2, 'is-done': f2 }">
-                <span class="num"><span x-show="! f2">2</span><x-icon name="check" class="h-4 w-4" x-show="f2" x-cloak /></span><span class="lbl">2. {{ __('Sumber Video') }}</span>
+                <span class="num"><span x-show="! f2">2</span><x-icon name="check" class="h-4 w-4" x-show="f2" x-cloak /></span><span class="lbl">{{ __('Sumber Video') }}</span>
             </a>
             <a href="#sec-gambar" class="vf-step" :class="{ 'is-on': active === 3, 'is-done': f3 }">
-                <span class="num"><span x-show="! f3">3</span><x-icon name="check" class="h-4 w-4" x-show="f3" x-cloak /></span><span class="lbl">3. {{ __('Gambar Kecil & Fail') }}</span>
+                <span class="num"><span x-show="! f3">3</span><x-icon name="check" class="h-4 w-4" x-show="f3" x-cloak /></span><span class="lbl">{{ __('Gambar Kecil & Fail') }}</span>
             </a>
             <a href="#sec-terbit" class="vf-step" :class="{ 'is-on': active === 4, 'is-done': f4 }">
-                <span class="num"><span x-show="! f4">4</span><x-icon name="check" class="h-4 w-4" x-show="f4" x-cloak /></span><span class="lbl">4. {{ __('Penerbitan') }}</span>
+                <span class="num"><span x-show="! f4">4</span><x-icon name="check" class="h-4 w-4" x-show="f4" x-cloak /></span><span class="lbl">{{ __('Penerbitan') }}</span>
             </a>
         </aside>
 
@@ -105,7 +105,7 @@
             {{-- 1. Maklumat Video: Tahun/Subjek/Bab + title + description. --}}
             <div class="tp-panelform" id="sec-maklumat">
                 <div style="display:flex;flex-direction:column;gap:3px">
-                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Maklumat Video') }}</h2>
+                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">1. {{ __('Maklumat Video') }}</h2>
                     <span style="font-size:13px;color:var(--tp-muted)">{{ __('Masukkan maklumat asas video anda.') }}</span>
                 </div>
                 <x-chapter-picker :subjects="$subjects" :grades="$grades" :chapter="$chapter" />
@@ -129,7 +129,7 @@
             {{-- 2. Sumber Video --}}
             <div class="tp-panelform" id="sec-sumber">
                 <div style="display:flex;flex-direction:column;gap:3px">
-                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Sumber Video') }}</h2>
+                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">2. {{ __('Sumber Video') }}</h2>
                     <span style="font-size:13px;color:var(--tp-muted)">{{ __('Pilih cara anda ingin menambah video.') }}</span>
                 </div>
 
@@ -298,7 +298,7 @@
                  so a single picker here would only be ambiguous. --}}
             <div class="tp-panelform" id="sec-gambar" @if (! $editing) x-show="! batch" x-cloak @endif>
                 <div style="display:flex;flex-direction:column;gap:3px">
-                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Gambar Kecil (Thumbnail)') }}</h2>
+                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">3. {{ __('Gambar Kecil (Thumbnail)') }}</h2>
                     <span style="font-size:13px;color:var(--tp-muted)">{{ __('Pilih gambar kecil untuk video anda.') }}</span>
                 </div>
                 <div class="tp-field">
@@ -323,7 +323,7 @@
             {{-- 4. Tetapan Penerbitan --}}
             <div class="tp-panelform" id="sec-terbit">
                 <div style="display:flex;flex-direction:column;gap:3px">
-                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Tetapan Penerbitan') }}</h2>
+                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">4. {{ __('Tetapan Penerbitan') }}</h2>
                     <span style="font-size:13px;color:var(--tp-muted)">{{ __('Pilih sama ada video ini sudah siap untuk diterbitkan.') }}</span>
                 </div>
                 <label for="is_published" style="display:flex;align-items:flex-start;gap:14px;cursor:pointer">
