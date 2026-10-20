@@ -189,6 +189,30 @@
                             </template>
                         </div>
                     </template>
+
+                    <button type="button" @click="addQuestion()"
+                            class="tp-g qb-addq" style="min-height:52px;cursor:pointer;border-radius:14px;border:1.5px dashed var(--tp-line-2, rgba(46,44,80,.2));background:var(--tp-surface-2, #F1F0E8);color:var(--tp-ink);font-weight:800;font-size:14.5px">+ {{ __('Tambah Soalan') }}</button>
+
+                    <div>
+                        <div class="tp-card" style="border-radius:18px;padding:16px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                            <span style="width:38px;height:38px;border-radius:11px;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;flex-shrink:0"><x-icon name="quiz" class="h-[19px] w-[19px]" /></span>
+                            <span style="font-size:13.5px;font-weight:700;color:var(--tp-muted-2);flex:1;min-width:140px"><span x-text="questions.length"></span> {{ __('soalan.') }} <span x-text="totalPoints()"></span> {{ __('mata keseluruhan.') }}</span>
+                            {{-- Cancel posts to the discard endpoint (a separate form, so it is not nested in
+                                 the questions form): an empty quiz is thrown away, one with questions is kept.
+                                 On mobile the two buttons drop to their own row below the summary. --}}
+                            <div class="qb-actbtns" style="display:flex;align-items:center;gap:10px">
+                                <button type="submit" form="kuiz-batal" class="tp-btn-ghost">{{ __('Batal') }}</button>
+                                <button type="submit" class="tp-btn tp-btn-sm" :disabled="submitting" style="display:inline-flex;align-items:center;gap:8px">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    <span x-show="! submitting">{{ __('Simpan Soalan') }}</span>
+                                    <span x-show="submitting" x-cloak>{{ __('Menyimpan...') }}</span>
+                                </button>
+                            </div>
+                        </div>
+                        {{-- Shown once they try to save an incomplete quiz, rather than a permanently greyed
+                             button that never says why. --}}
+                        <p style="margin:8px 0 0;text-align:center;font-size:13px;font-weight:700;color:#C24936" x-show="showError && ! isValid()" x-cloak>{{ __('Sila tambah sekurang-kurangnya satu soalan yang lengkap sebelum menyimpan. Setiap soalan radio perlu tepat satu jawapan betul, dan setiap soalan checkbox perlu sekurang-kurangnya satu.') }}</p>
+                    </div>
                 </div>
 
                 {{-- Guide sidebar. --}}
@@ -207,30 +231,6 @@
                         <div class="qs-gli"><span class="qs-gnum">4</span>{{ __('Masukkan pilihan jawapan dan tandakan jawapan yang betul.') }}</div>
                     </div>
                 </aside>
-            </div>
-
-            <button type="button" @click="addQuestion()"
-                    class="tp-g qb-addq" style="min-height:52px;cursor:pointer;border-radius:14px;border:1.5px dashed var(--tp-line-2, rgba(46,44,80,.2));background:var(--tp-surface-2, #F1F0E8);color:var(--tp-ink);font-weight:800;font-size:14.5px">+ {{ __('Tambah Soalan') }}</button>
-
-            <div>
-                <div class="tp-card" style="border-radius:18px;padding:16px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-                    <span style="width:38px;height:38px;border-radius:11px;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;flex-shrink:0"><x-icon name="quiz" class="h-[19px] w-[19px]" /></span>
-                    <span style="font-size:13.5px;font-weight:700;color:var(--tp-muted-2);flex:1;min-width:140px"><span x-text="questions.length"></span> {{ __('soalan.') }} <span x-text="totalPoints()"></span> {{ __('mata keseluruhan.') }}</span>
-                    {{-- Cancel posts to the discard endpoint (a separate form, so it is not nested in
-                         the questions form): an empty quiz is thrown away, one with questions is kept.
-                         On mobile the two buttons drop to their own row below the summary. --}}
-                    <div class="qb-actbtns" style="display:flex;align-items:center;gap:10px">
-                        <button type="submit" form="kuiz-batal" class="tp-btn-ghost">{{ __('Batal') }}</button>
-                        <button type="submit" class="tp-btn tp-btn-sm" :disabled="submitting" style="display:inline-flex;align-items:center;gap:8px">
-                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                            <span x-show="! submitting">{{ __('Simpan Soalan') }}</span>
-                            <span x-show="submitting" x-cloak>{{ __('Menyimpan...') }}</span>
-                        </button>
-                    </div>
-                </div>
-                {{-- Shown once they try to save an incomplete quiz, rather than a permanently greyed
-                     button that never says why. --}}
-                <p style="margin:8px 0 0;text-align:center;font-size:13px;font-weight:700;color:#C24936" x-show="showError && ! isValid()" x-cloak>{{ __('Sila tambah sekurang-kurangnya satu soalan yang lengkap sebelum menyimpan. Setiap soalan radio perlu tepat satu jawapan betul, dan setiap soalan checkbox perlu sekurang-kurangnya satu.') }}</p>
             </div>
         </form>
 
