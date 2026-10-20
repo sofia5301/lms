@@ -184,7 +184,7 @@
         <div class="pf-cards">
             {{-- Connect YouTube --}}
             @php($channels = $user->youtubeChannels()->latest('verified_at')->get())
-            <div style="{{ $card }};gap:14px">
+            <div style="{{ $card }};gap:20px">
                 <div class="pf-head">
                     <span class="pf-tile" style="background:#FBE4EA;color:#D23B4E"><x-icon name="youtube" class="h-5 w-5" /></span>
                     <h2 style="{{ $h2 }}">{{ __('Sambung YouTube') }}</h2>
