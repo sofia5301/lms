@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Cikgu;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quiz;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,9 +15,13 @@ class QuizStatsController extends Controller
      * Per-quiz statistics: who attempted, the average score, and the correct-rate for each
      * question so a teacher can see which concept the class actually missed.
      */
-    public function __invoke(Quiz $quiz): View
+    public function __invoke(Request $request, Quiz $quiz): View
     {
         $this->authorize('viewStats', $quiz);
+
+        // Only the attempt list is filtered by the student-name search; the summaries and per-
+        // question rates stay class-wide so the figures never shift when you search a name.
+        $search = trim((string) $request->query('murid', ''));
 
         abort_unless($quiz->isInteractive(), Response::HTTP_NOT_FOUND);
 
@@ -46,6 +51,7 @@ class QuizStatsController extends Controller
             ->completed()
             ->where('question_count', $currentQuestions)
             ->where('max_score', $currentMax)
+            ->when($search !== '', fn ($query) => $query->whereHas('student', fn ($s) => $s->where('name', 'like', '%'.$search.'%')))
             ->with('student.grade')
             ->orderByDesc('completed_at')
             ->paginate(10)
@@ -79,6 +85,7 @@ class QuizStatsController extends Controller
             'averageMax' => $completed > 0 ? (int) round((float) $aggregate->avg_max) : $quiz->maxScore(),
             'averagePercent' => $completed > 0 ? (int) round((float) $aggregate->avg_percent) : 0,
             'perQuestion' => $perQuestion,
+            'search' => $search,
         ]);
     }
 }
