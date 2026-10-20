@@ -8,6 +8,9 @@
         // is one invalid declaration that takes both properties down with it.
         $input = "min-height:46px;border:1.5px solid var(--tp-line-2);border-radius:12px;padding:0 14px;background:var(--tp-input);font-family:'Nunito',sans-serif;font-size:14.5px;color:var(--tp-ink);box-sizing:border-box;width:100%;";
         $field = "display:flex;flex-direction:column;gap:6px";
+        // Small lavender icon tile beside each field label (see the image).
+        $ftile = "width:30px;height:30px;border-radius:9px;background:#ECE9F7;color:#7C5CBF;display:grid;place-items:center;flex-shrink:0";
+        $flabel = "display:flex;align-items:center;gap:10px;margin-bottom:2px";
         $primary = "align-self:flex-start;min-height:46px;border:none;cursor:pointer;border-radius:12px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:14px;padding:0 22px;display:inline-flex;align-items:center;gap:9px";
         $err = "margin:0;font-size:12.5px;font-weight:700;color:#C24936";
         // Admin-maintained fields. Styled like an input - same box, same ink - because the teacher
@@ -24,6 +27,7 @@
         .wl-primary:active { transform:scale(.98); }
         .wl-avatarbtn { transition:background .15s; }
         .wl-avatarbtn:hover { background:#2BB39B; }
+        .pf-tophead { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; }
         .pf-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px 24px; align-items:start; }
         .pf-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
         .pf-tile  { width:40px; height:40px; border-radius:12px; display:grid; place-items:center; flex-shrink:0; }
@@ -44,34 +48,38 @@
             @csrf
             @method('PATCH')
 
-            <div class="pf-head">
-                <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><x-icon name="user" class="h-5 w-5" /></span>
-                <h2 style="{{ $h2 }}">{{ __('Butiran akaun') }}</h2>
-            </div>
-
-            {{-- Avatar: clicking the circle or the button opens the one hidden input; the chosen
-                 image previews live in the circle before saving. --}}
-            <div style="display:flex;align-items:center;gap:16px" x-data="{ name: '', preview: '' }">
-                <label for="avatar" title="{{ $user->avatarUrl() ? __('Tukar gambar profil') : __('Tambah gambar profil') }}"
-                       style="width:64px;height:64px;border-radius:50%;background:#DCF2EE;color:#0F7A68;display:flex;align-items:center;justify-content:center;font-family:'Geist',sans-serif;font-weight:800;font-size:20px;line-height:1;flex-shrink:0;overflow:hidden;cursor:pointer;position:relative">
-                    <span x-show="! preview">{{ $user->initials() }}</span>
-                    @if ($user->avatarUrl())
-                        <img src="{{ $user->avatarUrl() }}" alt="" x-show="! preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-                    @endif
-                    <template x-if="preview">
-                        <img :src="preview" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-                    </template>
-                </label>
-
-                <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-                        <label for="avatar" class="wl-avatarbtn tp-g" style="display:inline-flex;align-items:center;gap:7px;min-height:38px;border-radius:10px;background:#17907B;color:#fff;font-weight:800;font-size:13px;padding:0 16px;cursor:pointer">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 20h16"/></svg>
-                            {{ $user->avatarUrl() ? __('Tukar gambar') : __('Tambah gambar') }}
-                        </label>
-                        <span style="font-size:13px;color:var(--tp-muted)" x-text="name || '{{ __('Tiada fail dipilih') }}'"></span>
+            {{-- Header: title (left) + avatar & upload box (right). Clicking the circle or the box
+                 opens the one hidden input; the chosen image previews live in the circle. --}}
+            <div class="pf-tophead" x-data="{ name: '', preview: '' }">
+                <div class="pf-head" style="align-items:flex-start">
+                    <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><x-icon name="user" class="h-5 w-5" /></span>
+                    <div style="display:flex;flex-direction:column;gap:2px">
+                        <h2 style="{{ $h2 }}">{{ __('Butiran akaun') }}</h2>
+                        <span style="{{ $note }}">{{ __('Maklumat peribadi dan profesional anda.') }}</span>
                     </div>
-                    <span style="{{ $note }}">{{ __('JPG atau PNG. Klik bulatan atau butang untuk pilih gambar.') }}</span>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                    <label for="avatar" title="{{ $user->avatarUrl() ? __('Tukar gambar profil') : __('Tambah gambar profil') }}"
+                           style="width:64px;height:64px;border-radius:50%;background:#DCF2EE;color:#0F7A68;display:flex;align-items:center;justify-content:center;font-family:'Geist',sans-serif;font-weight:800;font-size:20px;line-height:1;flex-shrink:0;overflow:hidden;cursor:pointer;position:relative">
+                        <span x-show="! preview">{{ $user->initials() }}</span>
+                        @if ($user->avatarUrl())
+                            <img src="{{ $user->avatarUrl() }}" alt="" x-show="! preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                        @endif
+                        <template x-if="preview">
+                            <img :src="preview" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                        </template>
+                    </label>
+
+                    <label for="avatar" style="display:flex;align-items:center;gap:13px;border:1.5px dashed var(--tp-line-2);border-radius:14px;padding:11px 16px;cursor:pointer;min-width:250px">
+                        <span class="wl-avatarbtn" style="width:44px;height:44px;border-radius:12px;background:#17907B;color:#fff;display:grid;place-items:center;flex-shrink:0">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 20h16"/></svg>
+                        </span>
+                        <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                            <span class="tp-g" style="font-weight:800;font-size:14px;color:var(--tp-ink)">{{ $user->avatarUrl() ? __('Tukar gambar') : __('Tambah gambar') }}</span>
+                            <span style="{{ $note }}" x-text="name || '{{ __('JPG atau PNG. Klik bulatan atau butang untuk pilih gambar.') }}'"></span>
+                        </div>
+                    </label>
                 </div>
 
                 <input type="file" id="avatar" name="avatar" accept="image/*" class="sr-only"
@@ -85,12 +93,12 @@
             <div class="pf-grid2">
                 {{-- Read-only: the school's record of the teacher's name. --}}
                 <div style="{{ $field }}">
-                    <span style="{{ $label }}">{{ __('Nama penuh') }}</span>
+                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="user" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Nama penuh') }}</span></div>
                     <span style="{{ $locked }}">{{ $user->name }}</span>
                 </div>
 
                 <div style="{{ $field }}">
-                    <label for="username" style="{{ $label }}">{{ __('Nama pengguna (nama paparan)') }}</label>
+                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="user" class="h-[16px] w-[16px]" /></span><label for="username" style="{{ $label }}">{{ __('Nama pengguna (nama paparan)') }}</label></div>
                     <input id="username" name="username" type="text" value="{{ old('username', $user->username) }}" required style="{{ $input }}">
                     <span style="{{ $note }}">{{ __('Nama ini dipaparkan di papan pemuka anda. Anda boleh menukarnya bila-bila masa.') }}</span>
                     @error('username')<p style="{{ $err }}">{{ $message }}</p>@enderror
@@ -98,35 +106,35 @@
 
                 {{-- Read-only: email is the sign-in identifier, set by the admin. --}}
                 <div style="{{ $field }}">
-                    <span style="{{ $label }}">{{ __('E-mel (untuk log masuk)') }}</span>
+                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="mail" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('E-mel (untuk log masuk)') }}</span></div>
                     <span style="{{ $locked }}">{{ $user->email }}</span>
                     <span style="{{ $note }}">{{ __('Emel log masuk anda tidak boleh diubah. Hubungi pentadbir sekolah jika ia perlu ditukar.') }}</span>
                 </div>
 
                 <div style="{{ $field }}">
-                    <label for="phone" style="{{ $label }}">{{ __('Nombor telefon') }}</label>
+                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="phone" class="h-[16px] w-[16px]" /></span><label for="phone" style="{{ $label }}">{{ __('Nombor telefon') }}</label></div>
                     <input id="phone" name="phone" type="tel" value="{{ old('phone', $user->phone) }}" placeholder="+60 12-345 6789" style="{{ $input }}">
                     @error('phone')<p style="{{ $err }}">{{ $message }}</p>@enderror
                 </div>
 
                 <div style="{{ $field }}">
-                    <span style="{{ $label }}">{{ __('Jawatan') }}</span>
+                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="briefcase" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Jawatan') }}</span></div>
                     <span style="{{ $locked }}">{{ $user->position ?: __('Belum ditetapkan') }}</span>
                 </div>
 
                 <div style="{{ $field }}">
-                    <span style="{{ $label }}">{{ __('Sekolah') }}</span>
+                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="building" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Sekolah') }}</span></div>
                     <span style="{{ $locked }}">{{ $user->school?->name ?: __('Belum ditetapkan') }}</span>
                 </div>
 
                 <div style="{{ $field }}">
-                    <span style="{{ $label }}">{{ __('Kelas guru kelas') }}</span>
+                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="users" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Kelas guru kelas') }}</span></div>
                     <span style="{{ $locked }}">{{ $user->homeroomClass?->label() ?: __('Bukan guru kelas') }}</span>
                 </div>
 
                 {{-- Subjects taught: the ones assigned, as coloured chips. --}}
                 <div style="{{ $field }}">
-                    <span style="{{ $label }}">{{ __('Subjek diajar') }}</span>
+                    <div style="{{ $flabel }}"><span style="{{ $ftile }}"><x-icon name="book" class="h-[16px] w-[16px]" /></span><span style="{{ $label }}">{{ __('Subjek diajar') }}</span></div>
                     @if ($user->subjects->isEmpty())
                         <span style="{{ $locked }}">{{ __('Belum ditetapkan') }}</span>
                     @else
@@ -139,9 +147,11 @@
                 </div>
             </div>
 
-            <p style="margin:0;{{ $note }}">{{ __('Butiran sekolah di atas diselenggara oleh pentadbir. Hubungi mereka jika ada yang perlu ditukar.') }}</p>
-
-            <button type="submit" class="wl-primary" style="{{ $primary }}">{!! $saveIcon !!} {{ __('Simpan') }}</button>
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:rgba(23,144,123,.08);border:1px solid rgba(23,144,123,.18);border-radius:14px;padding:14px 18px">
+                <x-icon name="info-circle" class="h-5 w-5" style="color:#0F7A68;flex-shrink:0" />
+                <span style="flex:1;min-width:180px;font-size:13px;color:var(--tp-muted-2);line-height:1.5">{{ __('Butiran sekolah di atas diselenggara oleh pentadbir. Hubungi mereka jika ada yang perlu ditukar.') }}</span>
+                <button type="submit" class="wl-primary" style="{{ $primary }};align-self:auto">{!! $saveIcon !!} {{ __('Simpan') }}</button>
+            </div>
         </form>
 
         {{-- YouTube connect + change password, side by side. --}}
@@ -193,9 +203,12 @@
             <form method="POST" action="{{ route('profile.password') }}" style="{{ $card }};gap:16px">
                 @csrf
                 @method('PUT')
-                <div class="pf-head">
+                <div class="pf-head" style="align-items:flex-start">
                     <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-                    <h2 style="{{ $h2 }}">{{ __('Tukar kata laluan') }}</h2>
+                    <div style="display:flex;flex-direction:column;gap:2px">
+                        <h2 style="{{ $h2 }}">{{ __('Tukar kata laluan') }}</h2>
+                        <span style="{{ $note }}">{{ __('Kemas kini kata laluan anda secara berkala untuk keselamatan akaun.') }}</span>
+                    </div>
                 </div>
 
                 @foreach ([
