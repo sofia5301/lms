@@ -241,7 +241,7 @@
                 </div>
 
                 @if ($user->isStudent())
-                    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:rgba(23,144,123,.08);border:1px solid rgba(23,144,123,.18);border-radius:14px;padding:14px 18px">
+                    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:rgba(23,144,123,.08);border:1px solid rgba(23,144,123,.18);border-radius:14px;padding:14px 18px;margin-top:14px">
                         <x-icon name="info-circle" class="h-5 w-5" style="color:#0F7A68;flex-shrink:0" />
                         <span style="flex:1;min-width:180px;font-size:13px;color:var(--wl-muted);line-height:1.5">{{ __('Butiran sekolah di atas diselenggara oleh pentadbir. Hubungi mereka jika ada yang perlu ditukar.') }}</span>
                         <button type="submit" class="wl-btn-primary" style="min-height:46px;border:none;cursor:pointer;border-radius:12px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:14px;padding:0 24px">{{ __('Simpan') }}</button>
