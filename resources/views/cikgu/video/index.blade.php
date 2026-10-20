@@ -50,7 +50,7 @@
     </style>
 
     {{-- Search videos by title. Carries the current filters as hidden fields so searching keeps them. --}}
-    <form method="GET" action="{{ route('cikgu.video.index') }}" style="margin-top:-40px;margin-bottom:18px">
+    <form method="GET" action="{{ route('cikgu.video.index') }}" style="margin-top:-58px;margin-bottom:18px">
         @foreach (request()->except(['q', 'page']) as $k => $v)
             @unless (is_array($v))<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endunless
         @endforeach
