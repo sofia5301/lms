@@ -245,14 +245,15 @@
     @once
         <style>
             /* Top progress rail. */
-            .kf-steps { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin:0 auto 22px; max-width:900px; }
-            .kf-step { flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; }
+            .kf-steps { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin:0 auto 26px; max-width:1040px; width:100%; }
+            .kf-step { flex:1; display:flex; flex-direction:column; align-items:center; gap:10px; position:relative; }
+            .kf-step .l { white-space:nowrap; }
             .kf-step:not(:last-child)::after { content:''; position:absolute; top:17px; left:50%; width:100%; height:2px; background:var(--tp-line); z-index:0; }
             .kf-step .n { position:relative; z-index:1; width:36px; height:36px; border-radius:50%; background:var(--tp-surface); border:1.5px solid var(--tp-line-2); color:var(--tp-muted); display:grid; place-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; }
             .kf-step.is-on .n { background:var(--tp-teal); color:#fff; border-color:var(--tp-teal); }
             .kf-step .l { font-family:'Geist',sans-serif; font-weight:800; font-size:13px; color:var(--tp-muted); text-align:center; }
             .kf-step.is-on .l { color:var(--tp-teal); }
-            @media (max-width:640px) { .kf-step .l { font-size:11px; } }
+            @media (max-width:640px) { .kf-step .l { font-size:11px; white-space:normal; } }
 
             /* Coloured header band per card. */
             .kf-band { display:flex; align-items:center; gap:13px; padding:14px 16px; border-radius:14px; }
