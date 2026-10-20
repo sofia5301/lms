@@ -228,23 +228,19 @@
             {{-- Change password: collapsed behind a button; drops the form down on click. Opens
                  automatically when a password change failed validation, so the errors are visible. --}}
             <div style="{{ $card }};gap:16px" x-data="{ open: {{ $errors->updatePassword->isNotEmpty() ? 'true' : 'false' }} }">
-                <div class="pf-head" style="align-items:flex-start">
-                    <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-                    <div style="display:flex;flex-direction:column;gap:2px">
-                        <h2 style="{{ $h2 }}">{{ __('Tukar kata laluan') }}</h2>
-                        <span style="{{ $note }}">{{ __('Kemas kini kata laluan anda secara berkala untuk keselamatan akaun.') }}</span>
-                    </div>
-                </div>
-
-                <button type="button" @click="open = ! open" :aria-expanded="open" style="display:inline-flex;align-items:center;gap:10px;align-self:flex-start;min-height:46px;border:1.5px solid var(--tp-line-2);cursor:pointer;border-radius:12px;background:var(--tp-surface);color:var(--tp-ink);font-family:'Geist',sans-serif;font-weight:800;font-size:14px;padding:0 18px">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:#0F7A68"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    {{ __('Tukar kata laluan') }}
-                    <x-icon name="chevron-down" class="h-4 w-4" ::style="open ? 'transform:rotate(180deg)' : ''" style="transition:transform .15s" />
+                {{-- The whole card header is the toggle: lock + title (left), chevron (right). --}}
+                <button type="button" @click="open = ! open" :aria-expanded="open" style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;background:transparent;border:none;cursor:pointer;padding:0;text-align:left">
+                    <span style="display:flex;align-items:center;gap:12px;min-width:0">
+                        <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                        <span style="{{ $h2 }}">{{ __('Tukar kata laluan') }}</span>
+                    </span>
+                    <x-icon name="chevron-down" class="h-5 w-5" ::style="open ? 'transform:rotate(180deg)' : ''" style="transition:transform .15s;color:var(--tp-muted);flex-shrink:0" />
                 </button>
 
-                <form method="POST" action="{{ route('profile.password') }}" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:26px">
+                <form method="POST" action="{{ route('profile.password') }}" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:26px;margin-top:6px">
                 @csrf
                 @method('PUT')
+                <span style="{{ $note }}">{{ __('Kemas kini kata laluan anda secara berkala untuk keselamatan akaun.') }}</span>
                 @foreach ([
                     ['id' => 'current_password', 'label' => __('Kata laluan semasa'), 'bag' => true],
                     ['id' => 'password', 'label' => __('Kata laluan baru'), 'bag' => true],
