@@ -242,7 +242,7 @@
                     <x-icon name="chevron-down" class="h-4 w-4" ::style="open ? 'transform:rotate(180deg)' : ''" style="transition:transform .15s" />
                 </button>
 
-                <form method="POST" action="{{ route('profile.password') }}" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:22px">
+                <form method="POST" action="{{ route('profile.password') }}" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:26px">
                 @csrf
                 @method('PUT')
                 @foreach ([
@@ -265,7 +265,7 @@
                     </div>
                 @endforeach
 
-                <button type="submit" class="wl-primary" style="{{ $primary }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> {{ __('Tukar Kata Laluan') }}</button>
+                <button type="submit" class="wl-primary" style="{{ $primary }};margin-top:10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> {{ __('Tukar Kata Laluan') }}</button>
                 </form>
             </div>
         </div>
