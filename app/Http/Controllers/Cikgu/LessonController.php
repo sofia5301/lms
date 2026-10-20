@@ -85,15 +85,21 @@ class LessonController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         $this->authorize('create', Lesson::class);
+
+        // Reached from a chapter's page with ?chapter=, which pre-fills the Bab and lets the
+        // form's back link return to that chapter rather than the general Video list.
+        $chapter = $request->filled('chapter')
+            ? \App\Models\Chapter::with('subject', 'grade')->find($request->integer('chapter'))
+            : null;
 
         return view('cikgu.video.form', [
             'lesson' => new Lesson(['source' => Lesson::SOURCE_YOUTUBE, 'is_published' => true]),
             'subjects' => Subject::orderBy('sort_order')->get(),
             'grades' => Grade::orderBy('level')->get(),
-            'chapter' => null,
+            'chapter' => $chapter,
         ]);
     }
 

@@ -120,7 +120,7 @@
             <div class="bsec-head" style="background:rgba(15,122,104,.05)">
                 <span class="bsec-tile" style="background:#DCF2EE;color:#0F7A68"><x-icon name="video" class="h-6 w-6" /></span>
                 <div class="bsec-ht"><span class="bsec-title">{{ __('Video') }}</span><span class="bsec-sub">{{ __('Rakaman kelas yang anda muat naik atau pautkan dari YouTube') }}</span></div>
-                <a href="{{ route('cikgu.video.create') }}" class="bsec-new" style="background:linear-gradient(135deg,#1E7A58,#176B4C)"><x-icon name="plus" class="h-4 w-4" />{{ __('Video Baru') }}</a>
+                <a href="{{ route('cikgu.video.create', ['chapter' => $chapter->id]) }}" class="bsec-new" style="background:linear-gradient(135deg,#1E7A58,#176B4C)"><x-icon name="plus" class="h-4 w-4" />{{ __('Video Baru') }}</a>
             </div>
             <div class="bsec-body">
 
