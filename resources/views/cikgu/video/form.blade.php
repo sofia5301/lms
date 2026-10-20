@@ -81,16 +81,16 @@
              fields are filled. Clicking a step scrolls to its section. --}}
         <aside class="vf-steps">
             <a href="#sec-maklumat" class="vf-step" :class="{ 'is-on': active === 1, 'is-done': f1 }">
-                <span class="num"><span x-show="! f1">1</span><x-icon name="check" class="h-4 w-4" x-show="f1" x-cloak /></span><span class="lbl">{{ __('Maklumat Video') }}</span>
+                <span class="num"><span x-show="! f1">1</span><x-icon name="check" class="h-4 w-4" x-show="f1" x-cloak /></span><span class="lbl">1. {{ __('Maklumat Video') }}</span>
             </a>
             <a href="#sec-sumber" class="vf-step" :class="{ 'is-on': active === 2, 'is-done': f2 }">
-                <span class="num"><span x-show="! f2">2</span><x-icon name="check" class="h-4 w-4" x-show="f2" x-cloak /></span><span class="lbl">{{ __('Sumber Video') }}</span>
+                <span class="num"><span x-show="! f2">2</span><x-icon name="check" class="h-4 w-4" x-show="f2" x-cloak /></span><span class="lbl">2. {{ __('Sumber Video') }}</span>
             </a>
             <a href="#sec-gambar" class="vf-step" :class="{ 'is-on': active === 3, 'is-done': f3 }">
-                <span class="num"><span x-show="! f3">3</span><x-icon name="check" class="h-4 w-4" x-show="f3" x-cloak /></span><span class="lbl">{{ __('Gambar Kecil & Fail') }}</span>
+                <span class="num"><span x-show="! f3">3</span><x-icon name="check" class="h-4 w-4" x-show="f3" x-cloak /></span><span class="lbl">3. {{ __('Gambar Kecil & Fail') }}</span>
             </a>
             <a href="#sec-terbit" class="vf-step" :class="{ 'is-on': active === 4, 'is-done': f4 }">
-                <span class="num"><span x-show="! f4">4</span><x-icon name="check" class="h-4 w-4" x-show="f4" x-cloak /></span><span class="lbl">{{ __('Penerbitan') }}</span>
+                <span class="num"><span x-show="! f4">4</span><x-icon name="check" class="h-4 w-4" x-show="f4" x-cloak /></span><span class="lbl">4. {{ __('Penerbitan') }}</span>
             </a>
         </aside>
 
