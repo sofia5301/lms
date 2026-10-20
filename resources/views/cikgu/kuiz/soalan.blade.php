@@ -30,7 +30,7 @@
         <span style="background:#E4EEF9;color:#2E6CA8;border-radius:999px;padding:6px 14px;font-family:'Geist',sans-serif;font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px"><x-icon :name="$chapter->subject->iconName()" class="h-[15px] w-[15px]" />{{ $chapter->subject->name }} – {{ $chapter->grade->displayName() }} – {{ __('Bab :n', ['n' => $chapter->number]) }}</span>
     </div>
 
-    <div class="tp-formwrap" style="margin:0 auto;width:100%">
+    <div class="tp-formwrap" style="margin:0 auto;width:100%;max-width:1240px">
         @if ($hasAttempts)
             <div style="display:flex;gap:10px;background:#FEF0CE;border:1px solid rgba(138,106,18,.25);border-radius:14px;padding:14px 18px;font-size:13.5px;color:#8A6A12">
                 <x-icon name="alert" class="h-5 w-5" style="flex-shrink:0;margin-top:1px" />
