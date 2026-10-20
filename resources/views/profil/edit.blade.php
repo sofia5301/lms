@@ -263,7 +263,10 @@
             <button type="button" @click="open = ! open"
                     :aria-expanded="open ? 'true' : 'false'" aria-controls="kata-laluan-panel"
                     style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:0;margin:0;cursor:pointer;text-align:left;font:inherit;color:inherit">
-                <h2 style="{{ $h2Style }};flex:1">{{ __('Tukar kata laluan') }}</h2>
+                <span style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+                    <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                    <h2 style="{{ $h2Style }};margin:0">{{ __('Tukar kata laluan') }}</h2>
+                </span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
                      style="flex-shrink:0;color:var(--wl-muted);transition:transform .15s"
