@@ -193,51 +193,42 @@
 
                 <div style="border-top:1px solid var(--wl-line)"></div>
 
-                <div class="pf-grid2">
+                <div style="display:flex;flex-direction:column;gap:18px">
                     {{-- Nama penuh --}}
-                    <div style="{{ $frow }}">
-                        <span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span>
-                        <div style="{{ $fcol }}">
-                            @if ($user->isAdmin())
-                                <label for="name" style="{{ $labelStyle }}">{{ __('Nama penuh') }}</label>
-                                <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required style="{{ $inputStyle }}">
-                                @error('name')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
-                            @else
-                                <span style="{{ $labelStyle }}">{{ __('Nama penuh') }}</span>
-                                <span style="{{ $lockedStyle }}">{{ $user->name }}</span>
-                            @endif
-                        </div>
+                    <div>
+                        @if ($user->isAdmin())
+                            <label for="name" style="{{ $labelStyle }}">{{ __('Nama penuh') }}</label>
+                            <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required style="{{ $inputStyle }}">
+                            @error('name')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
+                        @else
+                            <span style="{{ $labelStyle }}">{{ __('Nama penuh') }}</span>
+                            <span style="{{ $lockedStyle }}">{{ $user->name }}</span>
+                        @endif
                     </div>
 
                     {{-- Nama pengguna --}}
-                    <div style="{{ $frow }}">
-                        <span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span>
-                        <div style="{{ $fcol }}">
-                            <label for="username" style="{{ $labelStyle }}">{{ __('Nama pengguna (nama paparan)') }}</label>
-                            <input id="username" name="username" type="text" value="{{ old('username', $user->username) }}" required style="{{ $inputStyle }}">
-                            <span style="font-size:12.5px;color:var(--wl-muted)">{{ __('Nama ini dipaparkan di papan pemuka anda. Anda boleh menukarnya bila-bila masa.') }}</span>
-                            @error('username')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
-                        </div>
+                    <div>
+                        <label for="username" style="{{ $labelStyle }}">{{ __('Nama pengguna (nama paparan)') }}</label>
+                        <input id="username" name="username" type="text" value="{{ old('username', $user->username) }}" required style="{{ $inputStyle }}">
+                        <p style="{{ $noteStyle }}">{{ __('Nama ini dipaparkan di papan pemuka anda. Anda boleh menukarnya bila-bila masa.') }}</p>
+                        @error('username')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
                     </div>
 
                     {{-- E-mel --}}
-                    <div style="{{ $frow }}">
-                        <span style="{{ $ftile }}"><x-icon name="mail" class="h-[18px] w-[18px]" /></span>
-                        <div style="{{ $fcol }}">
-                            <span style="{{ $labelStyle }}">{{ __('E-mel (untuk log masuk)') }}</span>
-                            <span style="{{ $lockedStyle }}">{{ $user->email }}</span>
-                            <p style="{{ $noteStyle }}">{{ __('Emel log masuk anda tidak boleh diubah. Hubungi pentadbir sekolah jika ia perlu ditukar.') }}</p>
-                        </div>
+                    <div>
+                        <span style="{{ $labelStyle }}">{{ __('E-mel (untuk log masuk)') }}</span>
+                        <span style="{{ $lockedStyle }}">{{ $user->email }}</span>
+                        <p style="{{ $noteStyle }}">{{ __('Emel log masuk anda tidak boleh diubah. Hubungi pentadbir sekolah jika ia perlu ditukar.') }}</p>
                     </div>
 
                     @if ($user->isStudent())
-                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="building" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Sekolah') }}</span><span style="{{ $lockedStyle }}">{{ $user->school?->name ?: __('Belum ditetapkan') }}</span></div></div>
-                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="graduation" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Tahun') }}</span><span style="{{ $lockedStyle }}">{{ $user->grade?->displayName() ?: __('Belum ditetapkan') }}</span></div></div>
-                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="users" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Kelas') }}</span><span style="{{ $lockedStyle }}">{{ $user->schoolClass?->label() ?: __('Belum ditetapkan') }}</span></div></div>
-                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Guru kelas') }}</span><span style="{{ $lockedStyle }}">{{ $homeroomTeacher?->name ?: __('Belum ditetapkan') }}</span><p style="{{ $noteStyle }}">{{ __('Ditentukan oleh kelas anda.') }}</p></div></div>
-                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Nama penjaga') }}</span><span style="{{ $lockedStyle }}">{{ $user->guardian_name ?: __('Belum ditetapkan') }}</span></div></div>
-                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="phone" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Nombor telefon penjaga') }}</span><span style="{{ $lockedStyle }}">{{ $user->guardian_phone ?: __('Belum ditetapkan') }}</span></div></div>
-                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="mail" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('E-mel penjaga') }}</span><span style="{{ $lockedStyle }}">{{ $user->guardian_email ?: __('Belum ditetapkan') }}</span></div></div>
+                        <div><span style="{{ $labelStyle }}">{{ __('Sekolah') }}</span><span style="{{ $lockedStyle }}">{{ $user->school?->name ?: __('Belum ditetapkan') }}</span></div>
+                        <div><span style="{{ $labelStyle }}">{{ __('Tahun') }}</span><span style="{{ $lockedStyle }}">{{ $user->grade?->displayName() ?: __('Belum ditetapkan') }}</span></div>
+                        <div><span style="{{ $labelStyle }}">{{ __('Kelas') }}</span><span style="{{ $lockedStyle }}">{{ $user->schoolClass?->label() ?: __('Belum ditetapkan') }}</span></div>
+                        <div><span style="{{ $labelStyle }}">{{ __('Guru kelas') }}</span><span style="{{ $lockedStyle }}">{{ $homeroomTeacher?->name ?: __('Belum ditetapkan') }}</span><p style="{{ $noteStyle }}">{{ __('Ditentukan oleh kelas anda.') }}</p></div>
+                        <div><span style="{{ $labelStyle }}">{{ __('Nama penjaga') }}</span><span style="{{ $lockedStyle }}">{{ $user->guardian_name ?: __('Belum ditetapkan') }}</span></div>
+                        <div><span style="{{ $labelStyle }}">{{ __('Nombor telefon penjaga') }}</span><span style="{{ $lockedStyle }}">{{ $user->guardian_phone ?: __('Belum ditetapkan') }}</span></div>
+                        <div><span style="{{ $labelStyle }}">{{ __('E-mel penjaga') }}</span><span style="{{ $lockedStyle }}">{{ $user->guardian_email ?: __('Belum ditetapkan') }}</span></div>
                     @endif
                 </div>
 
