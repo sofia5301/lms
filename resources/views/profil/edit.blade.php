@@ -191,8 +191,6 @@
                     @error('avatar')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
                 </div>
 
-                <div style="border-top:1px solid var(--wl-line)"></div>
-
                 {{-- Single column, each field led by its icon tile. --}}
                 <div style="display:flex;flex-direction:column;gap:18px;margin-top:26px">
                     {{-- Nama penuh --}}
