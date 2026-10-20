@@ -25,6 +25,9 @@
         .vf-step .lbl { font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--tp-ink); line-height:1.3; margin-top:4px; }
         .vf-step:not(.is-on):not(.is-done) .lbl { color:var(--tp-muted); }
 
+        /* Numbered green badge beside each section heading. */
+        .vf-secnum { display:inline-grid; place-items:center; width:26px; height:26px; border-radius:50%; background:var(--tp-teal); color:#fff; font-family:'Geist',sans-serif; font-weight:800; font-size:13px; flex-shrink:0; }
+
         /* Source choice tiles. */
         .vf-src { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
         @media (max-width:520px) { .vf-src { grid-template-columns:1fr; } }
@@ -105,7 +108,7 @@
             {{-- 1. Maklumat Video: Tahun/Subjek/Bab + title + description. --}}
             <div class="tp-panelform" id="sec-maklumat">
                 <div style="display:flex;flex-direction:column;gap:3px">
-                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">1. {{ __('Maklumat Video') }}</h2>
+                    <h2 class="tp-g" style="display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--tp-ink)"><span class="vf-secnum">1</span>{{ __('Maklumat Video') }}</h2>
                     <span style="font-size:13px;color:var(--tp-muted)">{{ __('Masukkan maklumat asas video anda.') }}</span>
                 </div>
                 <x-chapter-picker :subjects="$subjects" :grades="$grades" :chapter="$chapter" />
@@ -129,7 +132,7 @@
             {{-- 2. Sumber Video --}}
             <div class="tp-panelform" id="sec-sumber">
                 <div style="display:flex;flex-direction:column;gap:3px">
-                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">2. {{ __('Sumber Video') }}</h2>
+                    <h2 class="tp-g" style="display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--tp-ink)"><span class="vf-secnum">2</span>{{ __('Sumber Video') }}</h2>
                     <span style="font-size:13px;color:var(--tp-muted)">{{ __('Pilih cara anda ingin menambah video.') }}</span>
                 </div>
 
@@ -298,7 +301,7 @@
                  so a single picker here would only be ambiguous. --}}
             <div class="tp-panelform" id="sec-gambar" @if (! $editing) x-show="! batch" x-cloak @endif>
                 <div style="display:flex;flex-direction:column;gap:3px">
-                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">3. {{ __('Gambar Kecil (Thumbnail)') }}</h2>
+                    <h2 class="tp-g" style="display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--tp-ink)"><span class="vf-secnum">3</span>{{ __('Gambar Kecil (Thumbnail)') }}</h2>
                     <span style="font-size:13px;color:var(--tp-muted)">{{ __('Pilih gambar kecil untuk video anda.') }}</span>
                 </div>
                 <div class="tp-field">
@@ -323,7 +326,7 @@
             {{-- 4. Tetapan Penerbitan --}}
             <div class="tp-panelform" id="sec-terbit">
                 <div style="display:flex;flex-direction:column;gap:3px">
-                    <h2 class="tp-g" style="font-size:17px;font-weight:800;color:var(--tp-ink)">4. {{ __('Tetapan Penerbitan') }}</h2>
+                    <h2 class="tp-g" style="display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--tp-ink)"><span class="vf-secnum">4</span>{{ __('Tetapan Penerbitan') }}</h2>
                     <span style="font-size:13px;color:var(--tp-muted)">{{ __('Pilih sama ada video ini sudah siap untuk diterbitkan.') }}</span>
                 </div>
                 <label for="is_published" style="display:flex;align-items:flex-start;gap:14px;cursor:pointer">
