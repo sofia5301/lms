@@ -3,16 +3,34 @@
     heading-icon="quiz"
     :sub="__('Bina soalan aneka pilihan. Semua soalan disimpan serentak.')">
 
-    {{-- Back link keeps its original left position; the content block below is centred in the wide
-         column. The "now add questions" message comes from the layout flash, no banner here. --}}
-    <a href="{{ route('cikgu.kuiz.edit', $quiz) }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Kembali') }}</a>
+    <style>
+        /* Question builder: the questions (left) + a guide sidebar (right); Tambah Soalan and the
+           save footer span the full width below. */
+        .qs-top { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
+        .qs-grid { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:20px; align-items:start; }
+        @media (max-width:980px) { .qs-grid { grid-template-columns:1fr; } }
+        .qs-main { display:flex; flex-direction:column; gap:18px; min-width:0; }
+        .qs-guide { display:flex; flex-direction:column; gap:16px; position:sticky; top:14px; }
+
+        .qs-ghero { border-radius:16px; overflow:hidden; border:1px solid var(--tp-line); background:var(--tp-surface); }
+        .qs-ghero .banner { height:130px; display:grid; place-items:center; background:linear-gradient(135deg, rgba(23,144,123,.16), rgba(23,144,123,.04)); }
+        .qs-ghero .body { padding:15px 18px; }
+        .qs-ghero .t { font-family:'Geist',sans-serif; font-weight:800; font-size:16px; color:var(--tp-ink); }
+        .qs-ghero .s { font-size:13px; color:var(--tp-muted); margin-top:5px; line-height:1.5; }
+        .qs-gcard { border-radius:16px; border:1px solid var(--tp-line); background:rgba(46,108,168,.1); padding:16px 18px; }
+        .qs-gh { display:flex; align-items:center; gap:9px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; color:#2E6CA8; margin-bottom:14px; }
+        .qs-gli { display:flex; align-items:flex-start; gap:12px; font-size:13px; font-weight:700; color:var(--tp-ink); line-height:1.45; }
+        .qs-gli + .qs-gli { margin-top:14px; }
+        .qs-gnum { width:26px; height:26px; flex-shrink:0; border-radius:50%; background:#E4EEF9; color:#2E6CA8; display:grid; place-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:12.5px; }
+    </style>
+
+    {{-- Top row: back (to the quiz settings) + the chapter breadcrumb. --}}
+    <div class="qs-top">
+        <a href="{{ route('cikgu.kuiz.edit', $quiz) }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Kembali') }}</a>
+        <span style="background:#E4EEF9;color:#2E6CA8;border-radius:999px;padding:6px 14px;font-family:'Geist',sans-serif;font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px"><x-icon :name="$chapter->subject->iconName()" class="h-[15px] w-[15px]" />{{ $chapter->subject->name }} – {{ $chapter->grade->displayName() }} – {{ __('Bab :n', ['n' => $chapter->number]) }}</span>
+    </div>
 
     <div class="tp-formwrap" style="margin:0 auto;width:100%">
-        <div class="tp-quizhead" style="display:flex;flex-direction:column;gap:6px">
-            <span style="align-self:flex-start;background:#E4EEF9;color:#2E6CA8;border-radius:999px;padding:5px 14px;font-family:'Geist',sans-serif;font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px"><x-icon :name="$chapter->subject->iconName()" class="h-[15px] w-[15px]" />{{ $chapter->subject->name }} – {{ $chapter->grade->displayName() }} – {{ __('Bab :n', ['n' => $chapter->number]) }}</span>
-            <h2 class="tp-g" style="font-size:24px;font-weight:800;letter-spacing:-.01em;color:var(--tp-ink)">{{ $quiz->title }}</h2>
-        </div>
-
         @if ($hasAttempts)
             <div style="display:flex;gap:10px;background:#FEF0CE;border:1px solid rgba(138,106,18,.25);border-radius:14px;padding:14px 18px;font-size:13.5px;color:#8A6A12">
                 <x-icon name="alert" class="h-5 w-5" style="flex-shrink:0;margin-top:1px" />
@@ -63,113 +81,136 @@
                 </div>
             @endif
 
-            <template x-for="(question, qIndex) in questions" :key="question.uid">
-                <div class="tp-panelform" style="padding:26px;gap:24px">
-                    <div style="display:flex;align-items:center;gap:12px">
-                        <span class="qb-badge" x-text="qIndex + 1"></span>
-                        <h3 class="tp-g" style="font-size:16px;font-weight:800;color:var(--tp-ink);flex:1">{{ __('Soalan') }} <span x-text="qIndex + 1"></span></h3>
-                        <button type="button" class="tp-icon-action" style="width:36px;height:36px;border:1.5px solid var(--tp-line-2)" @click="moveUp(qIndex)" :disabled="qIndex === 0" title="{{ __('Naik') }}"><x-icon name="arrow-up" class="h-4 w-4" /></button>
-                        <button type="button" class="tp-icon-action" style="width:36px;height:36px;border:1.5px solid var(--tp-line-2)" @click="moveDown(qIndex)" :disabled="qIndex === questions.length - 1" title="{{ __('Turun') }}"><x-icon name="arrow-down" class="h-4 w-4" /></button>
-                        <button type="button" class="tp-icon-action tp-icon-danger" style="width:36px;height:36px;border:1.5px solid var(--tp-line-2)" @click="removeQuestion(qIndex)" :disabled="questions.length === 1" title="{{ __('Padam') }}">
-                            <x-icon name="trash" class="h-4 w-4" />
-                        </button>
-                    </div>
-
-                    <div class="tp-field">
-                        <label class="tp-label" :for="`q-${question.uid}-text`">{{ __('Teks soalan') }}</label>
-                        <textarea :id="`q-${question.uid}-text`" :name="`questions[${qIndex}][question_text]`" x-model="question.question_text"
-                                  rows="2" required class="tp-textarea" placeholder="{{ __('Contoh: Organ manakah yang mengepam darah?') }}"></textarea>
-                    </div>
-
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-                        <div class="tp-field">
-                            <label class="tp-label" :for="`q-${question.uid}-type`">{{ __('Jenis jawapan') }}</label>
-                            <select :id="`q-${question.uid}-type`" :name="`questions[${qIndex}][question_type]`" x-model="question.question_type" @change="onTypeChange(question)" class="tp-select js-styled-select">
-                                <option value="single">{{ __('Radio (satu jawapan)') }}</option>
-                                <option value="multiple">{{ __('Kotak semak (banyak jawapan)') }}</option>
-                            </select>
-                        </div>
-                        <div class="tp-field">
-                            <label class="tp-label" :for="`q-${question.uid}-points`">{{ __('Mata') }}</label>
-                            <input :id="`q-${question.uid}-points`" :name="`questions[${qIndex}][points]`" x-model.number="question.points" type="number" min="1" max="100" required class="tp-input">
-                        </div>
-                    </div>
-
-                    <fieldset style="border:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px">
-                        <legend class="tp-label" style="padding:0;margin-bottom:8px">
-                            {{ __('Pilihan jawapan.') }}
-                            <span x-show="question.question_type === 'single'">{{ __('Tanda SATU jawapan betul.') }}</span>
-                            <span x-show="question.question_type === 'multiple'" x-cloak>{{ __('Tanda SEMUA jawapan betul.') }}</span>
-                        </legend>
-
-                        <template x-for="(option, oIndex) in question.options" :key="option.uid">
-                            <div class="qb-optrow" :class="{ 'is-correct': option.is_correct }">
-                                <label style="display:flex;flex-shrink:0;cursor:pointer;align-items:center">
-                                    <input :type="question.question_type === 'single' ? 'radio' : 'checkbox'"
-                                           :name="`correct-${question.uid}`" :checked="option.is_correct"
-                                           @change="markCorrect(question, oIndex, $event.target.checked)"
-                                           style="width:22px;height:22px;accent-color:#17907B;cursor:pointer">
-                                    <span class="sr-only">{{ __('Tandakan pilihan ini sebagai jawapan betul') }}</span>
-                                </label>
-
-                                <span class="qb-letter" x-text="String.fromCharCode(65 + oIndex)"></span>
-
-                                <input type="text" :name="`questions[${qIndex}][options][${oIndex}][option_text]`" x-model="option.option_text" required
-                                       class="qb-optinput"
-                                       :aria-label="labels.optionAria.replace(':letter', String.fromCharCode(65 + oIndex))" placeholder="{{ __('Teks jawapan') }}">
-
-                                <input type="hidden" :name="`questions[${qIndex}][options][${oIndex}][is_correct]`" :value="option.is_correct ? 1 : 0">
-
-                                <button type="button" @click="removeOption(question, oIndex)" :disabled="question.options.length <= defaults.min_options"
-                                        class="qb-del" title="{{ __('Buang') }}">×</button>
+            <div class="qs-grid">
+                <div class="qs-main">
+                    <template x-for="(question, qIndex) in questions" :key="question.uid">
+                        <div class="tp-panelform" style="padding:26px;gap:24px">
+                            <div style="display:flex;align-items:center;gap:12px">
+                                <span class="qb-badge" x-text="qIndex + 1"></span>
+                                <h3 class="tp-g" style="font-size:16px;font-weight:800;color:var(--tp-ink);flex:1">{{ __('Soalan') }} <span x-text="qIndex + 1"></span></h3>
+                                <button type="button" class="tp-icon-action" style="width:36px;height:36px;border:1.5px solid var(--tp-line-2)" @click="moveUp(qIndex)" :disabled="qIndex === 0" title="{{ __('Naik') }}"><x-icon name="arrow-up" class="h-4 w-4" /></button>
+                                <button type="button" class="tp-icon-action" style="width:36px;height:36px;border:1.5px solid var(--tp-line-2)" @click="moveDown(qIndex)" :disabled="qIndex === questions.length - 1" title="{{ __('Turun') }}"><x-icon name="arrow-down" class="h-4 w-4" /></button>
+                                <button type="button" class="tp-icon-action tp-icon-danger" style="width:36px;height:36px;border:1.5px solid var(--tp-line-2)" @click="removeQuestion(qIndex)" :disabled="questions.length === 1" title="{{ __('Padam') }}">
+                                    <x-icon name="trash" class="h-4 w-4" />
+                                </button>
                             </div>
-                        </template>
 
-                        <button type="button" @click="addOption(question)" :disabled="question.options.length >= defaults.max_options"
-                                class="tp-g qb-addopt" style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:40px;border:none;cursor:pointer;border-radius:10px;background:transparent;color:#17907B;font-weight:800;font-size:13.5px;padding:0 4px">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 3 21 12 12 21 3 12z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
-                            {{ __('Tambah pilihan') }}
-                        </button>
+                            <div class="tp-field">
+                                <label class="tp-label" :for="`q-${question.uid}-text`">{{ __('Teks soalan') }}</label>
+                                <textarea :id="`q-${question.uid}-text`" :name="`questions[${qIndex}][question_text]`" x-model="question.question_text"
+                                          rows="2" required class="tp-textarea" placeholder="{{ __('Contoh: Organ manakah yang mengepam darah?') }}"></textarea>
+                            </div>
 
-                        <span class="qb-qerror" style="font-size:13px;font-weight:700;color:#C24936" x-show="! isQuestionValid(question)" x-cloak x-text="questionError(question)"></span>
-                    </fieldset>
-
-                    {{-- Translation review: the auto-translated question + options, editable, so a
-                         wrong machine translation is corrected before students see it. Submitted
-                         with the question so the toggle can pick it later. --}}
-                    <template x-if="translate.enabled">
-                        <div style="border-top:1px solid var(--tp-line);padding-top:14px;display:flex;flex-direction:column;gap:10px">
-                            <input type="hidden" :name="`questions[${qIndex}][source_locale]`" :value="question.source_locale || ''">
-
-                            <button type="button" @click="question._showT = ! question._showT"
-                                    class="tp-g" style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;border:none;background:transparent;cursor:pointer;color:#2E6CA8;font-weight:800;font-size:13px;padding:0">
-                                <x-icon name="chevron-down" class="h-4 w-4" style="transition:transform .15s" ::style="question._showT ? {} : { transform: 'rotate(-90deg)' }" />
-                                {{ __('Terjemahan') }}
-                                <span x-show="question.source_locale" x-cloak style="font-weight:700;color:var(--tp-muted)"
-                                      x-text="question.source_locale === 'en' ? '· English → Bahasa Melayu' : '· Bahasa Melayu → English'"></span>
-                            </button>
-
-                            <div x-show="question._showT" x-cloak style="display:flex;flex-direction:column;gap:12px;background:#F4F7FB;border:1px solid var(--tp-line-2);border-radius:12px;padding:14px">
-                                <span x-show="! question.source_locale" x-cloak style="font-size:12.5px;color:var(--tp-muted)">{{ __('Klik "Terjemah automatik" di atas untuk menjana terjemahan.') }}</span>
-
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
                                 <div class="tp-field">
-                                    <label class="tp-label" :for="`q-${question.uid}-ttext`">{{ __('Teks soalan (terjemahan)') }}</label>
-                                    <textarea :id="`q-${question.uid}-ttext`" :name="`questions[${qIndex}][question_text_translated]`" x-model="question.question_text_translated"
-                                              rows="2" class="tp-textarea" placeholder="{{ __('Terjemahan soalan') }}"></textarea>
+                                    <label class="tp-label" :for="`q-${question.uid}-type`">{{ __('Jenis jawapan') }}</label>
+                                    <select :id="`q-${question.uid}-type`" :name="`questions[${qIndex}][question_type]`" x-model="question.question_type" @change="onTypeChange(question)" class="tp-select js-styled-select">
+                                        <option value="single">{{ __('Radio (satu jawapan)') }}</option>
+                                        <option value="multiple">{{ __('Kotak semak (banyak jawapan)') }}</option>
+                                    </select>
                                 </div>
+                                <div class="tp-field">
+                                    <label class="tp-label" :for="`q-${question.uid}-points`">{{ __('Mata') }}</label>
+                                    <input :id="`q-${question.uid}-points`" :name="`questions[${qIndex}][points]`" x-model.number="question.points" type="number" min="1" max="100" required class="tp-input">
+                                </div>
+                            </div>
 
-                                <template x-for="(option, oIndex) in question.options" :key="`t-${option.uid}`">
-                                    <div style="display:flex;align-items:center;gap:10px">
-                                        <span style="width:26px;height:26px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-family:'Geist',sans-serif;font-weight:800;font-size:12px;background:#F1F0E8;color:var(--tp-muted-2)" x-text="String.fromCharCode(65 + oIndex)"></span>
-                                        <input type="text" :name="`questions[${qIndex}][options][${oIndex}][option_text_translated]`" x-model="option.option_text_translated"
-                                               style="flex:1;min-height:40px;border:1.5px solid var(--tp-line-3);border-radius:10px;padding:0 12px;background:var(--tp-input);font-family:'Nunito',sans-serif;font-size:14px;color:var(--tp-ink);min-width:0" placeholder="{{ __('Terjemahan jawapan') }}">
+                            <fieldset style="border:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px">
+                                <legend class="tp-label" style="padding:0;margin-bottom:8px">
+                                    {{ __('Pilihan jawapan.') }}
+                                    <span x-show="question.question_type === 'single'">{{ __('Tanda SATU jawapan betul.') }}</span>
+                                    <span x-show="question.question_type === 'multiple'" x-cloak>{{ __('Tanda SEMUA jawapan betul.') }}</span>
+                                </legend>
+
+                                <template x-for="(option, oIndex) in question.options" :key="option.uid">
+                                    <div class="qb-optrow" :class="{ 'is-correct': option.is_correct }">
+                                        <label style="display:flex;flex-shrink:0;cursor:pointer;align-items:center">
+                                            <input :type="question.question_type === 'single' ? 'radio' : 'checkbox'"
+                                                   :name="`correct-${question.uid}`" :checked="option.is_correct"
+                                                   @change="markCorrect(question, oIndex, $event.target.checked)"
+                                                   style="width:22px;height:22px;accent-color:#17907B;cursor:pointer">
+                                            <span class="sr-only">{{ __('Tandakan pilihan ini sebagai jawapan betul') }}</span>
+                                        </label>
+
+                                        <span class="qb-letter" x-text="String.fromCharCode(65 + oIndex)"></span>
+
+                                        <input type="text" :name="`questions[${qIndex}][options][${oIndex}][option_text]`" x-model="option.option_text" required
+                                               class="qb-optinput"
+                                               :aria-label="labels.optionAria.replace(':letter', String.fromCharCode(65 + oIndex))" placeholder="{{ __('Teks jawapan') }}">
+
+                                        <input type="hidden" :name="`questions[${qIndex}][options][${oIndex}][is_correct]`" :value="option.is_correct ? 1 : 0">
+
+                                        <button type="button" @click="removeOption(question, oIndex)" :disabled="question.options.length <= defaults.min_options"
+                                                class="qb-del" title="{{ __('Buang') }}">×</button>
                                     </div>
                                 </template>
-                            </div>
+
+                                <button type="button" @click="addOption(question)" :disabled="question.options.length >= defaults.max_options"
+                                        class="tp-g qb-addopt" style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:40px;border:none;cursor:pointer;border-radius:10px;background:transparent;color:#17907B;font-weight:800;font-size:13.5px;padding:0 4px">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 3 21 12 12 21 3 12z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+                                    {{ __('Tambah pilihan') }}
+                                </button>
+
+                                <span class="qb-qerror" style="font-size:13px;font-weight:700;color:#C24936" x-show="! isQuestionValid(question)" x-cloak x-text="questionError(question)"></span>
+                            </fieldset>
+
+                            {{-- Translation review: the auto-translated question + options, editable, so a
+                                 wrong machine translation is corrected before students see it. Submitted
+                                 with the question so the toggle can pick it later. --}}
+                            <template x-if="translate.enabled">
+                                <div style="border-top:1px solid var(--tp-line);padding-top:14px;display:flex;flex-direction:column;gap:10px">
+                                    <input type="hidden" :name="`questions[${qIndex}][source_locale]`" :value="question.source_locale || ''">
+
+                                    <button type="button" @click="question._showT = ! question._showT"
+                                            class="tp-g" style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;border:none;background:transparent;cursor:pointer;color:#2E6CA8;font-weight:800;font-size:13px;padding:0">
+                                        <x-icon name="chevron-down" class="h-4 w-4" style="transition:transform .15s" ::style="question._showT ? {} : { transform: 'rotate(-90deg)' }" />
+                                        {{ __('Terjemahan') }}
+                                        <span x-show="question.source_locale" x-cloak style="font-weight:700;color:var(--tp-muted)"
+                                              x-text="question.source_locale === 'en' ? '· English → Bahasa Melayu' : '· Bahasa Melayu → English'"></span>
+                                    </button>
+
+                                    <div x-show="question._showT" x-cloak style="display:flex;flex-direction:column;gap:12px;background:#F4F7FB;border:1px solid var(--tp-line-2);border-radius:12px;padding:14px">
+                                        <span x-show="! question.source_locale" x-cloak style="font-size:12.5px;color:var(--tp-muted)">{{ __('Klik "Terjemah automatik" di atas untuk menjana terjemahan.') }}</span>
+
+                                        <div class="tp-field">
+                                            <label class="tp-label" :for="`q-${question.uid}-ttext`">{{ __('Teks soalan (terjemahan)') }}</label>
+                                            <textarea :id="`q-${question.uid}-ttext`" :name="`questions[${qIndex}][question_text_translated]`" x-model="question.question_text_translated"
+                                                      rows="2" class="tp-textarea" placeholder="{{ __('Terjemahan soalan') }}"></textarea>
+                                        </div>
+
+                                        <template x-for="(option, oIndex) in question.options" :key="`t-${option.uid}`">
+                                            <div style="display:flex;align-items:center;gap:10px">
+                                                <span style="width:26px;height:26px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-family:'Geist',sans-serif;font-weight:800;font-size:12px;background:#F1F0E8;color:var(--tp-muted-2)" x-text="String.fromCharCode(65 + oIndex)"></span>
+                                                <input type="text" :name="`questions[${qIndex}][options][${oIndex}][option_text_translated]`" x-model="option.option_text_translated"
+                                                       style="flex:1;min-height:40px;border:1.5px solid var(--tp-line-3);border-radius:10px;padding:0 12px;background:var(--tp-input);font-family:'Nunito',sans-serif;font-size:14px;color:var(--tp-ink);min-width:0" placeholder="{{ __('Terjemahan jawapan') }}">
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </template>
                 </div>
-            </template>
+
+                {{-- Guide sidebar. --}}
+                <aside class="qs-guide">
+                    <div class="qs-ghero">
+                        <div class="banner"><x-icon name="quiz" class="h-16 w-16" style="color:#17907B" /></div>
+                        <div class="body">
+                            <div class="t">{{ __('Soalan Kuiz') }}</div>
+                            <div class="s">{{ __('Lengkapkan maklumat soalan di sebelah.') }}</div>
+                        </div>
+                    </div>
+
+                    <div class="qs-gcard">
+                        <div class="qs-gh"><x-icon name="bulb" class="h-5 w-5" />{{ __('Panduan Ringkas') }}</div>
+                        <div class="qs-gli"><span class="qs-gnum">1</span>{{ __('Masukkan teks soalan yang jelas.') }}</div>
+                        <div class="qs-gli"><span class="qs-gnum">2</span>{{ __('Pilih jenis jawapan yang sesuai.') }}</div>
+                        <div class="qs-gli"><span class="qs-gnum">3</span>{{ __('Tetapkan markah bagi soalan.') }}</div>
+                        <div class="qs-gli"><span class="qs-gnum">4</span>{{ __('Masukkan pilihan jawapan dan tandakan jawapan yang betul.') }}</div>
+                    </div>
+                </aside>
+            </div>
 
             <button type="button" @click="addQuestion()"
                     class="tp-g qb-addq" style="min-height:52px;cursor:pointer;border-radius:14px;border:1.5px dashed var(--tp-line-2, rgba(46,44,80,.2));background:var(--tp-surface-2, #F1F0E8);color:var(--tp-ink);font-weight:800;font-size:14.5px">+ {{ __('Tambah Soalan') }}</button>
