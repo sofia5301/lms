@@ -12,11 +12,20 @@
         // matters, $inputStyle above ends without one.
         $lockedStyle = $inputStyle.';display:flex;align-items:center;cursor:default';
         $noteStyle = 'margin:6px 0 0;font-size:12.5px;color:var(--wl-muted)';
+        // Icon tile to the LEFT of each field (icon | label+value), matching the teacher profile.
+        $ftile = 'width:36px;height:36px;border-radius:11px;background:#ECE9F7;color:#7C5CBF;display:grid;place-items:center;flex-shrink:0;margin-top:2px';
+        $frow = 'display:flex;gap:13px;align-items:flex-start';
+        $fcol = 'display:flex;flex-direction:column;gap:6px;flex:1;min-width:0';
     @endphp
 
     <style>
         /* Two columns on a wide screen, one on a narrow one. The side column carries what a
            student reads; the main column carries what they change. */
+        .pf-tile { width:40px; height:40px; border-radius:12px; display:grid; place-items:center; flex-shrink:0; }
+        .pf-head { display:flex; align-items:center; gap:12px; }
+        .pf-tophead { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+        .pf-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px 24px; align-items:start; }
+        @media (max-width:820px) { .pf-grid2 { grid-template-columns:1fr; } }
         .pf-grid { display:grid; grid-template-columns:minmax(0,1.9fr) minmax(0,1fr); gap:22px; align-items:start; }
         .pf-col  { display:flex; flex-direction:column; gap:22px; min-width:0; }
         .pf-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
@@ -132,118 +141,113 @@
             <h2 style="margin:0;font-family:'Geist',sans-serif;font-size:24px;font-weight:800;color:var(--wl-ink)">{{ __('Profil Saya') }}</h2>
         @endif
 
-        {{-- Account info form. Collapsed by default: it is a long form, and most visits to this
-             page are only a look at the profile. It opens itself when the last save came back with
-             errors, so a validation message is never left hidden behind a closed panel. --}}
-        <section class="wl-acccard" style="{{ $cardStyle }}"
-                 x-data="{ open: @js($errors->getBag('default')->any()) }">
-            <button type="button" @click="open = ! open"
-                    :aria-expanded="open ? 'true' : 'false'" aria-controls="akaun-panel"
-                    style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:0;margin:0;cursor:pointer;text-align:left;font:inherit;color:inherit">
-                <h2 style="{{ $h2Style }};flex:1">{{ __('Maklumat akaun') }}</h2>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-                     style="flex-shrink:0;color:var(--wl-muted);transition:transform .15s"
-                     :style="{ transform: open ? 'rotate(180deg)' : 'none' }"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
-            <div id="akaun-panel" x-show="open" x-cloak>
-            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:18px;margin-top:14px">
+        {{-- Account info card (flat, like the teacher profile): header + avatar top-right, a
+             two-column icon-labelled grid, and a green save bar. --}}
+        <section class="wl-acccard" style="{{ $cardStyle }}">
+            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:20px" x-data="{ fname: '', preview: '' }">
                 @csrf
                 @method('PATCH')
-                {{-- Avatar uploader: clicking the circle or the button opens the one hidden input; the
-                     chosen image previews live in the circle before saving. --}}
-                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap" x-data="{ fname: '', preview: '' }">
-                    <label for="avatar" title="{{ $user->avatarUrl() ? __('Tukar gambar profil') : __('Tambah gambar profil') }}"
-                           style="width:84px;height:84px;border-radius:50%;background:#17907B;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Geist',sans-serif;font-weight:800;font-size:30px;flex-shrink:0;overflow:hidden;cursor:pointer;position:relative;border:4px solid {{ $isDark ? 'rgba(45,212,191,.3)' : '#DCF2EE' }}">
-                        <span x-show="! preview">{{ $user->initials() }}</span>
-                        @if ($user->avatarUrl())
-                            <img src="{{ $user->avatarUrl() }}" alt="" x-show="! preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-                        @endif
-                        <template x-if="preview">
-                            <img :src="preview" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-                        </template>
-                    </label>
-                    <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px">
-                        <label for="avatar" style="{{ $labelStyle }}">{{ __('Gambar profil') }}</label>
-                        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-                            <label for="avatar" style="display:inline-flex;align-items:center;gap:7px;min-height:40px;border-radius:10px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:13px;padding:0 16px;cursor:pointer">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 20h16"/></svg>
-                                {{ $user->avatarUrl() ? __('Tukar gambar') : __('Tambah gambar') }}
-                            </label>
-                            <span style="font-size:13px;color:var(--wl-muted)" x-text="fname || '{{ __('Tiada fail dipilih') }}'"></span>
+
+                {{-- Header: title (left) + avatar & upload box (right). Clicking the circle or the box
+                     opens the one hidden input; the chosen image previews in the circle. --}}
+                <div class="pf-tophead">
+                    <div class="pf-head" style="align-items:flex-start">
+                        <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><x-icon name="user" class="h-5 w-5" /></span>
+                        <div style="display:flex;flex-direction:column;gap:2px">
+                            <h2 style="{{ $h2Style }};margin:0">{{ __('Maklumat akaun') }}</h2>
+                            <span style="{{ $noteStyle }};margin:0">{{ __('Maklumat peribadi dan sekolah anda.') }}</span>
                         </div>
-                        <span style="font-size:12.5px;color:var(--wl-muted)">{{ __('JPG, PNG atau WEBP. Klik bulatan atau butang untuk pilih gambar.') }}</span>
-                        @error('avatar')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
                     </div>
+
+                    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                        <label for="avatar" title="{{ $user->avatarUrl() ? __('Tukar gambar profil') : __('Tambah gambar profil') }}"
+                               style="width:64px;height:64px;border-radius:50%;background:#DCF2EE;color:#0F7A68;display:flex;align-items:center;justify-content:center;font-family:'Geist',sans-serif;font-weight:800;font-size:20px;line-height:1;flex-shrink:0;overflow:hidden;cursor:pointer;position:relative">
+                            <span x-show="! preview">{{ $user->initials() }}</span>
+                            @if ($user->avatarUrl())
+                                <img src="{{ $user->avatarUrl() }}" alt="" x-show="! preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                            @endif
+                            <template x-if="preview">
+                                <img :src="preview" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                            </template>
+                        </label>
+
+                        <label for="avatar" style="display:flex;align-items:center;gap:13px;border:1.5px dashed var(--wl-line-3);border-radius:14px;padding:11px 16px;cursor:pointer;min-width:250px">
+                            <span style="width:44px;height:44px;border-radius:12px;background:#17907B;color:#fff;display:grid;place-items:center;flex-shrink:0">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 20h16"/></svg>
+                            </span>
+                            <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                                <span style="font-family:'Geist',sans-serif;font-weight:800;font-size:14px;color:var(--wl-ink)">{{ $user->avatarUrl() ? __('Tukar gambar') : __('Tambah gambar') }}</span>
+                                <span style="font-size:12.5px;color:var(--wl-muted)" x-text="fname || '{{ __('JPG, PNG atau WEBP. Klik bulatan atau butang untuk pilih gambar.') }}'"></span>
+                            </div>
+                        </label>
+                    </div>
+
                     <input type="file" id="avatar" name="avatar" accept="image/*" class="sr-only"
                            x-on:change="fname = $event.target.files[0]?.name || ''; preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : ''"
                            @error('avatar') aria-invalid="true" @enderror>
                 </div>
-                <div>
-                    @if ($user->isAdmin())
-                        <label for="name" style="{{ $labelStyle }}">{{ __('Nama penuh') }}</label>
-                        <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required style="{{ $inputStyle }}">
-                        @error('name')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
-                    @else
-                        <span style="{{ $labelStyle }}">{{ __('Nama penuh') }}</span>
-                        <span style="{{ $lockedStyle }}">{{ $user->name }}</span>
+                @error('avatar')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
+
+                <div style="border-top:1px solid var(--wl-line)"></div>
+
+                <div class="pf-grid2">
+                    {{-- Nama penuh --}}
+                    <div style="{{ $frow }}">
+                        <span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span>
+                        <div style="{{ $fcol }}">
+                            @if ($user->isAdmin())
+                                <label for="name" style="{{ $labelStyle }}">{{ __('Nama penuh') }}</label>
+                                <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required style="{{ $inputStyle }}">
+                                @error('name')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
+                            @else
+                                <span style="{{ $labelStyle }}">{{ __('Nama penuh') }}</span>
+                                <span style="{{ $lockedStyle }}">{{ $user->name }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Nama pengguna --}}
+                    <div style="{{ $frow }}">
+                        <span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span>
+                        <div style="{{ $fcol }}">
+                            <label for="username" style="{{ $labelStyle }}">{{ __('Nama pengguna (nama paparan)') }}</label>
+                            <input id="username" name="username" type="text" value="{{ old('username', $user->username) }}" required style="{{ $inputStyle }}">
+                            <span style="font-size:12.5px;color:var(--wl-muted)">{{ __('Nama ini dipaparkan di papan pemuka anda. Anda boleh menukarnya bila-bila masa.') }}</span>
+                            @error('username')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+
+                    {{-- E-mel --}}
+                    <div style="{{ $frow }}">
+                        <span style="{{ $ftile }}"><x-icon name="mail" class="h-[18px] w-[18px]" /></span>
+                        <div style="{{ $fcol }}">
+                            <span style="{{ $labelStyle }}">{{ __('E-mel (untuk log masuk)') }}</span>
+                            <span style="{{ $lockedStyle }}">{{ $user->email }}</span>
+                            <p style="{{ $noteStyle }}">{{ __('Emel log masuk anda tidak boleh diubah. Hubungi pentadbir sekolah jika ia perlu ditukar.') }}</p>
+                        </div>
+                    </div>
+
+                    @if ($user->isStudent())
+                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="building" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Sekolah') }}</span><span style="{{ $lockedStyle }}">{{ $user->school?->name ?: __('Belum ditetapkan') }}</span></div></div>
+                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="graduation" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Tahun') }}</span><span style="{{ $lockedStyle }}">{{ $user->grade?->displayName() ?: __('Belum ditetapkan') }}</span></div></div>
+                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="users" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Kelas') }}</span><span style="{{ $lockedStyle }}">{{ $user->schoolClass?->label() ?: __('Belum ditetapkan') }}</span></div></div>
+                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Guru kelas') }}</span><span style="{{ $lockedStyle }}">{{ $homeroomTeacher?->name ?: __('Belum ditetapkan') }}</span><p style="{{ $noteStyle }}">{{ __('Ditentukan oleh kelas anda.') }}</p></div></div>
+                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="user" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Nama penjaga') }}</span><span style="{{ $lockedStyle }}">{{ $user->guardian_name ?: __('Belum ditetapkan') }}</span></div></div>
+                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="phone" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('Nombor telefon penjaga') }}</span><span style="{{ $lockedStyle }}">{{ $user->guardian_phone ?: __('Belum ditetapkan') }}</span></div></div>
+                        <div style="{{ $frow }}"><span style="{{ $ftile }}"><x-icon name="mail" class="h-[18px] w-[18px]" /></span><div style="{{ $fcol }}"><span style="{{ $labelStyle }}">{{ __('E-mel penjaga') }}</span><span style="{{ $lockedStyle }}">{{ $user->guardian_email ?: __('Belum ditetapkan') }}</span></div></div>
                     @endif
                 </div>
-                <div>
-                    <label for="username" style="{{ $labelStyle }}">{{ __('Nama pengguna (nama paparan)') }}</label>
-                    <input id="username" name="username" type="text" value="{{ old('username', $user->username) }}" required style="{{ $inputStyle }}">
-                    <span style="font-size:12.5px;color:var(--tp-muted-2)">{{ __('Nama ini dipaparkan di papan pemuka anda. Anda boleh menukarnya bila-bila masa.') }}</span>
-                    @error('username')<p style="{{ $errStyle }}">{{ $message }}</p>@enderror
-                </div>
-                {{-- Read-only: email is the sign-in identifier, set by the admin. --}}
-                <div>
-                    <span style="{{ $labelStyle }}">{{ __('E-mel (untuk log masuk)') }}</span>
-                    <span style="{{ $lockedStyle }}">{{ $user->email }}</span>
-                    <p style="{{ $noteStyle }}">{{ __('Emel log masuk anda tidak boleh diubah. Hubungi pentadbir sekolah jika ia perlu ditukar.') }}</p>
-                </div>
+
                 @if ($user->isStudent())
-                    {{-- School record. Kept by the admin, shown here so the student can check it. --}}
-                    <div>
-                        <span style="{{ $labelStyle }}">{{ __('Sekolah') }}</span>
-                        <span style="{{ $lockedStyle }}">{{ $user->school?->name ?: __('Belum ditetapkan') }}</span>
+                    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:rgba(23,144,123,.08);border:1px solid rgba(23,144,123,.18);border-radius:14px;padding:14px 18px">
+                        <x-icon name="info-circle" class="h-5 w-5" style="color:#0F7A68;flex-shrink:0" />
+                        <span style="flex:1;min-width:180px;font-size:13px;color:var(--wl-muted);line-height:1.5">{{ __('Butiran sekolah di atas diselenggara oleh pentadbir. Hubungi mereka jika ada yang perlu ditukar.') }}</span>
+                        <button type="submit" class="wl-btn-primary" style="min-height:46px;border:none;cursor:pointer;border-radius:12px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:14px;padding:0 24px">{{ __('Simpan') }}</button>
                     </div>
-
-                    <div>
-                        <span style="{{ $labelStyle }}">{{ __('Tahun') }}</span>
-                        <span style="{{ $lockedStyle }}">{{ $user->grade?->displayName() ?: __('Belum ditetapkan') }}</span>
-                    </div>
-
-                    <div>
-                        <span style="{{ $labelStyle }}">{{ __('Kelas') }}</span>
-                        <span style="{{ $lockedStyle }}">{{ $user->schoolClass?->label() ?: __('Belum ditetapkan') }}</span>
-                    </div>
-
-                    <div>
-                        <span style="{{ $labelStyle }}">{{ __('Guru kelas') }}</span>
-                        <span style="{{ $lockedStyle }}">{{ $homeroomTeacher?->name ?: __('Belum ditetapkan') }}</span>
-                        <p style="{{ $noteStyle }}">{{ __('Ditentukan oleh kelas anda.') }}</p>
-                    </div>
-
-                    <div>
-                        <span style="{{ $labelStyle }}">{{ __('Nama penjaga') }}</span>
-                        <span style="{{ $lockedStyle }}">{{ $user->guardian_name ?: __('Belum ditetapkan') }}</span>
-                    </div>
-
-                    <div>
-                        <span style="{{ $labelStyle }}">{{ __('Nombor telefon penjaga') }}</span>
-                        <span style="{{ $lockedStyle }}">{{ $user->guardian_phone ?: __('Belum ditetapkan') }}</span>
-                    </div>
-
-                    <div>
-                        <span style="{{ $labelStyle }}">{{ __('E-mel penjaga') }}</span>
-                        <span style="{{ $lockedStyle }}">{{ $user->guardian_email ?: __('Belum ditetapkan') }}</span>
-                    </div>
-
-                    <p style="margin:0;{{ $noteStyle }}">{{ __('Butiran sekolah di atas diselenggara oleh pentadbir. Hubungi mereka jika ada yang perlu ditukar.') }}</p>
+                @else
+                    <button type="submit" class="wl-btn-primary" style="align-self:flex-start;min-height:48px;border:none;cursor:pointer;border-radius:13px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:15px;padding:0 24px">{{ __('Simpan') }}</button>
                 @endif
-                <button type="submit" class="wl-btn-primary" style="align-self:flex-start;min-height:48px;border:none;cursor:pointer;border-radius:13px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:15px;padding:0 24px">{{ __('Simpan') }}</button>
             </form>
-            </div>
         </section>
 
         @if ($user->isTeacher())
