@@ -10,13 +10,12 @@
         .qs-grid { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:20px; align-items:start; }
         @media (max-width:980px) { .qs-grid { grid-template-columns:1fr; } }
         .qs-main { display:flex; flex-direction:column; gap:18px; min-width:0; }
-        .qs-guide { display:flex; flex-direction:column; gap:16px; position:sticky; top:14px; }
+        .qs-guide { background:var(--tp-surface); border:1px solid var(--tp-line); border-radius:18px; box-shadow:0 2px 10px rgba(46,44,80,.04); padding:16px; display:flex; flex-direction:column; gap:14px; position:sticky; top:14px; }
 
-        .qs-ghero { border-radius:16px; overflow:hidden; border:1px solid var(--tp-line); background:var(--tp-surface); }
-        .qs-ghero .banner { height:130px; display:grid; place-items:center; background:linear-gradient(135deg, rgba(23,144,123,.16), rgba(23,144,123,.04)); }
-        .qs-ghero .body { padding:15px 18px; }
-        .qs-ghero .t { font-family:'Geist',sans-serif; font-weight:800; font-size:16px; color:var(--tp-ink); }
-        .qs-ghero .s { font-size:13px; color:var(--tp-muted); margin-top:5px; line-height:1.5; }
+        .qs-banner { height:130px; border-radius:14px; overflow:hidden; display:grid; place-items:center; background:linear-gradient(135deg, rgba(23,144,123,.16), rgba(23,144,123,.04)); }
+        .qs-banner img { width:100%; height:100%; object-fit:cover; }
+        .qs-htitle { font-family:'Geist',sans-serif; font-weight:800; font-size:16px; color:var(--tp-ink); }
+        .qs-hsub { font-size:13px; color:var(--tp-muted); margin-top:5px; line-height:1.5; }
         .qs-gcard { border-radius:16px; border:1px solid var(--tp-line); background:rgba(46,108,168,.1); padding:16px 18px; }
         .qs-gh { display:flex; align-items:center; gap:9px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; color:#2E6CA8; margin-bottom:14px; }
         .qs-gli { display:flex; align-items:flex-start; gap:12px; font-size:13px; font-weight:700; color:var(--tp-ink); line-height:1.45; }
@@ -194,12 +193,10 @@
 
                 {{-- Guide sidebar. --}}
                 <aside class="qs-guide">
-                    <div class="qs-ghero">
-                        <div class="banner"><img src="{{ asset('images/new-quiz.png') }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
-                        <div class="body">
-                            <div class="t">{{ __('Soalan Kuiz') }}</div>
-                            <div class="s">{{ __('Lengkapkan maklumat soalan di sebelah.') }}</div>
-                        </div>
+                    <div class="qs-banner"><img src="{{ asset('images/new-quiz.png') }}" alt=""></div>
+                    <div>
+                        <div class="qs-htitle">{{ __('Soalan Kuiz') }}</div>
+                        <div class="qs-hsub">{{ __('Lengkapkan maklumat soalan di sebelah.') }}</div>
                     </div>
 
                     <div class="qs-gcard">
