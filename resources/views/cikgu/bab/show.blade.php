@@ -169,7 +169,7 @@
             <div class="bsec-head" style="background:rgba(184,74,117,.05)">
                 <span class="bsec-tile" style="background:#FBE4ED;color:#B84A75"><x-icon name="file" class="h-6 w-6" /></span>
                 <div class="bsec-ht"><span class="bsec-title">{{ __('Bahan') }}</span><span class="bsec-sub">{{ __('Muat turun pada bahan anda') }}</span></div>
-                <a href="{{ route('cikgu.bahan.create') }}" class="bsec-new" style="background:linear-gradient(135deg,#D9548A,#C13E74)"><x-icon name="plus" class="h-4 w-4" />{{ __('Bahan Baru') }}</a>
+                <a href="{{ route('cikgu.bahan.create', ['chapter' => $chapter->id]) }}" class="bsec-new" style="background:linear-gradient(135deg,#D9548A,#C13E74)"><x-icon name="plus" class="h-4 w-4" />{{ __('Bahan Baru') }}</a>
             </div>
             <div class="bsec-body">
 

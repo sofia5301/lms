@@ -76,13 +76,20 @@ class MaterialController extends Controller
             $lesson = null;
         }
 
+        // The chapter comes from the attached lesson, or from ?chapter= when reached straight from a
+        // chapter's page - which pre-fills the Bab and lets the back link return to that chapter.
+        $chapter = $lesson?->chapter;
+        if (! $chapter && $request->filled('chapter')) {
+            $chapter = \App\Models\Chapter::with('subject', 'grade')->find($request->integer('chapter'));
+        }
+
         return view('cikgu.bahan.form', [
             'material' => new Material(['lesson_id' => $lesson?->id]),
             'subjects' => Subject::orderBy('sort_order')->get(),
             'grades' => Grade::orderBy('level')->get(),
-            'chapter' => $lesson?->chapter,
+            'chapter' => $chapter,
             'lesson' => $lesson,
-            'lessons' => $this->lessonsInChapter($request->user()->id, $lesson?->chapter_id),
+            'lessons' => $this->lessonsInChapter($request->user()->id, $chapter?->id),
         ]);
     }
 

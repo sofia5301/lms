@@ -37,7 +37,11 @@
         .bm-gli svg { flex-shrink:0; margin-top:1px; }
     </style>
 
-    <a href="{{ route('cikgu.bahan.index') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:16px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Bahan Bantu Mengajar') }}</a>
+    @if ($chapter)
+        <a href="{{ route('cikgu.bab.show', $chapter) }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:16px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Bab :number', ['number' => $chapter->number]) }}</a>
+    @else
+        <a href="{{ route('cikgu.bahan.index') }}" class="tp-back" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:16px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Bahan Bantu Mengajar') }}</a>
+    @endif
 
     <div class="bm-layout">
         <form method="POST"
@@ -148,7 +152,7 @@
 
             <div class="tp-formfooter" style="display:flex;gap:12px">
                 <button type="submit" class="tp-btn" style="min-height:48px">{{ $editing ? __('Simpan Perubahan') : __('Muat Naik Bahan') }}</button>
-                <a href="{{ route('cikgu.bahan.index') }}" class="tp-btn-outline" style="min-height:48px">{{ __('Batal') }}</a>
+                <a href="{{ $chapter ? route('cikgu.bab.show', $chapter) : route('cikgu.bahan.index') }}" class="tp-btn-outline" style="min-height:48px">{{ __('Batal') }}</a>
             </div>
         </form>
 
