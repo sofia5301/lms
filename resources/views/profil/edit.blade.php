@@ -155,7 +155,7 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--wl-muted);transition:transform .15s" :style="{ transform: open ? 'rotate(180deg)' : 'none' }"><path d="M6 9l6 6 6-6"/></svg>
             </button>
 
-            <form id="akaun-panel" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:28px;margin-top:16px">
+            <form id="akaun-panel" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:20px;margin-top:16px">
                 @csrf
                 @method('PATCH')
 
