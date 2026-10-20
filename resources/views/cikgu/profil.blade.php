@@ -30,7 +30,7 @@
         .wl-avatarbtn:hover { background:#2BB39B; }
         .pf-tophead { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; }
         .pf-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px 24px; align-items:start; }
-        .pf-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
+        .pf-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:stretch; }
         .pf-tile  { width:40px; height:40px; border-radius:12px; display:grid; place-items:center; flex-shrink:0; }
         .pf-head  { display:flex; align-items:center; gap:12px; }
         .pf-eye   { position:absolute; right:7px; top:50%; transform:translateY(-50%); width:32px; height:32px; border:none; background:transparent; cursor:pointer; color:var(--tp-muted-2); display:grid; place-items:center; }
@@ -225,10 +225,9 @@
                 @endif
             </div>
 
-            {{-- Change password --}}
-            <form method="POST" action="{{ route('profile.password') }}" style="{{ $card }};gap:16px">
-                @csrf
-                @method('PUT')
+            {{-- Change password: collapsed behind a button; drops the form down on click. Opens
+                 automatically when a password change failed validation, so the errors are visible. --}}
+            <div style="{{ $card }};gap:16px" x-data="{ open: {{ $errors->updatePassword->isNotEmpty() ? 'true' : 'false' }} }">
                 <div class="pf-head" style="align-items:flex-start">
                     <span class="pf-tile" style="background:#DCF2EE;color:#0F7A68"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
                     <div style="display:flex;flex-direction:column;gap:2px">
@@ -237,6 +236,15 @@
                     </div>
                 </div>
 
+                <button type="button" @click="open = ! open" :aria-expanded="open" style="display:inline-flex;align-items:center;gap:10px;align-self:flex-start;min-height:46px;border:1.5px solid var(--tp-line-2);cursor:pointer;border-radius:12px;background:var(--tp-surface);color:var(--tp-ink);font-family:'Geist',sans-serif;font-weight:800;font-size:14px;padding:0 18px">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:#0F7A68"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    {{ __('Tukar kata laluan') }}
+                    <x-icon name="chevron-down" class="h-4 w-4" ::style="open ? 'transform:rotate(180deg)' : ''" style="transition:transform .15s" />
+                </button>
+
+                <form method="POST" action="{{ route('profile.password') }}" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:16px">
+                @csrf
+                @method('PUT')
                 @foreach ([
                     ['id' => 'current_password', 'label' => __('Kata laluan semasa'), 'bag' => true],
                     ['id' => 'password', 'label' => __('Kata laluan baru'), 'bag' => true],
@@ -258,7 +266,8 @@
                 @endforeach
 
                 <button type="submit" class="wl-primary" style="{{ $primary }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> {{ __('Tukar Kata Laluan') }}</button>
-            </form>
+                </form>
+            </div>
         </div>
 
     </div>
