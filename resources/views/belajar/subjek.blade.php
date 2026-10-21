@@ -16,13 +16,12 @@
         @media (max-width:620px) { .ss-sum { width:100%; } .ss-s { flex:1; justify-content:center; padding:6px 8px; } .ss-s .l { font-size:11px; } }
 
         /* Chapter row extras: a tinted icon block + a chevron. */
-        /* Decorative pastel shade: a gradient that fades white -> pastel (right), with two
-           translucent circles toward the left. Per-unit colours come in via --p (pastel) and
-           --c (slightly deeper pastel for the shapes). No icon. */
-        .ss-ico { width:200px; align-self:stretch; margin:-14px 0; flex-shrink:0; position:relative; overflow:hidden;
-                  background:linear-gradient(90deg, transparent 0%, var(--p) 55%); }
-        .ss-ico::before { content:''; position:absolute; width:132px; height:132px; border-radius:50%; left:-18px; bottom:-48px; background:var(--c); opacity:.55; }
-        .ss-ico::after  { content:''; position:absolute; width:88px; height:88px; border-radius:50%; left:48px; bottom:-18px; background:var(--c); opacity:.38; }
+        /* Decorative pastel shade: a pastel panel filling the right, with a ROUNDED (circular) left
+           edge, plus a deeper translucent circle for the two-tone shade. Per-unit colours come in
+           via --p (pastel) and --c (deeper pastel). No icon. */
+        .ss-ico { width:200px; align-self:stretch; margin:-14px 0; flex-shrink:0; position:relative; overflow:hidden; }
+        .ss-ico::before { content:''; position:absolute; top:0; bottom:0; left:44px; right:0; background:var(--p); border-radius:999px 0 0 999px; }
+        .ss-ico::after  { content:''; position:absolute; width:96px; height:96px; border-radius:50%; left:20px; bottom:-24px; background:var(--c); opacity:.45; }
         @media (max-width:900px) { .ss-ico { display:none; } }
         .ss-prog { display:flex; flex-direction:column; gap:6px; width:160px; flex-shrink:0; }
         @media (max-width:560px) { .ss-prog { width:110px; } }
