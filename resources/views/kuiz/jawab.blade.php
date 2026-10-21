@@ -5,7 +5,7 @@
     @php($selBg = $isDark ? 'rgba(23,144,123,.16)' : '#E8F5F1')
 
     <style>
-        .qr-wrap { max-width:980px; margin:16px auto 0; width:100%; display:flex; flex-direction:column; gap:18px; }
+        .qr-wrap { max-width:1240px; margin:16px auto 0; width:100%; display:flex; flex-direction:column; gap:18px; }
         /* One big outer card holding every section as its own sub-card. */
         .qr-shell { background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:24px; box-shadow:0 12px 34px var(--wl-line); padding:28px; display:flex; flex-direction:column; gap:22px; }
 
