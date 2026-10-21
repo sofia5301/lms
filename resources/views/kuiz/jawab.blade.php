@@ -5,8 +5,9 @@
     @php($selBg = $isDark ? 'rgba(23,144,123,.16)' : '#E8F5F1')
 
     <style>
+        .qr-wrap { max-width:980px; margin:16px auto 0; width:100%; display:flex; flex-direction:column; gap:18px; }
         /* One big outer card holding every section as its own sub-card. */
-        .qr-shell { background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:24px; box-shadow:0 12px 34px var(--wl-line); padding:28px; display:flex; flex-direction:column; gap:22px; max-width:980px; margin:16px auto 0; width:100%; }
+        .qr-shell { background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:24px; box-shadow:0 12px 34px var(--wl-line); padding:28px; display:flex; flex-direction:column; gap:22px; }
 
         /* Header */
         .qr-headrow { display:flex; align-items:flex-start; gap:18px; }
@@ -52,8 +53,8 @@
         .qr-letter { width:38px; height:38px; border-radius:11px; flex-shrink:0; display:grid; place-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:15px; }
         .qr-otext { flex:1; min-width:0; font-family:'Geist',sans-serif; font-weight:800; font-size:15.5px; color:var(--wl-ink); }
 
-        /* Footer */
-        .qr-foot { display:flex; align-items:center; gap:14px; margin-top:4px; }
+        /* Footer: its own card below the big card. */
+        .qr-footcard { display:flex; align-items:center; gap:14px; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:20px; box-shadow:0 8px 24px var(--wl-line); padding:18px 24px; }
         .qr-navbtn { min-height:56px; cursor:pointer; border-radius:16px; font-family:'Geist',sans-serif; font-weight:800; font-size:16px; padding:0 26px; display:inline-flex; align-items:center; justify-content:center; gap:10px; }
         .qr-prev { border:1.5px solid var(--wl-line-2); background:var(--wl-surface); color:var(--wl-ink); }
         .qr-next { border:none; background:#17907B; color:#fff; margin-left:auto; }
@@ -70,7 +71,7 @@
         }
     </style>
 
-    <div class="qr-shell"
+    <div class="qr-wrap"
          x-data="quizRunner({ total: {{ $questionCount }}, secondsLeft: {{ $secondsLeft === null ? 'null' : $secondsLeft }}, labels: { answered: @js(__('dijawab')) } })"
          x-init="start()">
 
@@ -78,6 +79,10 @@
             <div style="background:#FEF0CE;border-radius:14px;padding:14px 18px;font-weight:700;font-size:14px;color:#8A6A12">{{ __('JavaScript perlu dihidupkan untuk menjawab kuiz ini.') }}</div>
         </noscript>
 
+        <form method="POST" action="{{ route('kuiz.hantar', $attempt) }}" x-ref="form" @submit="submitting = true"
+              style="display:flex;flex-direction:column;gap:18px">
+            @csrf
+            <div class="qr-shell">
         {{-- Header --}}
         <div class="qr-headrow">
             <span class="qr-ic"><x-icon name="help-circle" style="width:30px;height:30px" /></span>
@@ -118,11 +123,8 @@
             <div class="qr-bar"><div class="qr-barfill" :style="{ width: ((current + 1) / total * 100) + '%' }" style="width:{{ $questionCount ? round(1 / $questionCount * 100, 1) : 0 }}%"></div></div>
         </div>
 
-        {{-- Questions + footer --}}
-        <form method="POST" action="{{ route('kuiz.hantar', $attempt) }}" x-ref="form" @submit="submitting = true"
-              style="display:flex;flex-direction:column;gap:20px">
-            @csrf
-            @foreach ($questions as $index => $question)
+                {{-- Questions --}}
+                @foreach ($questions as $index => $question)
                 <section x-show="current === {{ $index }}" @if ($index > 0) x-cloak @endif class="qr-q">
                     <div class="qr-qhead">
                         <span class="qr-qnum">{{ $index + 1 }}</span>
@@ -155,10 +157,11 @@
                         @endforeach
                     </div>
                 </section>
-            @endforeach
+                @endforeach
+            </div>
 
-            {{-- Footer: prev (left) + next / submit (right) --}}
-            <div class="qr-foot">
+            {{-- Footer card: prev (left) + next / submit (right) --}}
+            <div class="qr-footcard">
                 <button type="button" @click="previous()" class="qr-navbtn qr-prev" :style="{ visibility: current === 0 ? 'hidden' : 'visible' }"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Soalan sebelumnya') }}</button>
 
                 <button type="submit" x-show="current === total - 1" x-cloak :disabled="submitting" class="qr-navbtn qr-next">
