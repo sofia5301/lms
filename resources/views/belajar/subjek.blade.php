@@ -16,9 +16,13 @@
         @media (max-width:620px) { .ss-sum { width:100%; } .ss-s { flex:1; justify-content:center; padding:6px 8px; } .ss-s .l { font-size:11px; } }
 
         /* Chapter row extras: a tinted icon block + a chevron. */
-        .ss-ico { width:160px; align-self:stretch; margin:-14px 0; flex-shrink:0; position:relative; }
-        .ss-panel { position:absolute; top:0; bottom:0; left:58px; right:0; }
-        .ss-blob { position:absolute; border-radius:50%; }
+        /* Decorative pastel shade: a gradient that fades white -> pastel (right), with two
+           translucent circles toward the left. Per-unit colours come in via --p (pastel) and
+           --c (slightly deeper pastel for the shapes). No icon. */
+        .ss-ico { width:200px; align-self:stretch; margin:-14px 0; flex-shrink:0; position:relative; overflow:hidden;
+                  background:linear-gradient(90deg, transparent 0%, var(--p) 55%); }
+        .ss-ico::before { content:''; position:absolute; width:132px; height:132px; border-radius:50%; left:-18px; bottom:-48px; background:var(--c); opacity:.55; }
+        .ss-ico::after  { content:''; position:absolute; width:88px; height:88px; border-radius:50%; left:48px; bottom:-18px; background:var(--c); opacity:.38; }
         @media (max-width:900px) { .ss-ico { display:none; } }
         .ss-prog { display:flex; flex-direction:column; gap:6px; width:160px; flex-shrink:0; }
         @media (max-width:560px) { .ss-prog { width:110px; } }
@@ -80,12 +84,25 @@
                 ['accent' => '#D9862B', 'tint' => '#FBEAD3'],
                 ['accent' => '#D9548A', 'tint' => '#FBE0EC'],
             ])
+            {{-- Soft pastel backgrounds for the decorative shade area (p = pastel, c = deeper
+                 pastel for the circular shapes), one per unit, cycling. --}}
+            @php($shadeColors = [
+                ['p' => '#E8F8F4', 'c' => '#C9EFE6'],
+                ['p' => '#EAF3FF', 'c' => '#CFE2FA'],
+                ['p' => '#F3EBFF', 'c' => '#E0CFF6'],
+                ['p' => '#FFF2E5', 'c' => '#FBE0C2'],
+                ['p' => '#FDEBF3', 'c' => '#F8D2E2'],
+                ['p' => '#E5F8F3', 'c' => '#C4EFE4'],
+                ['p' => '#EAF3FF', 'c' => '#CFE2FA'],
+                ['p' => '#F2EBFC', 'c' => '#DFCFF3'],
+            ])
             <div style="display:flex;flex-direction:column;gap:14px">
                 @foreach ($chapters as $chapter)
                     @php($total = $chapter->lessons_count)
                     @php($watched = (int) ($watchedByChapter[$chapter->id] ?? 0))
                     @php($wpct = $total > 0 ? (int) round($watched / $total * 100) : 0)
                     @php($c = $palette[$loop->index % count($palette)])
+                    @php($sh = $shadeColors[$loop->index % count($shadeColors)])
                     <a href="{{ route('bab.show', $chapter) }}" class="wl-row-lift wl-chaprow"
                        style="background:var(--wl-surface);border:1px solid var(--wl-line);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:18px;box-shadow:0 3px 12px rgba(46,44,80,.04);cursor:pointer;text-decoration:none;position:relative;overflow:hidden">
                         <span style="width:52px;height:52px;border-radius:14px;background:{{ $c['tint'] }};color:{{ $c['accent'] }};display:grid;place-items:center;font-family:'Geist',sans-serif;font-weight:800;font-size:20px;flex-shrink:0">{{ $chapter->number }}</span>
@@ -98,15 +115,8 @@
                             </div>
                         </div>
 
-                        {{-- Colour shade: a full-height tint panel on the right whose left edge is
-                             broken up by overlapping same-tint circles bleeding into the white, plus
-                             a lighter patch. No icon. --}}
-                        <span class="ss-ico">
-                            <span class="ss-panel" style="background:{{ $c['tint'] }}"></span>
-                            <span class="ss-blob" style="background:{{ $c['tint'] }};width:92px;height:92px;left:16px;top:50%;margin-top:-46px"></span>
-                            <span class="ss-blob" style="background:{{ $c['tint'] }};width:62px;height:62px;left:-10px;bottom:-14px"></span>
-                            <span class="ss-blob" style="background:{{ $c['tint'] }};opacity:.55;width:58px;height:58px;left:44px;bottom:-16px"></span>
-                        </span>
+                        {{-- Decorative pastel shade (gradient + circular shapes via CSS, no icon). --}}
+                        <span class="ss-ico" style="--p:{{ $sh['p'] }};--c:{{ $sh['c'] }}"></span>
 
                         @if (auth()->user()->isStudent() && $total > 0)
                             <div class="ss-prog">
