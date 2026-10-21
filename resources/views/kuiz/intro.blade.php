@@ -5,7 +5,7 @@
     @php($tagColor = "color-mix(in oklab, {$col} var(--pill-fw), var(--pill-fb))")
     @php($backToQuizzes = request('from') === 'quizzes')
     @php($last = $myAttempts->first())
-    @php($panelBg = $isDark ? 'rgba(23,144,123,.1)' : '#EAF6F1')
+    @php($panelBg = $isDark ? 'rgba(23,144,123,.07)' : 'rgba(23,144,123,.045)')
 
     <style>
         .qi-wrap { max-width:1160px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:22px; }
