@@ -62,15 +62,6 @@
                     <span style="font-size:14px;color:var(--wl-muted)">{{ $chapter->description }}</span>
                 @endif
             </div>
-            <div class="bh-prog">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                    <span style="font-family:'Geist',sans-serif;font-size:13px;font-weight:800;color:var(--wl-muted)">{{ __('Kemajuan bab') }}</span>
-                    <span style="font-family:'Geist',sans-serif;font-size:13px;font-weight:800;color:var(--wl-ink)">{{ $doneCount }}/{{ $totalItems }}</span>
-                </div>
-                <div style="height:8px;border-radius:999px;background:#EFEEE6;overflow:hidden">
-                    <div style="height:100%;border-radius:999px;background:#17907B;width:{{ $progPct }}%"></div>
-                </div>
-            </div>
         </div>
 
         {{-- Filter tabs + content. --}}
