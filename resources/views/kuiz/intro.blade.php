@@ -8,7 +8,7 @@
     @php($panelBg = $isDark ? 'rgba(23,144,123,.07)' : 'rgba(23,144,123,.045)')
 
     <style>
-        .qi-wrap { max-width:1160px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:22px; }
+        .qi-wrap { max-width:1160px; margin:14px auto 0; width:100%; display:flex; flex-direction:column; gap:22px; }
         .qi-crumb { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--wl-muted); }
         .qi-crumb .cur { color:var(--wl-ink); } .qi-crumb .sep { color:var(--wl-muted-2); display:inline-flex; }
 
