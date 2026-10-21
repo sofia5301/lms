@@ -119,7 +119,7 @@
                 </div>
 
                 @unless ($isPreview)
-                    <form method="POST" action="{{ route('kuiz.mula', $quiz) }}">
+                    <form method="POST" action="{{ route('kuiz.mula', $quiz) }}" style="margin-top:auto">
                         @csrf
                         <button type="submit" class="wl-btn-primary" style="width:100%;min-height:56px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;cursor:pointer;border-radius:16px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:16px"><x-icon name="play" class="h-5 w-5" />{{ $rankedAttempt ? __('Cuba Lagi (Latihan)') : __('Mula Kuiz') }}</button>
                     </form>
