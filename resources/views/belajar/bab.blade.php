@@ -19,7 +19,7 @@
         .bh-prog { width:300px; max-width:36%; flex-shrink:0; }
         @media (max-width:760px) { .bh-prog { width:100%; max-width:none; } .bh-hero { flex-wrap:wrap; } }
 
-        .bh-tabs { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .bh-tabs { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:14px; }
         .bh-tab { display:inline-flex; align-items:center; gap:9px; min-height:46px; padding:0 20px; border-radius:999px; border:1.5px solid var(--wl-line-2); background:var(--wl-surface); font-family:'Geist',sans-serif; font-weight:800; font-size:14px; color:var(--wl-ink); cursor:pointer; }
         .bh-tab .ic, .bh-tab .ct { color:var(--wl-muted); }
         .bh-tab.is-on { background:#17907B; border-color:#17907B; color:#fff; }
