@@ -34,13 +34,8 @@
         @media (max-width:820px) { .bh-vidgrid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media (max-width:560px) { .bh-vidgrid { grid-template-columns:1fr; } }
 
-        /* Full-width item row with a pastel shade on the right (--p pastel, --c deeper). */
-        .bh-item { position:relative; overflow:hidden; display:flex; align-items:center; gap:14px; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:16px; padding:14px 18px; }
-        .bh-item > * { position:relative; z-index:1; }
-        .bh-shade { position:absolute; top:0; right:0; bottom:0; width:320px; max-width:48%; z-index:0; pointer-events:none; }
-        .bh-shade::before { content:''; position:absolute; width:150px; height:150px; border-radius:50%; right:-6px; top:50%; margin-top:-75px; background:var(--p); }
-        .bh-shade::after  { content:''; position:absolute; width:120px; height:120px; border-radius:50%; right:92px; bottom:-30px; background:var(--c); opacity:.5; }
-        @media (max-width:560px) { .bh-shade { display:none; } }
+        /* Full-width item row; the whole card is tinted its section's pastel colour. */
+        .bh-item { display:flex; align-items:center; gap:14px; border:1px solid var(--wl-line); border-radius:16px; padding:14px 18px; }
     </style>
 
     <div style="display:flex;flex-direction:column;gap:22px">
@@ -145,8 +140,7 @@
                 @else
                     <div style="display:flex;flex-direction:column;gap:12px">
                         @foreach ($materials as $material)
-                            <div class="bh-item">
-                                <span class="bh-shade" style="--p:#FDEBF3;--c:#F8D2E2"></span>
+                            <div class="bh-item" style="background:color-mix(in oklab, #D9548A 9%, var(--wl-surface))">
                                 <span style="width:44px;height:44px;border-radius:12px;background:#FDE7E0;color:#B84A75;display:grid;place-items:center;flex-shrink:0"><x-icon :name="$material->iconName()" style="width:21px;height:21px" /></span>
                                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1">
                                     <span class="wl-cardtitle" style="font-family:'Geist',sans-serif;font-weight:800;font-size:14.5px;color:var(--wl-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $material->title }}</span>
@@ -174,8 +168,7 @@
                 @else
                     <div style="display:flex;flex-direction:column;gap:12px">
                         @foreach ($quizzes as $quiz)
-                            <div class="bh-item">
-                                <span class="bh-shade" style="--p:#F2EBFC;--c:#DFCFF3"></span>
+                            <div class="bh-item" style="background:color-mix(in oklab, #7C5CBF 9%, var(--wl-surface))">
                                 <span style="width:44px;height:44px;border-radius:12px;background:#EDE7F9;color:#7C5CBF;display:grid;place-items:center;flex-shrink:0"><x-icon name="{{ $quiz->isFile() ? 'file' : 'help-circle' }}" style="width:21px;height:21px" /></span>
                                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
                                     <span style="background:{{ $tagBg }};color:{{ $tagColor }};border-radius:999px;padding:3px 11px;font-family:'Geist',sans-serif;font-size:11.5px;font-weight:800;align-self:flex-start">{{ $subject->displayName() }}</span>
