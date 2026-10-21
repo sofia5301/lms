@@ -33,6 +33,14 @@
         .bh-vidgrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
         @media (max-width:820px) { .bh-vidgrid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media (max-width:560px) { .bh-vidgrid { grid-template-columns:1fr; } }
+
+        /* Full-width item row with a pastel shade on the right (--p pastel, --c deeper). */
+        .bh-item { position:relative; overflow:hidden; display:flex; align-items:center; gap:14px; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:16px; padding:14px 18px; }
+        .bh-item > * { position:relative; z-index:1; }
+        .bh-shade { position:absolute; top:0; right:0; bottom:0; width:300px; max-width:46%; z-index:0; pointer-events:none; }
+        .bh-shade::before { content:''; position:absolute; top:0; bottom:0; left:66px; right:0; background:var(--p); border-radius:999px 0 0 999px; }
+        .bh-shade::after  { content:''; position:absolute; width:120px; height:120px; border-radius:50%; left:34px; bottom:-34px; background:var(--c); opacity:.45; }
+        @media (max-width:560px) { .bh-shade { display:none; } }
     </style>
 
     <div style="display:flex;flex-direction:column;gap:22px">
@@ -135,15 +143,16 @@
                         <span style="font-size:13.5px;color:var(--wl-muted)">{{ __('Cikgu belum memuat naik slaid, PDF atau lembaran kerja untuk bab ini.') }}</span>
                     </div>
                 @else
-                    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+                    <div style="display:flex;flex-direction:column;gap:12px">
                         @foreach ($materials as $material)
-                            <div style="background:var(--wl-surface);border:1px solid var(--wl-line);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px">
-                                <span style="width:38px;height:38px;border-radius:10px;background:#FDE7E0;color:#B84A75;display:grid;place-items:center;flex-shrink:0"><x-icon :name="$material->iconName()" style="width:19px;height:19px" /></span>
-                                <div style="display:flex;flex-direction:column;gap:1px;min-width:0;flex:1">
-                                    <span class="wl-cardtitle" style="font-family:'Geist',sans-serif;font-weight:800;font-size:13.5px;color:var(--wl-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $material->title }}</span>
-                                    <span style="font-size:12px;color:var(--wl-muted)">{{ $material->humanSize() }}</span>
+                            <div class="bh-item">
+                                <span class="bh-shade" style="--p:#FDEBF3;--c:#F8D2E2"></span>
+                                <span style="width:44px;height:44px;border-radius:12px;background:#FDE7E0;color:#B84A75;display:grid;place-items:center;flex-shrink:0"><x-icon :name="$material->iconName()" style="width:21px;height:21px" /></span>
+                                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1">
+                                    <span class="wl-cardtitle" style="font-family:'Geist',sans-serif;font-weight:800;font-size:14.5px;color:var(--wl-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $material->title }}</span>
+                                    <span style="font-size:12.5px;color:var(--wl-muted)">{{ $material->humanSize() }}</span>
                                 </div>
-                                <a href="{{ route('muat-turun.bahan', $material) }}" title="{{ __('Muat turun') }}" style="width:38px;height:38px;border-radius:10px;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;text-decoration:none;flex-shrink:0"><x-icon name="download" style="width:19px;height:19px" /></a>
+                                <a href="{{ route('muat-turun.bahan', $material) }}" title="{{ __('Muat turun') }}" style="width:42px;height:42px;border-radius:11px;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;text-decoration:none;flex-shrink:0"><x-icon name="download" style="width:20px;height:20px" /></a>
                             </div>
                         @endforeach
                     </div>
@@ -163,22 +172,25 @@
                         <span style="font-size:13.5px;color:var(--wl-muted)">{{ __('Tonton video dahulu. Kuiz akan muncul di sini apabila cikgu menyediakannya.') }}</span>
                     </div>
                 @else
-                    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px">
+                    <div style="display:flex;flex-direction:column;gap:12px">
                         @foreach ($quizzes as $quiz)
-                            <div style="background:var(--wl-surface);border:1px solid var(--wl-line);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
-                                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                                    <span style="background:{{ $tagBg }};color:{{ $tagColor }};border-radius:999px;padding:4px 12px;font-family:'Geist',sans-serif;font-size:11.5px;font-weight:800">{{ $subject->displayName() }}</span>
-                                    @if ($quiz->isFile())
-                                        <span style="font-size:12px;font-weight:700;color:var(--wl-muted)">{{ __('Kuiz Bercetak') }}</span>
-                                    @endif
+                            <div class="bh-item">
+                                <span class="bh-shade" style="--p:#F2EBFC;--c:#DFCFF3"></span>
+                                <span style="width:44px;height:44px;border-radius:12px;background:#EDE7F9;color:#7C5CBF;display:grid;place-items:center;flex-shrink:0"><x-icon name="{{ $quiz->isFile() ? 'file' : 'help-circle' }}" style="width:21px;height:21px" /></span>
+                                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
+                                    <span style="background:{{ $tagBg }};color:{{ $tagColor }};border-radius:999px;padding:3px 11px;font-family:'Geist',sans-serif;font-size:11.5px;font-weight:800;align-self:flex-start">{{ $subject->displayName() }}</span>
+                                    <span class="wl-quiztitle" style="font-family:'Geist',sans-serif;font-weight:800;font-size:15.5px;color:var(--wl-ink)">{{ $quiz->localizedTitle() }}</span>
+                                    <div style="display:flex;align-items:center;gap:12px;font-size:12.5px;font-weight:700;color:var(--wl-muted);flex-wrap:wrap">
+                                        @if ($quiz->my_attempts_count > 0)
+                                            <span>{{ __('Dicuba :count kali', ['count' => $quiz->my_attempts_count]) }}</span>
+                                        @endif
+                                        @if ($quiz->isInteractive() && ! is_null($quiz->questions_count))
+                                            @if ($quiz->my_attempts_count > 0)<span style="color:var(--wl-line-2)">|</span>@endif
+                                            <span>{{ __(':count soalan', ['count' => $quiz->questions_count]) }}</span>
+                                        @endif
+                                    </div>
                                 </div>
-                                <span class="wl-quiztitle" style="font-family:'Geist',sans-serif;font-weight:800;font-size:15.5px;color:var(--wl-ink)">{{ $quiz->localizedTitle() }}</span>
-                                <div style="display:flex;align-items:center;gap:12px;margin-top:auto">
-                                    @if ($quiz->my_attempts_count > 0)
-                                        <span style="font-size:12.5px;font-weight:700;color:var(--wl-muted)">{{ __('Dicuba :count kali', ['count' => $quiz->my_attempts_count]) }}</span>
-                                    @endif
-                                    <a href="{{ route('kuiz.intro', ['quiz' => $quiz, 'from' => 'chapter']) }}" class="wl-btn-primary" style="margin-left:auto;min-height:42px;display:inline-flex;align-items:center;border-radius:12px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:13.5px;padding:0 18px;text-decoration:none">{{ $quiz->isFile() ? __('Lihat Kuiz') : __('Cuba Kuiz') }}</a>
-                                </div>
+                                <a href="{{ route('kuiz.intro', ['quiz' => $quiz, 'from' => 'chapter']) }}" class="wl-btn-primary" style="min-height:46px;display:inline-flex;align-items:center;gap:8px;border-radius:12px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:14px;padding:0 20px;text-decoration:none;flex-shrink:0">{{ $quiz->isFile() ? __('Lihat Kuiz') : __('Cuba Kuiz') }} <x-icon name="arrow-right" class="h-4 w-4" /></a>
                             </div>
                         @endforeach
                     </div>

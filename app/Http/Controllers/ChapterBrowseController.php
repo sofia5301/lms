@@ -30,7 +30,10 @@ class ChapterBrowseController extends Controller
 
         $quizzes = $chapter->quizzes()
             ->published()
-            ->withCount(['attempts as my_attempts_count' => fn ($q) => $q->where('student_id', $user->id)])
+            ->withCount([
+                'attempts as my_attempts_count' => fn ($q) => $q->where('student_id', $user->id),
+                'questions',
+            ])
             ->orderBy('id')
             ->get();
 
