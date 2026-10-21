@@ -121,16 +121,16 @@
                 {{-- Your progress: only when there is an attempt. --}}
                 @if ($last)
                     @php($dpct = $last->max_score > 0 ? (int) round($last->score / $last->max_score * 100) : 0)
-                    @php($circ = 2 * M_PI * 46)
+                    @php($circ = 2 * M_PI * 60)
                     @php($dash = round($dpct / 100 * $circ, 1))
                     <div class="qi-card">
                         <div class="qi-sech"><x-icon name="chart" class="h-5 w-5" style="color:#0F7A68" />{{ __('Kemajuan anda') }}</div>
                         <div style="background:{{ $panelBg }};border-radius:14px;padding:22px;display:grid;place-items:center">
-                            <svg width="130" height="130" viewBox="0 0 130 130" aria-hidden="true">
-                                <circle cx="65" cy="65" r="46" fill="none" stroke="{{ $isDark ? 'rgba(255,255,255,.1)' : '#CFE7DE' }}" stroke-width="9"/>
-                                <circle cx="65" cy="65" r="46" fill="none" stroke="#17907B" stroke-width="9" stroke-linecap="round" stroke-dasharray="{{ $dash }} {{ round($circ, 1) }}" transform="rotate(-90 65 65)"/>
-                                <text x="65" y="63" text-anchor="middle" font-family="Geist, sans-serif" font-size="24" font-weight="800" fill="var(--wl-ink)">{{ $last->score }}/{{ $last->max_score }}</text>
-                                <text x="65" y="82" text-anchor="middle" font-family="Nunito, sans-serif" font-size="11.5" font-weight="700" fill="var(--wl-muted)">{{ __('Markah terakhir') }}</text>
+                            <svg width="156" height="156" viewBox="0 0 156 156" aria-hidden="true">
+                                <circle cx="78" cy="78" r="60" fill="none" stroke="{{ $isDark ? 'rgba(255,255,255,.1)' : '#CFE7DE' }}" stroke-width="12"/>
+                                <circle cx="78" cy="78" r="60" fill="none" stroke="#17907B" stroke-width="12" stroke-linecap="round" stroke-dasharray="{{ $dash }} {{ round($circ, 1) }}" transform="rotate(-90 78 78)"/>
+                                <text x="78" y="76" text-anchor="middle" font-family="Geist, sans-serif" font-size="30" font-weight="800" fill="var(--wl-ink)">{{ $last->score }}/{{ $last->max_score }}</text>
+                                <text x="78" y="98" text-anchor="middle" font-family="Nunito, sans-serif" font-size="12.5" font-weight="700" fill="var(--wl-muted)">{{ __('Markah terakhir') }}</text>
                             </svg>
                         </div>
                         <div style="margin-top:16px">
