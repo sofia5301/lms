@@ -29,7 +29,7 @@
         .fav-views { display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:700; color:var(--wl-muted); }
 
         .fav-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
-        .fav-btn { width:48px; height:48px; border-radius:50%; border:none; cursor:pointer; background:transparent; display:grid; place-items:center; }
+        .fav-btn { width:56px; height:56px; border-radius:50%; border:none; cursor:pointer; background:transparent; display:grid; place-items:center; }
         .fav-kebab { width:36px; height:36px; border-radius:50%; border:none; cursor:pointer; background:transparent; color:var(--wl-muted); display:grid; place-items:center; }
         .fav-kebab:hover { background:var(--wl-line); }
         .fav-menu { position:absolute; top:42px; right:0; z-index:20; min-width:190px; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:14px; box-shadow:0 12px 30px rgba(46,44,80,.16); padding:6px; display:flex; flex-direction:column; }
@@ -107,7 +107,7 @@
                                 <div class="fav-actions">
                                     <button type="button" class="fav-btn" data-fav="true" title="{{ __('Kegemaran') }}" aria-label="{{ __('Kegemaran') }}"
                                             data-add="{{ route('kegemaran.simpan', $lesson) }}" data-remove="{{ route('kegemaran.padam', $lesson) }}"
-                                            onclick="wlToggleFav(event, this)" style="color:#EB5E5A"><x-icon name="heart" class="h-[34px] w-[34px]" style="fill:currentColor" /></button>
+                                            onclick="wlToggleFav(event, this)" style="color:#EB5E5A"><x-icon name="heart" class="h-[42px] w-[42px]" style="fill:currentColor" /></button>
                                 </div>
                             </div>
                         @endforeach
