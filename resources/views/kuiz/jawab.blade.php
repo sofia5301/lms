@@ -33,7 +33,7 @@
         .qr-stat .v { font-family:'Geist',sans-serif; font-size:21px; font-weight:800; color:var(--wl-ink); line-height:1; margin-top:4px; }
 
         /* Progress sub-card */
-        .qr-prog { border:1px solid var(--wl-line); border-radius:16px; padding:18px 22px; }
+        .qr-prog { border:1px solid var(--wl-line); border-radius:16px; padding:18px 22px; margin:12px 0; }
         .qr-progtop { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
         .qr-progl { font-family:'Geist',sans-serif; font-weight:800; font-size:15px; color:var(--wl-ink); }
         .qr-progr { margin-left:auto; font-size:13.5px; font-weight:700; color:var(--wl-muted); }
