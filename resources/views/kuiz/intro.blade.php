@@ -67,9 +67,6 @@
                     <p style="margin:0;font-size:15px;color:var(--wl-muted);line-height:1.55;max-width:620px">{{ $quiz->localizedDescription() }}</p>
                 @endif
             </div>
-            <div class="qi-heroimg">
-                <x-icon name="book" class="h-16 w-16" style="color:#17907B;opacity:.9" />
-            </div>
         </div>
 
         <div class="qi-grid">
