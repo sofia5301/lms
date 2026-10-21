@@ -8,7 +8,7 @@
     <style>
         /* Header content summary (totals across the subject's chapters). */
         .ss-sum { display:flex; align-items:center; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:16px; padding:8px 10px; box-shadow:0 3px 12px rgba(46,44,80,.04); }
-        .ss-s { display:flex; align-items:center; gap:11px; padding:6px 16px; }
+        .ss-s { display:flex; align-items:center; gap:13px; padding:6px 30px; }
         .ss-s .ic { width:40px; height:40px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; }
         .ss-s .n { font-family:'Geist',sans-serif; font-size:22px; font-weight:800; color:var(--wl-ink); line-height:1; }
         .ss-s .l { font-size:12px; font-weight:700; color:var(--wl-muted); margin-top:3px; white-space:nowrap; }
