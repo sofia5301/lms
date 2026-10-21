@@ -56,7 +56,7 @@
         .qr-foot { display:flex; align-items:center; gap:14px; margin-top:4px; }
         .qr-navbtn { min-height:56px; cursor:pointer; border-radius:16px; font-family:'Geist',sans-serif; font-weight:800; font-size:16px; padding:0 26px; display:inline-flex; align-items:center; justify-content:center; gap:10px; }
         .qr-prev { border:1.5px solid var(--wl-line-2); background:var(--wl-surface); color:var(--wl-ink); }
-        .qr-next { border:none; background:#17907B; color:#fff; flex:1; }
+        .qr-next { border:none; background:#17907B; color:#fff; margin-left:auto; }
 
         @media (max-width:900px) {
             .qr-shell { padding:18px !important; gap:16px !important; }
