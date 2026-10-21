@@ -115,6 +115,13 @@
                         <div style="display:flex;align-items:center;gap:8px;background:{{ $isDark ? 'rgba(45,212,191,.12)' : '#DCF2EE' }};border:1px solid {{ $isDark ? 'rgba(45,212,191,.3)' : 'rgba(23,144,123,.25)' }};border-radius:14px;padding:14px 18px;margin-top:16px;font-family:'Geist',sans-serif;font-size:13.5px;font-weight:700;color:{{ $isDark ? '#5EEAD4' : '#0F7A68' }}"><x-icon name="trophy" style="width:18px;height:18px;flex-shrink:0" />{{ __('Percubaan pertama anda: :score/:max mata. Percubaan baharu adalah latihan.', ['score' => $rankedAttempt->score, 'max' => $rankedAttempt->max_score]) }}</div>
                     @endif
                 </div>
+
+                @unless ($isPreview)
+                    <form method="POST" action="{{ route('kuiz.mula', $quiz) }}">
+                        @csrf
+                        <button type="submit" class="wl-btn-primary" style="width:100%;min-height:56px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;cursor:pointer;border-radius:16px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:16px"><x-icon name="play" class="h-5 w-5" />{{ $rankedAttempt ? __('Cuba Lagi (Latihan)') : __('Mula Kuiz') }}</button>
+                    </form>
+                @endunless
             </div>
 
             <aside class="qi-side">
@@ -164,12 +171,5 @@
                 </div>
             </aside>
         </div>
-
-        @unless ($isPreview)
-            <form method="POST" action="{{ route('kuiz.mula', $quiz) }}">
-                @csrf
-                <button type="submit" class="wl-btn-primary" style="width:100%;min-height:56px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;cursor:pointer;border-radius:16px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:16px"><x-icon name="play" class="h-5 w-5" />{{ $rankedAttempt ? __('Cuba Lagi (Latihan)') : __('Mula Kuiz') }}</button>
-            </form>
-        @endunless
     </div>
 </x-dynamic-component>
