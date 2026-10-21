@@ -107,15 +107,7 @@
                                 <div class="fav-actions">
                                     <button type="button" class="fav-btn" data-fav="true" title="{{ __('Kegemaran') }}" aria-label="{{ __('Kegemaran') }}"
                                             data-add="{{ route('kegemaran.simpan', $lesson) }}" data-remove="{{ route('kegemaran.padam', $lesson) }}"
-                                            onclick="wlToggleFav(event, this)" style="color:#EB5E5A"><x-icon name="heart" class="h-[22px] w-[22px]" style="fill:currentColor" /></button>
-
-                                    <div x-data="{ o: false }" style="position:relative">
-                                        <button type="button" class="fav-kebab" @click="o = !o" aria-label="{{ __('Pilihan') }}"><x-icon name="dots" class="h-5 w-5" style="transform:rotate(90deg)" /></button>
-                                        <div class="fav-menu" x-show="o" x-cloak @click.outside="o = false">
-                                            <a href="{{ route('video.show', $lesson) }}" class="fav-mitem"><x-icon name="play" class="h-[18px] w-[18px]" /> {{ __('Tonton video') }}</a>
-                                            <button type="button" class="fav-mitem danger" @click="o = false" onclick="this.closest('.fav-row').querySelector('.fav-btn').click()"><x-icon name="trash" class="h-[18px] w-[18px]" /> {{ __('Buang dari kegemaran') }}</button>
-                                        </div>
-                                    </div>
+                                            onclick="wlToggleFav(event, this)" style="color:#EB5E5A"><x-icon name="heart" class="h-[27px] w-[27px]" style="fill:currentColor" /></button>
                                 </div>
                             </div>
                         @endforeach
