@@ -37,7 +37,7 @@
         .qi-rd { font-size:13.5px; color:var(--wl-muted); line-height:1.55; margin-top:2px; }
 
         .qi-inforow { display:flex; align-items:center; gap:12px; }
-        .qi-inforow + .qi-inforow { margin-top:14px; }
+        .qi-inforow + .qi-inforow { margin-top:14px; padding-top:14px; border-top:1px solid var(--wl-line); }
         .qi-inforow .nm { display:inline-flex; align-items:center; gap:10px; font-size:13.5px; font-weight:700; color:var(--wl-muted); flex:1; }
         .qi-inforow .vl { font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--wl-ink); text-align:right; }
     </style>
