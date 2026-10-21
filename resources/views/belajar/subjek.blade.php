@@ -16,7 +16,8 @@
         @media (max-width:620px) { .ss-sum { width:100%; } .ss-s { flex:1; justify-content:center; padding:6px 8px; } .ss-s .l { font-size:11px; } }
 
         /* Chapter row extras: a tinted icon block + a chevron. */
-        .ss-ico { width:150px; align-self:stretch; flex-shrink:0; position:relative; }
+        .ss-ico { width:160px; align-self:stretch; margin:-14px 0; flex-shrink:0; position:relative; }
+        .ss-panel { position:absolute; top:0; bottom:0; left:58px; right:0; }
         .ss-blob { position:absolute; border-radius:50%; }
         @media (max-width:900px) { .ss-ico { display:none; } }
         .ss-prog { display:flex; flex-direction:column; gap:6px; width:160px; flex-shrink:0; }
@@ -86,7 +87,7 @@
                     @php($wpct = $total > 0 ? (int) round($watched / $total * 100) : 0)
                     @php($c = $palette[$loop->index % count($palette)])
                     <a href="{{ route('bab.show', $chapter) }}" class="wl-row-lift wl-chaprow"
-                       style="background:var(--wl-surface);border:1px solid var(--wl-line);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:18px;box-shadow:0 3px 12px rgba(46,44,80,.04);cursor:pointer;text-decoration:none">
+                       style="background:var(--wl-surface);border:1px solid var(--wl-line);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:18px;box-shadow:0 3px 12px rgba(46,44,80,.04);cursor:pointer;text-decoration:none;position:relative;overflow:hidden">
                         <span style="width:52px;height:52px;border-radius:14px;background:{{ $c['tint'] }};color:{{ $c['accent'] }};display:grid;place-items:center;font-family:'Geist',sans-serif;font-weight:800;font-size:20px;flex-shrink:0">{{ $chapter->number }}</span>
                         <div style="display:flex;flex-direction:column;gap:7px;margin-right:auto;min-width:0">
                             <span style="font-family:'Geist',sans-serif;font-weight:800;font-size:17px;color:var(--wl-ink)">{{ $chapter->title }}</span>
@@ -97,11 +98,14 @@
                             </div>
                         </div>
 
-                        {{-- Soft organic colour shade: overlapping tint circles, no icon. --}}
+                        {{-- Colour shade: a full-height tint panel on the right whose left edge is
+                             broken up by overlapping same-tint circles bleeding into the white, plus
+                             a lighter patch. No icon. --}}
                         <span class="ss-ico">
-                            <span class="ss-blob" style="background:{{ $c['tint'] }};width:74px;height:74px;right:2px;top:50%;margin-top:-37px"></span>
-                            <span class="ss-blob" style="background:{{ $c['tint'] }};opacity:.6;width:56px;height:56px;left:36px;bottom:0"></span>
-                            <span class="ss-blob" style="background:{{ $c['tint'] }};opacity:.4;width:44px;height:44px;left:12px;top:3px"></span>
+                            <span class="ss-panel" style="background:{{ $c['tint'] }}"></span>
+                            <span class="ss-blob" style="background:{{ $c['tint'] }};width:92px;height:92px;left:16px;top:50%;margin-top:-46px"></span>
+                            <span class="ss-blob" style="background:{{ $c['tint'] }};width:62px;height:62px;left:-10px;bottom:-14px"></span>
+                            <span class="ss-blob" style="background:{{ $c['tint'] }};opacity:.55;width:58px;height:58px;left:44px;bottom:-16px"></span>
                         </span>
 
                         @if (auth()->user()->isStudent() && $total > 0)
