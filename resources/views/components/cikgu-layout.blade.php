@@ -142,7 +142,7 @@
         .tp-logout:hover { background:#FDE7E0; }
 
         /* Main + header */
-        .tp-main { grid-column:2; padding:28px 40px 48px; display:flex; flex-direction:column; gap:24px; min-width:0; max-width:clamp(1240px, 78vw, 1440px); width:100%; margin:0 auto; }
+        .tp-main { grid-column:2; padding:28px 40px 48px; display:flex; flex-direction:column; gap:24px; min-width:0; max-width:none; width:100%; margin:0 auto; }
         .tp-head { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
         .tp-heading { display:flex; align-items:center; gap:14px; flex:1; min-width:200px; }
         .tp-topbar { display:flex; align-items:center; gap:14px; }
