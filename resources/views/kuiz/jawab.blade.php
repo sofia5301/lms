@@ -3,9 +3,14 @@
     @php($questionCount = $questions->count())
     @php($maxScore = $questions->sum('points'))
     @php($selBg = $isDark ? 'rgba(23,144,123,.16)' : '#E8F5F1')
+    @php($chapter = $quiz->chapter)
 
     <style>
         .qr-wrap { max-width:1240px; margin:16px auto 0; width:100%; display:flex; flex-direction:column; gap:18px; }
+        .qr-crumb { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--wl-muted); }
+        .qr-crumb .cur { color:var(--wl-ink); }
+        .qr-crumb .sep { color:var(--wl-muted-2); display:inline-flex; }
+        .qr-cdiv { width:1px; height:18px; background:var(--wl-line-2); margin:0 4px; }
         /* One big outer card holding every section as its own sub-card. */
         .qr-shell { background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:24px; box-shadow:0 12px 34px var(--wl-line); padding:28px; display:flex; flex-direction:column; gap:22px; }
 
@@ -78,6 +83,18 @@
     <div class="qr-wrap"
          x-data="quizRunner({ total: {{ $questionCount }}, secondsLeft: {{ $secondsLeft === null ? 'null' : $secondsLeft }}, labels: { answered: @js(__('dijawab')) } })"
          x-init="start()">
+
+        {{-- Back + breadcrumb, above the card. --}}
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <a href="{{ route('bab.show', $chapter) }}" class="wl-back" style="display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Kembali') }}</a>
+            <span class="qr-cdiv"></span>
+            <span class="qr-crumb">
+                <span style="display:inline-flex;align-items:center;gap:6px;color:var(--wl-ink)"><x-subject-icon :subject="$subject" :size="16" />{{ $subject->name }}</span>
+                <span class="sep"><x-icon name="chevron-right" class="h-4 w-4" /></span>{{ $chapter->grade->displayName() }}
+                <span class="sep"><x-icon name="chevron-right" class="h-4 w-4" /></span>{{ __('Kuiz') }}
+                <span class="sep"><x-icon name="chevron-right" class="h-4 w-4" /></span><span class="cur">{{ $quiz->localizedTitle() }}</span>
+            </span>
+        </div>
 
         <noscript>
             <div style="background:#FEF0CE;border-radius:14px;padding:14px 18px;font-weight:700;font-size:14px;color:#8A6A12">{{ __('JavaScript perlu dihidupkan untuk menjawab kuiz ini.') }}</div>
