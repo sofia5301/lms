@@ -5,29 +5,25 @@
     @php($selBg = $isDark ? 'rgba(23,144,123,.16)' : '#E8F5F1')
 
     <style>
-        .qr-wrap { display:flex; flex-direction:column; gap:18px; max-width:980px; margin:16px auto 0; width:100%; }
-        .qr-card { background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:22px; box-shadow:0 10px 30px var(--wl-line); }
+        /* One big outer card holding every section as its own sub-card. */
+        .qr-shell { background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:24px; box-shadow:0 12px 34px var(--wl-line); padding:28px; display:flex; flex-direction:column; gap:22px; max-width:980px; margin:16px auto 0; width:100%; }
 
         /* Header */
-        .qr-head { padding:26px 28px; position:relative; overflow:hidden; }
         .qr-headrow { display:flex; align-items:flex-start; gap:18px; }
         .qr-ic { width:58px; height:58px; border-radius:16px; flex-shrink:0; display:grid; place-items:center; background:{{ $isDark ? 'rgba(124,92,191,.18)' : '#EDE7F9' }}; color:#7C5CBF; }
         .qr-kuiz { font-family:'Geist',sans-serif; font-weight:800; font-size:13px; letter-spacing:.02em; color:#7C5CBF; }
         .qr-title { margin:2px 0 0; font-family:'Geist',sans-serif; font-size:27px; font-weight:800; letter-spacing:-.01em; color:var(--wl-ink); line-height:1.15; }
-        .qr-desc { margin:8px 0 0; font-size:15px; color:var(--wl-muted); line-height:1.55; max-width:640px; }
-        .qr-heroimg { width:200px; height:140px; flex-shrink:0; margin:-6px -6px 0 0; align-self:flex-start; }
-        .qr-heroimg img { width:100%; height:100%; object-fit:contain; }
-        @media (max-width:760px) { .qr-heroimg { display:none; } }
+        .qr-desc { margin:8px 0 0; font-size:15px; color:var(--wl-muted); line-height:1.55; max-width:680px; }
 
-        .qr-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:22px; }
+        .qr-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
         @media (max-width:560px) { .qr-stats { grid-template-columns:1fr; } }
-        .qr-stat { background:var(--wl-surface-2, var(--wl-surface)); border:1px solid var(--wl-line); border-radius:16px; padding:14px 18px; display:flex; align-items:center; gap:13px; }
-        .qr-stat .ic { width:46px; height:46px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; }
+        .qr-stat { border:1px solid var(--wl-line); border-radius:16px; padding:14px 18px; display:flex; align-items:center; gap:13px; }
+        .qr-stat .ic { width:46px; height:46px; border-radius:13px; display:grid; place-items:center; flex-shrink:0; }
         .qr-stat .l { font-size:12.5px; font-weight:700; color:var(--wl-muted); }
         .qr-stat .v { font-family:'Geist',sans-serif; font-size:21px; font-weight:800; color:var(--wl-ink); line-height:1; margin-top:4px; }
 
-        /* Progress */
-        .qr-prog { padding:18px 24px; }
+        /* Progress sub-card */
+        .qr-prog { border:1px solid var(--wl-line); border-radius:16px; padding:18px 22px; }
         .qr-progtop { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
         .qr-progl { font-family:'Geist',sans-serif; font-weight:800; font-size:15px; color:var(--wl-ink); }
         .qr-progr { margin-left:auto; font-size:13.5px; font-weight:700; color:var(--wl-muted); }
@@ -35,14 +31,14 @@
         .qr-barfill { height:100%; border-radius:999px; background:linear-gradient(90deg,#17907B,#2BB39B); transition:width .25s ease-out; }
         .qr-timer { display:inline-flex; align-items:center; gap:7px; border-radius:999px; padding:7px 14px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; }
 
-        /* Question */
-        .qr-q { padding:26px 28px; display:flex; flex-direction:column; gap:22px; }
-        .qr-qhead { display:flex; align-items:flex-start; gap:16px; }
-        .qr-qnum { width:52px; height:52px; border-radius:15px; flex-shrink:0; display:grid; place-items:center; background:{{ $isDark ? 'rgba(23,144,123,.18)' : '#E3F3EE' }}; color:#0F7A68; font-family:'Geist',sans-serif; font-weight:800; font-size:20px; }
+        /* Question: a tinted sub-block (number + text), options stacked under it. */
+        .qr-q { display:flex; flex-direction:column; gap:14px; }
+        .qr-qhead { display:flex; align-items:center; gap:16px; border-radius:18px; padding:20px 22px; background:{{ $isDark ? 'rgba(23,144,123,.12)' : 'linear-gradient(180deg,#E7F4EF,#F2F9F6)' }}; border:1px solid {{ $isDark ? 'rgba(23,144,123,.18)' : '#DCEEE7' }}; }
+        .qr-qnum { width:52px; height:52px; border-radius:15px; flex-shrink:0; display:grid; place-items:center; background:{{ $isDark ? 'rgba(23,144,123,.22)' : '#D8EEE6' }}; color:#0F7A68; font-family:'Geist',sans-serif; font-weight:800; font-size:20px; }
         .qr-qtext { margin:0; font-family:'Geist',sans-serif; font-size:21px; font-weight:800; line-height:1.3; color:var(--wl-ink); }
-        .qr-qsub { margin:5px 0 0; font-size:14px; color:var(--wl-muted); }
+        .qr-qsub { margin:4px 0 0; font-size:14px; color:var(--wl-muted); }
 
-        .qr-opts { display:flex; flex-direction:column; gap:12px; }
+        .qr-opts { display:flex; flex-direction:column; gap:12px; margin-top:2px; }
         .qopt { position:relative; display:flex; align-items:center; gap:16px; border:1.5px solid var(--wl-line-2); border-radius:16px; padding:15px 18px; cursor:pointer; background:var(--wl-surface); transition:border-color .12s, background .12s, box-shadow .12s; }
         .qopt:hover { border-color:#9FD8CB; }
         .qopt input { position:absolute; opacity:0; width:0; height:0; }
@@ -63,8 +59,9 @@
         .qr-next { border:none; background:#17907B; color:#fff; flex:1; }
 
         @media (max-width:900px) {
-            .qr-head, .qr-q { padding:20px 18px !important; }
+            .qr-shell { padding:18px !important; gap:16px !important; }
             .qr-title { font-size:22px !important; }
+            .qr-qhead { padding:16px !important; }
             .qr-qtext { font-size:18px !important; }
             .qr-qnum { width:44px !important; height:44px !important; font-size:17px !important; }
             .qr-letter { width:32px !important; height:32px !important; font-size:13px !important; }
@@ -73,7 +70,7 @@
         }
     </style>
 
-    <div class="qr-wrap"
+    <div class="qr-shell"
          x-data="quizRunner({ total: {{ $questionCount }}, secondsLeft: {{ $secondsLeft === null ? 'null' : $secondsLeft }}, labels: { answered: @js(__('dijawab')) } })"
          x-init="start()">
 
@@ -81,37 +78,36 @@
             <div style="background:#FEF0CE;border-radius:14px;padding:14px 18px;font-weight:700;font-size:14px;color:#8A6A12">{{ __('JavaScript perlu dihidupkan untuk menjawab kuiz ini.') }}</div>
         </noscript>
 
-        {{-- Header: icon + Kuiz label + title + description + stats + illustration --}}
-        <div class="qr-card qr-head">
-            <div class="qr-headrow">
-                <span class="qr-ic"><x-icon name="help-circle" style="width:30px;height:30px" /></span>
-                <div style="flex:1;min-width:0">
-                    <div class="qr-kuiz">{{ __('Kuiz') }}</div>
-                    <h1 class="qr-title">{{ $quiz->localizedTitle() }}</h1>
-                    @if ($quiz->localizedDescription())
-                        <p class="qr-desc">{{ $quiz->localizedDescription() }}</p>
-                    @endif
-                </div>
+        {{-- Header --}}
+        <div class="qr-headrow">
+            <span class="qr-ic"><x-icon name="help-circle" style="width:30px;height:30px" /></span>
+            <div style="flex:1;min-width:0">
+                <div class="qr-kuiz">{{ __('Kuiz') }}</div>
+                <h1 class="qr-title">{{ $quiz->localizedTitle() }}</h1>
+                @if ($quiz->localizedDescription())
+                    <p class="qr-desc">{{ $quiz->localizedDescription() }}</p>
+                @endif
             </div>
+        </div>
 
-            <div class="qr-stats">
-                <div class="qr-stat">
-                    <span class="ic" style="background:#DCF2EE;color:#0F7A68"><x-icon name="file-text" class="h-5 w-5" /></span>
-                    <div><div class="l">{{ __('Jumlah soalan') }}</div><div class="v">{{ $questionCount }}</div></div>
-                </div>
-                <div class="qr-stat">
-                    <span class="ic" style="background:#FBEAD3;color:#D9862B"><x-icon name="trophy" class="h-5 w-5" /></span>
-                    <div><div class="l">{{ __('Markah penuh') }}</div><div class="v">{{ $maxScore }}</div></div>
-                </div>
-                <div class="qr-stat">
-                    <span class="ic" style="background:#EDE7F9;color:#7C5CBF"><x-icon name="clock" class="h-5 w-5" /></span>
-                    <div><div class="l">{{ __('Masa') }}</div><div class="v">{{ $quiz->duration_minutes ? $quiz->duration_minutes.' '.__('minit') : __('Bebas') }}</div></div>
-                </div>
+        {{-- Stats --}}
+        <div class="qr-stats">
+            <div class="qr-stat">
+                <span class="ic" style="background:#DCF2EE;color:#0F7A68"><x-icon name="file-text" class="h-5 w-5" /></span>
+                <div><div class="l">{{ __('Jumlah soalan') }}</div><div class="v">{{ $questionCount }}</div></div>
+            </div>
+            <div class="qr-stat">
+                <span class="ic" style="background:#FBEAD3;color:#D9862B"><x-icon name="trophy" class="h-5 w-5" /></span>
+                <div><div class="l">{{ __('Markah penuh') }}</div><div class="v">{{ $maxScore }}</div></div>
+            </div>
+            <div class="qr-stat">
+                <span class="ic" style="background:#EDE7F9;color:#7C5CBF"><x-icon name="clock" class="h-5 w-5" /></span>
+                <div><div class="l">{{ __('Masa') }}</div><div class="v">{{ $quiz->duration_minutes ? $quiz->duration_minutes.' '.__('minit') : __('Bebas') }}</div></div>
             </div>
         </div>
 
         {{-- Progress --}}
-        <div class="qr-card qr-prog">
+        <div class="qr-prog">
             <div class="qr-progtop">
                 <span class="qr-progl">{{ __('Soalan') }} <span x-text="current + 1">1</span> {{ __('daripada') }} {{ $questionCount }}</span>
                 @if ($secondsLeft !== null)
@@ -122,18 +118,18 @@
             <div class="qr-bar"><div class="qr-barfill" :style="{ width: ((current + 1) / total * 100) + '%' }" style="width:{{ $questionCount ? round(1 / $questionCount * 100, 1) : 0 }}%"></div></div>
         </div>
 
+        {{-- Questions + footer --}}
         <form method="POST" action="{{ route('kuiz.hantar', $attempt) }}" x-ref="form" @submit="submitting = true"
-              style="display:flex;flex-direction:column;gap:18px">
+              style="display:flex;flex-direction:column;gap:20px">
             @csrf
             @foreach ($questions as $index => $question)
-                <section x-show="current === {{ $index }}" @if ($index > 0) x-cloak @endif class="qr-card qr-q">
+                <section x-show="current === {{ $index }}" @if ($index > 0) x-cloak @endif class="qr-q">
                     <div class="qr-qhead">
                         <span class="qr-qnum">{{ $index + 1 }}</span>
                         <div style="flex:1;min-width:0">
                             <h3 class="qr-qtext">{{ $question->localizedText() }}</h3>
                             <p class="qr-qsub">{{ $question->isMultiple() ? __('Pilih semua jawapan yang betul. Semua mesti betul untuk mendapatkan markah.') : __('Pilih satu jawapan sahaja.') }}</p>
                         </div>
-                        <span style="background:#DCEBF8;color:#2E6CA8;border-radius:999px;padding:5px 13px;font-family:'Geist',sans-serif;font-weight:800;font-size:13px;flex-shrink:0">{{ $question->points }} {{ __('mata') }}</span>
                     </div>
 
                     <div class="qr-opts">
