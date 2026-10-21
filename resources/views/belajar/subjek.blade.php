@@ -97,7 +97,7 @@
                         </div>
 
                         {{-- Tinted icon block (the subject glyph in the chapter's accent colour). --}}
-                        <span class="ss-ico" style="background:{{ $c['tint'] }};color:{{ $c['accent'] }}"><x-subject-icon :subject="$subject" :size="30" /></span>
+                        <span class="ss-ico" style="background:{{ $c['tint'] }};color:{{ $c['accent'] }}"><x-icon :name="$subject->iconName()" class="h-7 w-7" /></span>
 
                         @if (auth()->user()->isStudent() && $total > 0)
                             <div class="ss-prog">
