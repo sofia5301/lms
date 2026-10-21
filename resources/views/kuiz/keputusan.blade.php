@@ -7,7 +7,7 @@
     @php($mid = $pct >= 50)
     @php($name = \Illuminate\Support\Str::before(auth()->user()->name, ' '))
 
-    <div style="display:flex;flex-direction:column;gap:24px;max-width:760px;margin:0 auto;width:100%">
+    <div style="display:flex;flex-direction:column;gap:24px;max-width:880px;margin:0 auto;width:100%">
         {{-- Score card --}}
         @php($isDark = ($theme ?? 'light') === 'dark')
         {{-- No time limit: the stored duration is just wall-clock elapsed (a quiz can sit open for
