@@ -16,7 +16,7 @@
         @media (max-width:620px) { .ss-sum { width:100%; } .ss-s { flex:1; justify-content:center; padding:6px 8px; } .ss-s .l { font-size:11px; } }
 
         /* Chapter row extras: a tinted icon block + a chevron. */
-        .ss-ico { width:132px; align-self:stretch; border-radius:14px; flex-shrink:0; position:relative; overflow:hidden; }
+        .ss-ico { width:150px; align-self:stretch; flex-shrink:0; position:relative; }
         .ss-blob { position:absolute; border-radius:50%; }
         @media (max-width:900px) { .ss-ico { display:none; } }
         .ss-prog { display:flex; flex-direction:column; gap:6px; width:160px; flex-shrink:0; }
@@ -97,10 +97,11 @@
                             </div>
                         </div>
 
-                        {{-- Tinted shade block: just the colour + soft blobs, no icon. --}}
-                        <span class="ss-ico" style="background:{{ $c['tint'] }}">
-                            <span class="ss-blob" style="background:{{ $c['accent'] }};opacity:.13;width:72px;height:72px;left:-10px;bottom:-24px"></span>
-                            <span class="ss-blob" style="background:{{ $c['accent'] }};opacity:.09;width:52px;height:52px;left:36px;bottom:-14px"></span>
+                        {{-- Soft organic colour shade: overlapping tint circles, no icon. --}}
+                        <span class="ss-ico">
+                            <span class="ss-blob" style="background:{{ $c['tint'] }};width:74px;height:74px;right:2px;top:50%;margin-top:-37px"></span>
+                            <span class="ss-blob" style="background:{{ $c['tint'] }};opacity:.6;width:56px;height:56px;left:36px;bottom:0"></span>
+                            <span class="ss-blob" style="background:{{ $c['tint'] }};opacity:.4;width:44px;height:44px;left:12px;top:3px"></span>
                         </span>
 
                         @if (auth()->user()->isStudent() && $total > 0)
