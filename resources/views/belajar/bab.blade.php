@@ -37,9 +37,9 @@
         /* Full-width item row with a pastel shade on the right (--p pastel, --c deeper). */
         .bh-item { position:relative; overflow:hidden; display:flex; align-items:center; gap:14px; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:16px; padding:14px 18px; }
         .bh-item > * { position:relative; z-index:1; }
-        .bh-shade { position:absolute; top:0; right:0; bottom:0; width:300px; max-width:46%; z-index:0; pointer-events:none; }
-        .bh-shade::before { content:''; position:absolute; top:0; bottom:0; left:66px; right:0; background:var(--p); border-radius:999px 0 0 999px; }
-        .bh-shade::after  { content:''; position:absolute; width:120px; height:120px; border-radius:50%; left:34px; bottom:-34px; background:var(--c); opacity:.45; }
+        .bh-shade { position:absolute; top:0; right:0; bottom:0; width:320px; max-width:48%; z-index:0; pointer-events:none; }
+        .bh-shade::before { content:''; position:absolute; width:150px; height:150px; border-radius:50%; right:-6px; top:50%; margin-top:-75px; background:var(--p); }
+        .bh-shade::after  { content:''; position:absolute; width:120px; height:120px; border-radius:50%; right:92px; bottom:-30px; background:var(--c); opacity:.5; }
         @media (max-width:560px) { .bh-shade { display:none; } }
     </style>
 
