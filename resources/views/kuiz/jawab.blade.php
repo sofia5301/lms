@@ -34,10 +34,10 @@
 
         /* Question: a tinted sub-block (number + text), options stacked under it. */
         .qr-q { display:flex; flex-direction:column; gap:14px; }
-        .qr-qhead { display:flex; align-items:center; gap:16px; border-radius:18px; padding:20px 22px; background:{{ $isDark ? 'rgba(23,144,123,.12)' : 'linear-gradient(180deg,#E7F4EF,#F2F9F6)' }}; border:1px solid {{ $isDark ? 'rgba(23,144,123,.18)' : '#DCEEE7' }}; }
-        .qr-qnum { width:52px; height:52px; border-radius:15px; flex-shrink:0; display:grid; place-items:center; background:{{ $isDark ? 'rgba(23,144,123,.22)' : '#D8EEE6' }}; color:#0F7A68; font-family:'Geist',sans-serif; font-weight:800; font-size:20px; }
-        .qr-qtext { margin:0; font-family:'Geist',sans-serif; font-size:21px; font-weight:800; line-height:1.3; color:var(--wl-ink); }
-        .qr-qsub { margin:4px 0 0; font-size:14px; color:var(--wl-muted); }
+        .qr-qhead { display:flex; align-items:center; gap:13px; border-radius:15px; padding:13px 16px; background:{{ $isDark ? 'rgba(23,144,123,.12)' : 'linear-gradient(180deg,#E7F4EF,#F2F9F6)' }}; border:1px solid {{ $isDark ? 'rgba(23,144,123,.18)' : '#DCEEE7' }}; }
+        .qr-qnum { width:42px; height:42px; border-radius:12px; flex-shrink:0; display:grid; place-items:center; background:{{ $isDark ? 'rgba(23,144,123,.22)' : '#D8EEE6' }}; color:#0F7A68; font-family:'Geist',sans-serif; font-weight:800; font-size:17px; }
+        .qr-qtext { margin:0; font-family:'Geist',sans-serif; font-size:17px; font-weight:800; line-height:1.3; color:var(--wl-ink); }
+        .qr-qsub { margin:3px 0 0; font-size:13px; color:var(--wl-muted); }
 
         .qr-opts { display:flex; flex-direction:column; gap:12px; margin-top:2px; }
         .qopt { position:relative; display:flex; align-items:center; gap:16px; border:1.5px solid var(--wl-line-2); border-radius:16px; padding:15px 18px; cursor:pointer; background:var(--wl-surface); transition:border-color .12s, background .12s, box-shadow .12s; }
