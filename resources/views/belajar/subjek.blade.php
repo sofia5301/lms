@@ -26,6 +26,14 @@
         .ss-prog { display:flex; flex-direction:column; gap:6px; width:160px; flex-shrink:0; }
         @media (max-width:560px) { .ss-prog { width:110px; } }
         .ss-chev { width:40px; height:40px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; }
+
+        /* Year dropdown (custom, opens downward, matches the app). */
+        .yr-wrap { position:relative; }
+        .yr-trigger { display:inline-flex; align-items:center; justify-content:space-between; gap:10px; min-width:150px; min-height:44px; border:1px solid var(--wl-line-2); border-radius:12px; padding:0 14px; background:var(--wl-surface); font-family:'Geist',sans-serif; font-weight:700; font-size:14px; color:var(--wl-ink); cursor:pointer; }
+        .yr-trigger svg { transition:transform .15s; color:var(--wl-muted); flex-shrink:0; }
+        .yr-panel { position:absolute; top:calc(100% + 6px); left:0; min-width:170px; background:var(--wl-surface); border:1px solid var(--wl-line-2); border-radius:12px; box-shadow:0 12px 32px rgba(46,44,80,.16); padding:6px; z-index:50; }
+        .yr-opt { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 12px; border-radius:9px; font-family:'Geist',sans-serif; font-weight:700; font-size:14px; color:var(--wl-ink); text-decoration:none; white-space:nowrap; }
+        .yr-opt:hover, .yr-opt.is-sel { background:rgba(23,144,123,.1); }
     </style>
 
     <div style="display:flex;flex-direction:column;gap:20px">
@@ -56,15 +64,23 @@
                 </div>
             </div>
 
-            <label style="display:flex;flex-direction:column;gap:5px;font-family:'Geist',sans-serif;font-size:12.5px;font-weight:800;color:var(--wl-ink)">
-                {{ __('Tukar Tahun') }}
-                <select onchange="if (this.value) window.location = '{{ url('/belajar/'.$subject->slug) }}/' + this.value"
-                        style="min-width:150px;min-height:44px;border:1px solid var(--wl-line-2);border-radius:12px;padding:0 36px 0 14px;-webkit-appearance:none;-moz-appearance:none;appearance:none;background:var(--wl-surface) url(&quot;data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%2328293F'%20stroke-width='2.5'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M6%209l6%206%206-6'/%3E%3C/svg%3E&quot;) no-repeat right 12px center;background-size:12px;font-family:'Geist',sans-serif;font-weight:700;font-size:14px;color:var(--wl-ink);cursor:pointer">
-                    @foreach ($grades as $option)
-                        <option value="{{ $option->level }}" @selected($option->level === $grade->level)>{{ $option->displayName() }}</option>
-                    @endforeach
-                </select>
-            </label>
+            <div style="display:flex;flex-direction:column;gap:5px">
+                <span style="font-family:'Geist',sans-serif;font-size:12.5px;font-weight:800;color:var(--wl-ink)">{{ __('Tukar Tahun') }}</span>
+                <div class="yr-wrap" x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false">
+                    <button type="button" class="yr-trigger" @click="open = ! open" :aria-expanded="open">
+                        <span>{{ $grade->displayName() }}</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" :style="open ? 'transform:rotate(180deg)' : ''"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="yr-panel" x-show="open" x-cloak>
+                        @foreach ($grades as $option)
+                            <a href="{{ url('/belajar/'.$subject->slug.'/'.$option->level) }}" @class(['yr-opt', 'is-sel' => $option->level === $grade->level])>
+                                {{ $option->displayName() }}
+                                @if ($option->level === $grade->level)<x-icon name="check" class="h-4 w-4" style="color:#0F7A68" />@endif
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
         </div>
 
         @if ($chapters->isEmpty())
