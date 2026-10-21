@@ -16,7 +16,8 @@
         @media (max-width:620px) { .ss-sum { width:100%; } .ss-s { flex:1; justify-content:center; padding:6px 8px; } .ss-s .l { font-size:11px; } }
 
         /* Chapter row extras: a tinted icon block + a chevron. */
-        .ss-ico { width:132px; align-self:stretch; border-radius:14px; display:grid; place-items:center; flex-shrink:0; }
+        .ss-ico { width:132px; align-self:stretch; border-radius:14px; flex-shrink:0; position:relative; overflow:hidden; }
+        .ss-blob { position:absolute; border-radius:50%; }
         @media (max-width:900px) { .ss-ico { display:none; } }
         .ss-prog { display:flex; flex-direction:column; gap:6px; width:160px; flex-shrink:0; }
         @media (max-width:560px) { .ss-prog { width:110px; } }
@@ -96,8 +97,11 @@
                             </div>
                         </div>
 
-                        {{-- Tinted icon block (the subject glyph in the chapter's accent colour). --}}
-                        <span class="ss-ico" style="background:{{ $c['tint'] }};color:{{ $c['accent'] }}"><x-icon :name="$subject->iconName()" class="h-7 w-7" /></span>
+                        {{-- Tinted shade block: just the colour + soft blobs, no icon. --}}
+                        <span class="ss-ico" style="background:{{ $c['tint'] }}">
+                            <span class="ss-blob" style="background:{{ $c['accent'] }};opacity:.13;width:72px;height:72px;left:-10px;bottom:-24px"></span>
+                            <span class="ss-blob" style="background:{{ $c['accent'] }};opacity:.09;width:52px;height:52px;left:36px;bottom:-14px"></span>
+                        </span>
 
                         @if (auth()->user()->isStudent() && $total > 0)
                             <div class="ss-prog">
