@@ -129,8 +129,8 @@
                             <svg width="124" height="124" viewBox="0 0 124 124" aria-hidden="true">
                                 <circle cx="62" cy="62" r="48" fill="none" stroke="{{ $isDark ? 'rgba(255,255,255,.1)' : '#CFE7DE' }}" stroke-width="9"/>
                                 <circle cx="62" cy="62" r="48" fill="none" stroke="#17907B" stroke-width="9" stroke-linecap="round" stroke-dasharray="{{ $dash }} {{ round($circ, 1) }}" transform="rotate(-90 62 62)"/>
-                                <text x="62" y="60" text-anchor="middle" font-family="Geist, sans-serif" font-size="24" font-weight="800" fill="var(--wl-ink)">{{ $last->score }}/{{ $last->max_score }}</text>
-                                <text x="62" y="79" text-anchor="middle" font-family="Nunito, sans-serif" font-size="11" font-weight="700" fill="var(--wl-muted)">{{ __('Markah terakhir') }}</text>
+                                <text x="62" y="59" text-anchor="middle" font-family="Geist, sans-serif" font-size="19" font-weight="800" fill="var(--wl-ink)">{{ $last->score }}/{{ $last->max_score }}</text>
+                                <text x="62" y="76" text-anchor="middle" font-family="Nunito, sans-serif" font-size="9.5" font-weight="700" fill="var(--wl-muted)">{{ __('Markah terakhir') }}</text>
                             </svg>
                         </div>
                         <div style="margin-top:16px">
