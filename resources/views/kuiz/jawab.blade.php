@@ -186,7 +186,7 @@
                 <button type="button" @click="previous()" class="qr-navbtn qr-prev" :style="{ visibility: current === 0 ? 'hidden' : 'visible' }"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Soalan sebelumnya') }}</button>
 
                 <button type="submit" x-show="current === total - 1" x-cloak :disabled="submitting" class="qr-navbtn qr-next">
-                    <span x-show="! submitting">{{ __('Hantar Jawapan') }}</span><span x-show="submitting" x-cloak>{{ __('Menghantar...') }}</span>
+                    <span x-show="! submitting">{{ __('Hantar') }}</span><span x-show="submitting" x-cloak>{{ __('Menghantar...') }}</span>
                 </button>
                 <button type="button" x-show="current < total - 1" @click="next()" class="qr-navbtn qr-next">{{ __('Soalan seterusnya') }} <x-icon name="arrow-right" class="h-4 w-4" /></button>
             </div>
