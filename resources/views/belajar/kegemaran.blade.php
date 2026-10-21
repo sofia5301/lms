@@ -6,17 +6,18 @@
         .fav-head { display:flex; align-items:flex-start; gap:16px; }
         .fav-htile { width:52px; height:52px; border-radius:15px; background:{{ ($theme ?? 'light') === 'dark' ? 'rgba(23,144,123,.2)' : '#DCF2EE' }}; color:#0F7A68; display:grid; place-items:center; flex-shrink:0; }
 
-        /* Group */
-        .fav-group { display:flex; flex-direction:column; gap:12px; }
-        .fav-gbar { display:flex; align-items:center; gap:12px; border-radius:16px; padding:12px 16px; cursor:pointer; user-select:none; border:1px solid var(--wl-line); }
+        /* Group: header bar + rows share one bordered, rounded card. */
+        .fav-group { display:flex; flex-direction:column; border:1px solid var(--wl-line); border-radius:16px; overflow:hidden; box-shadow:0 3px 12px rgba(46,44,80,.04); }
+        .fav-gbar { display:flex; align-items:center; gap:12px; padding:12px 16px; cursor:pointer; user-select:none; }
         .fav-gtile { width:38px; height:38px; border-radius:11px; display:grid; place-items:center; flex-shrink:0; }
         .fav-gname { font-family:'Geist',sans-serif; font-size:15.5px; font-weight:800; color:var(--wl-ink); }
         .fav-gcount { font-size:12.5px; font-weight:700; color:var(--wl-muted); }
         .fav-chev { margin-left:auto; color:var(--wl-muted); display:inline-flex; transition:transform .18s; }
 
-        /* Rows */
-        .fav-rows { display:flex; flex-direction:column; gap:10px; }
-        .fav-row { display:flex; align-items:center; gap:16px; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:16px; padding:12px 16px; box-shadow:0 3px 12px rgba(46,44,80,.04); }
+        /* Rows: no gap, divided by a line, sitting directly under the header bar. */
+        .fav-rows { display:flex; flex-direction:column; background:var(--wl-surface); border-top:1px solid var(--wl-line); }
+        .fav-row { display:flex; align-items:center; gap:16px; background:var(--wl-surface); padding:12px 16px; }
+        .fav-row + .fav-row { border-top:1px solid var(--wl-line); }
         .fav-thumb { position:relative; width:150px; height:84px; flex-shrink:0; border-radius:12px; overflow:hidden; display:grid; place-items:center; text-decoration:none; }
         .fav-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
         .fav-dur { position:absolute; right:7px; bottom:7px; background:rgba(40,56,74,.88); color:#fff; font-size:11px; font-weight:700; border-radius:7px; padding:2px 7px; z-index:1; }
