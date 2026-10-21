@@ -16,7 +16,9 @@
         .qi-heroimg { width:220px; height:150px; flex-shrink:0; border-radius:18px; position:relative; overflow:hidden; display:grid; place-items:center; background:linear-gradient(135deg, rgba(23,144,123,.16), rgba(23,144,123,.04)); }
         @media (max-width:680px) { .qi-heroimg { display:none; } }
 
-        .qi-grid { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:20px; align-items:start; }
+        .qi-grid { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:20px; align-items:stretch; }
+        @media (max-width:900px) { .qi-side .qi-grow { flex:0 1 auto; } }
+        .qi-grow { flex:1 1 auto; }
         @media (max-width:900px) { .qi-grid { grid-template-columns:1fr; } }
         .qi-main, .qi-side { display:flex; flex-direction:column; gap:18px; min-width:0; }
 
@@ -154,7 +156,7 @@
                 @endif
 
                 {{-- Additional information --}}
-                <div class="qi-card">
+                <div class="qi-card qi-grow">
                     <div class="qi-sech"><x-icon name="info-circle" class="h-5 w-5" style="color:#0F7A68" />{{ __('Maklumat tambahan') }}</div>
                     <div class="qi-inforow">
                         <span class="nm"><x-icon name="file-text" class="h-[18px] w-[18px]" style="color:var(--wl-muted)" />{{ __('Topik') }}</span>
