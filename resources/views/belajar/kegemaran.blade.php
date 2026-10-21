@@ -1,6 +1,6 @@
 <x-student-layout :title="__('Kegemaran Saya')">
     <style>
-        .fav-wrap { display:flex; flex-direction:column; gap:20px; max-width:1180px; width:100%; }
+        .fav-wrap { display:flex; flex-direction:column; gap:20px; max-width:1180px; width:100%; margin:0 auto; }
 
         /* Header */
         .fav-head { display:flex; align-items:flex-start; gap:16px; }
