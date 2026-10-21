@@ -78,9 +78,6 @@
                 <div class="bh-sechead">
                     <span class="tile" style="background:#DCF2EE;color:#0F7A68"><x-icon name="play" class="h-5 w-5" /></span>
                     <span class="t">{{ __('Video pelajaran') }} ({{ $lessons->count() }})</span>
-                    @if ($lessons->isNotEmpty())
-                        <button type="button" class="bh-seeall" @click="tab='video'">{{ __('Tonton semua') }} <x-icon name="arrow-right" class="h-4 w-4" /></button>
-                    @endif
                 </div>
                 @if ($lessons->isEmpty())
                     <div style="padding:30px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
