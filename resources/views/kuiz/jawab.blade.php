@@ -92,7 +92,6 @@
                         <p class="qr-desc">{{ $quiz->localizedDescription() }}</p>
                     @endif
                 </div>
-                <div class="qr-heroimg"><img src="{{ asset('images/quiz.png') }}" alt=""></div>
             </div>
 
             <div class="qr-stats">
