@@ -12,7 +12,7 @@
         .qi-crumb { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:'Geist',sans-serif; font-weight:800; font-size:13.5px; color:var(--wl-muted); }
         .qi-crumb .cur { color:var(--wl-ink); } .qi-crumb .sep { color:var(--wl-muted-2); display:inline-flex; }
 
-        .qi-hero { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+        .qi-hero { display:flex; align-items:center; gap:24px; flex-wrap:wrap; margin-top:10px; }
         .qi-heroimg { width:220px; height:150px; flex-shrink:0; border-radius:18px; position:relative; overflow:hidden; display:grid; place-items:center; background:linear-gradient(135deg, rgba(23,144,123,.16), rgba(23,144,123,.04)); }
         @media (max-width:680px) { .qi-heroimg { display:none; } }
 
