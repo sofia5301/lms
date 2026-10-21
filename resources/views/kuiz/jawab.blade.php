@@ -1,143 +1,175 @@
 <x-student-layout :title="$quiz->localizedTitle()">
     @php($isDark = ($theme ?? 'light') === 'dark')
-    <style>
-        /* Answer options: a colour-tinted card each, turning solid when picked (colours set per
-           option via --tint / --solid). Letter badge left, answer in the middle, tick on the right. */
-        .qopt2 { position:relative; display:flex; align-items:center; gap:14px; border-radius:14px; padding:14px 18px; cursor:pointer; transition:transform .1s ease-out, box-shadow .12s; background:var(--tint); }
-        .qopt2:hover { transform:translateY(-1px); }
-        .qopt2 input { position:absolute; opacity:0; width:0; height:0; }
-        .qopt2:has(input:checked) { background:var(--solid); box-shadow:0 10px 24px rgba(46,44,80,.18); }
-        .q2letter { width:36px; height:36px; border-radius:10px; flex-shrink:0; display:grid; place-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; background:#fff; color:var(--solid); box-shadow:0 1px 3px rgba(46,44,80,.12); }
-        .qopt2:has(input:checked) .q2letter { background:rgba(255,255,255,.25); color:#fff; box-shadow:none; }
-        .q2text { flex:1; min-width:0; font-family:'Geist',sans-serif; font-weight:800; font-size:15px; color:var(--wl-ink); }
-        .qopt2:has(input:checked) .q2text { color:#fff; }
-        .q2radio { width:26px; height:26px; flex-shrink:0; border-radius:50%; border:2px solid rgba(40,40,60,.18); background:#fff; display:grid; place-items:center; color:transparent; }
-        .qopt2.check .q2radio { border-radius:8px; }
-        .qopt2:has(input:checked) .q2radio { background:#fff; border-color:#fff; color:var(--solid); }
-        /* The question card. Flex/gap live here (not inline) so Alpine's x-show does not drop the
-           display back to block on reveal - which would collapse the gap and stack the rows. */
-        .qcard { display:flex; flex-direction:column; gap:22px; }
-        /* Footer question jumper */
-        .qnum { width:44px; height:44px; border-radius:12px; cursor:pointer; font-family:'Geist',sans-serif; font-weight:800; font-size:15px; border:1.5px solid var(--wl-line-2); background:var(--wl-surface); color:#4A4B63; transition:all .12s; }
-        .qnum.answered { border-color:#17907B; color:#0F7A68; }
-        .qnum.active { border:none; background:#17907B; color:#fff; }
+    @php($questionCount = $questions->count())
+    @php($maxScore = $questions->sum('points'))
+    @php($selBg = $isDark ? 'rgba(23,144,123,.16)' : '#E8F5F1')
 
-        /* Phones/tablets: shrink the whole question card, options and footer. */
-        @media (max-width: 900px) {
-            .qcard { gap:14px !important; padding:18px !important; }
-            .qcard h2 { font-size:17px !important; }
-            .qcard h3 { font-size:15px !important; line-height:1.3 !important; }
-            .q2label { font-size:10.5px !important; }
-            .q2meta > span { font-size:12px !important; }
-            .q2timer { font-size:12.5px !important; padding:6px 12px !important; }
-            .q2timer svg { width:15px !important; height:15px !important; }
-            .qopt2 { padding:12px 14px !important; gap:10px !important; }
-            .q2letter { width:30px !important; height:30px !important; font-size:13px !important; }
-            .q2text { font-size:13px !important; }
-            .q2radio { width:22px !important; height:22px !important; }
-            .q2navbtn { min-height:40px !important; font-size:12px !important; padding:0 14px !important; }
-            .qnum { width:36px !important; height:36px !important; font-size:12.5px !important; }
-            /* Footer: put the question jumper on its own full-width row above the nav buttons. */
-            .q2footer { flex-wrap:wrap !important; }
-            .q2jumper { flex:1 1 100% !important; order:-1; }
-            .q2actbtn { margin-left:auto !important; }
+    <style>
+        .qr-wrap { display:flex; flex-direction:column; gap:18px; max-width:980px; margin:16px auto 0; width:100%; }
+        .qr-card { background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:22px; box-shadow:0 10px 30px var(--wl-line); }
+
+        /* Header */
+        .qr-head { padding:26px 28px; position:relative; overflow:hidden; }
+        .qr-headrow { display:flex; align-items:flex-start; gap:18px; }
+        .qr-ic { width:58px; height:58px; border-radius:16px; flex-shrink:0; display:grid; place-items:center; background:{{ $isDark ? 'rgba(124,92,191,.18)' : '#EDE7F9' }}; color:#7C5CBF; }
+        .qr-kuiz { font-family:'Geist',sans-serif; font-weight:800; font-size:13px; letter-spacing:.02em; color:#7C5CBF; }
+        .qr-title { margin:2px 0 0; font-family:'Geist',sans-serif; font-size:27px; font-weight:800; letter-spacing:-.01em; color:var(--wl-ink); line-height:1.15; }
+        .qr-desc { margin:8px 0 0; font-size:15px; color:var(--wl-muted); line-height:1.55; max-width:640px; }
+        .qr-heroimg { width:200px; height:140px; flex-shrink:0; margin:-6px -6px 0 0; align-self:flex-start; }
+        .qr-heroimg img { width:100%; height:100%; object-fit:contain; }
+        @media (max-width:760px) { .qr-heroimg { display:none; } }
+
+        .qr-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:22px; }
+        @media (max-width:560px) { .qr-stats { grid-template-columns:1fr; } }
+        .qr-stat { background:var(--wl-surface-2, var(--wl-surface)); border:1px solid var(--wl-line); border-radius:16px; padding:14px 18px; display:flex; align-items:center; gap:13px; }
+        .qr-stat .ic { width:46px; height:46px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; }
+        .qr-stat .l { font-size:12.5px; font-weight:700; color:var(--wl-muted); }
+        .qr-stat .v { font-family:'Geist',sans-serif; font-size:21px; font-weight:800; color:var(--wl-ink); line-height:1; margin-top:4px; }
+
+        /* Progress */
+        .qr-prog { padding:18px 24px; }
+        .qr-progtop { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+        .qr-progl { font-family:'Geist',sans-serif; font-weight:800; font-size:15px; color:var(--wl-ink); }
+        .qr-progr { margin-left:auto; font-size:13.5px; font-weight:700; color:var(--wl-muted); }
+        .qr-bar { height:12px; border-radius:999px; background:{{ $isDark ? 'var(--wl-line-2)' : '#E8EDF2' }}; overflow:hidden; }
+        .qr-barfill { height:100%; border-radius:999px; background:linear-gradient(90deg,#17907B,#2BB39B); transition:width .25s ease-out; }
+        .qr-timer { display:inline-flex; align-items:center; gap:7px; border-radius:999px; padding:7px 14px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; }
+
+        /* Question */
+        .qr-q { padding:26px 28px; display:flex; flex-direction:column; gap:22px; }
+        .qr-qhead { display:flex; align-items:flex-start; gap:16px; }
+        .qr-qnum { width:52px; height:52px; border-radius:15px; flex-shrink:0; display:grid; place-items:center; background:{{ $isDark ? 'rgba(23,144,123,.18)' : '#E3F3EE' }}; color:#0F7A68; font-family:'Geist',sans-serif; font-weight:800; font-size:20px; }
+        .qr-qtext { margin:0; font-family:'Geist',sans-serif; font-size:21px; font-weight:800; line-height:1.3; color:var(--wl-ink); }
+        .qr-qsub { margin:5px 0 0; font-size:14px; color:var(--wl-muted); }
+
+        .qr-opts { display:flex; flex-direction:column; gap:12px; }
+        .qopt { position:relative; display:flex; align-items:center; gap:16px; border:1.5px solid var(--wl-line-2); border-radius:16px; padding:15px 18px; cursor:pointer; background:var(--wl-surface); transition:border-color .12s, background .12s, box-shadow .12s; }
+        .qopt:hover { border-color:#9FD8CB; }
+        .qopt input { position:absolute; opacity:0; width:0; height:0; }
+        .qopt:has(input:checked) { border-color:#17907B; background:{{ $selBg }}; box-shadow:0 6px 18px rgba(23,144,123,.12); }
+        .qr-radio { width:26px; height:26px; flex-shrink:0; border-radius:50%; border:2px solid var(--wl-line-2); background:var(--wl-surface); display:grid; place-items:center; transition:all .12s; }
+        .qopt.check .qr-radio { border-radius:8px; }
+        .qopt:has(input:checked) .qr-radio { border-color:#17907B; background:#17907B; }
+        .qr-radio .dot { width:11px; height:11px; border-radius:50%; background:#fff; opacity:0; transform:scale(.4); transition:all .12s; }
+        .qopt.check .qr-radio .dot { border-radius:3px; }
+        .qopt:has(input:checked) .qr-radio .dot { opacity:1; transform:scale(1); }
+        .qr-letter { width:38px; height:38px; border-radius:11px; flex-shrink:0; display:grid; place-items:center; font-family:'Geist',sans-serif; font-weight:800; font-size:15px; }
+        .qr-otext { flex:1; min-width:0; font-family:'Geist',sans-serif; font-weight:800; font-size:15.5px; color:var(--wl-ink); }
+
+        /* Footer */
+        .qr-foot { display:flex; align-items:center; gap:14px; margin-top:4px; }
+        .qr-navbtn { min-height:56px; cursor:pointer; border-radius:16px; font-family:'Geist',sans-serif; font-weight:800; font-size:16px; padding:0 26px; display:inline-flex; align-items:center; justify-content:center; gap:10px; }
+        .qr-prev { border:1.5px solid var(--wl-line-2); background:var(--wl-surface); color:var(--wl-ink); }
+        .qr-next { border:none; background:#17907B; color:#fff; flex:1; }
+
+        @media (max-width:900px) {
+            .qr-head, .qr-q { padding:20px 18px !important; }
+            .qr-title { font-size:22px !important; }
+            .qr-qtext { font-size:18px !important; }
+            .qr-qnum { width:44px !important; height:44px !important; font-size:17px !important; }
+            .qr-letter { width:32px !important; height:32px !important; font-size:13px !important; }
+            .qr-otext { font-size:14px !important; }
+            .qr-navbtn { min-height:48px !important; font-size:14px !important; padding:0 18px !important; }
         }
     </style>
 
-    <div style="display:flex;flex-direction:column;gap:18px;max-width:900px;margin:16px auto 0;width:100%"
-         x-data="quizRunner({ total: {{ $questions->count() }}, secondsLeft: {{ $secondsLeft === null ? 'null' : $secondsLeft }}, labels: { answered: @js(__('dijawab')) } })"
+    <div class="qr-wrap"
+         x-data="quizRunner({ total: {{ $questionCount }}, secondsLeft: {{ $secondsLeft === null ? 'null' : $secondsLeft }}, labels: { answered: @js(__('dijawab')) } })"
          x-init="start()">
 
         <noscript>
             <div style="background:#FEF0CE;border-radius:14px;padding:14px 18px;font-weight:700;font-size:14px;color:#8A6A12">{{ __('JavaScript perlu dihidupkan untuk menjawab kuiz ini.') }}</div>
         </noscript>
 
+        {{-- Header: icon + Kuiz label + title + description + stats + illustration --}}
+        <div class="qr-card qr-head">
+            <div class="qr-headrow">
+                <span class="qr-ic"><x-icon name="help-circle" style="width:30px;height:30px" /></span>
+                <div style="flex:1;min-width:0">
+                    <div class="qr-kuiz">{{ __('Kuiz') }}</div>
+                    <h1 class="qr-title">{{ $quiz->localizedTitle() }}</h1>
+                    @if ($quiz->localizedDescription())
+                        <p class="qr-desc">{{ $quiz->localizedDescription() }}</p>
+                    @endif
+                </div>
+                <div class="qr-heroimg"><img src="{{ asset('images/quiz.png') }}" alt=""></div>
+            </div>
+
+            <div class="qr-stats">
+                <div class="qr-stat">
+                    <span class="ic" style="background:#DCF2EE;color:#0F7A68"><x-icon name="file-text" class="h-5 w-5" /></span>
+                    <div><div class="l">{{ __('Jumlah soalan') }}</div><div class="v">{{ $questionCount }}</div></div>
+                </div>
+                <div class="qr-stat">
+                    <span class="ic" style="background:#FBEAD3;color:#D9862B"><x-icon name="trophy" class="h-5 w-5" /></span>
+                    <div><div class="l">{{ __('Markah penuh') }}</div><div class="v">{{ $maxScore }}</div></div>
+                </div>
+                <div class="qr-stat">
+                    <span class="ic" style="background:#EDE7F9;color:#7C5CBF"><x-icon name="clock" class="h-5 w-5" /></span>
+                    <div><div class="l">{{ __('Masa') }}</div><div class="v">{{ $quiz->duration_minutes ? $quiz->duration_minutes.' '.__('minit') : __('Bebas') }}</div></div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Progress --}}
+        <div class="qr-card qr-prog">
+            <div class="qr-progtop">
+                <span class="qr-progl">{{ __('Soalan') }} <span x-text="current + 1">1</span> {{ __('daripada') }} {{ $questionCount }}</span>
+                @if ($secondsLeft !== null)
+                    <span class="qr-timer" :style="secondsLeft < 60 ? { background: '#FDE7E0', color: '#C24936' } : { background: '#FBEECB', color: '#8A6A12' }"><x-icon name="clock" style="width:16px;height:16px" /><span x-text="clock()">{{ gmdate('i:s', $secondsLeft) }}</span></span>
+                @endif
+                <span class="qr-progr"><span x-text="answeredCount()">0</span>/{{ $questionCount }} {{ __('dijawab') }}</span>
+            </div>
+            <div class="qr-bar"><div class="qr-barfill" :style="{ width: ((current + 1) / total * 100) + '%' }" style="width:{{ $questionCount ? round(1 / $questionCount * 100, 1) : 0 }}%"></div></div>
+        </div>
+
         <form method="POST" action="{{ route('kuiz.hantar', $attempt) }}" x-ref="form" @submit="submitting = true"
               style="display:flex;flex-direction:column;gap:18px">
             @csrf
             @foreach ($questions as $index => $question)
-                <section x-show="current === {{ $index }}" @if ($index > 0) x-cloak @endif class="qcard"
-                         style="background:var(--wl-surface);border:1px solid var(--wl-line);border-radius:22px;padding:26px;box-shadow:0 10px 30px var(--wl-line)">
-                    {{-- Title + timer, at the top of the card. --}}
-                    <div style="display:flex;align-items:center;gap:16px">
-                        <h2 style="margin:0;font-family:'Geist',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.01em;color:var(--wl-ink);flex:1;min-width:0">{{ $quiz->localizedTitle() }}</h2>
-                        @if ($secondsLeft !== null)
-                            {{-- Object syntax so the binding does not wipe the static pill styles. --}}
-                            <span class="q2timer" :style="secondsLeft < 60 ? { background: '#FDE7E0', color: '#C24936' } : { background: '#FBEECB', color: '#8A6A12' }"
-                                  style="display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 16px;font-family:'Geist',sans-serif;font-weight:800;font-size:15px"><x-icon name="clock" style="width:17px;height:17px" /><span x-text="clock()">{{ gmdate('i:s', $secondsLeft) }}</span></span>
-                        @else
-                            {{-- No time limit: an infinity mark rather than a misleading 00:00. --}}
-                            <span class="q2timer" title="{{ __('Tiada had masa') }}" style="display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 16px;font-family:'Geist',sans-serif;font-weight:800;background:#EDECF2;color:#6C6F87"><x-icon name="clock" style="width:18px;height:18px" /><x-icon name="infinity" style="width:22px;height:22px" /></span>
-                        @endif
+                <section x-show="current === {{ $index }}" @if ($index > 0) x-cloak @endif class="qr-card qr-q">
+                    <div class="qr-qhead">
+                        <span class="qr-qnum">{{ $index + 1 }}</span>
+                        <div style="flex:1;min-width:0">
+                            <h3 class="qr-qtext">{{ $question->localizedText() }}</h3>
+                            <p class="qr-qsub">{{ $question->isMultiple() ? __('Pilih semua jawapan yang betul. Semua mesti betul untuk mendapatkan markah.') : __('Pilih satu jawapan sahaja.') }}</p>
+                        </div>
+                        <span style="background:#DCEBF8;color:#2E6CA8;border-radius:999px;padding:5px 13px;font-family:'Geist',sans-serif;font-weight:800;font-size:13px;flex-shrink:0">{{ $question->points }} {{ __('mata') }}</span>
                     </div>
 
-                    {{-- Position + points + answered count --}}
-                    <div class="q2meta" style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-                        <span style="background:#17907B;color:#fff;border-radius:999px;padding:6px 15px;font-family:'Geist',sans-serif;font-weight:800;font-size:13.5px">{{ $index + 1 }} / {{ $questions->count() }}</span>
-                        <span style="background:#DCEBF8;color:#2E6CA8;border-radius:999px;padding:6px 13px;font-family:'Geist',sans-serif;font-weight:800;font-size:13.5px">{{ $question->points }} {{ __('mata') }}</span>
-                        <span style="margin-left:auto;font-size:13px;font-weight:700;color:var(--wl-muted)" x-text="answeredCount() + ' ' + labels.answered">0 {{ __('dijawab') }}</span>
-                    </div>
-
-                    {{-- Segmented progress: one bar per question - solid where answered, brighter on the
-                         current one, faint for the rest. --}}
-                    <div style="display:flex;gap:8px">
-                        @php($track = $isDark ? 'var(--wl-line-2)' : '#DCEAF8')
-                        @for ($i = 0; $i < $questions->count(); $i++)
-                            <div style="flex:1;height:8px;border-radius:999px"
-                                 :style="answered[{{ $i }}] ? { background: '#17907B' } : (current === {{ $i }} ? { background: '#2BB39B' } : { background: @js($track) })"></div>
-                        @endfor
-                    </div>
-
-                    <div style="display:flex;flex-direction:column;gap:8px">
-                        <span class="q2label" style="font-family:'Geist',sans-serif;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-muted)">{{ $question->isMultiple() ? __('Pilih semua jawapan betul') : __('Pilih satu jawapan') }}</span>
-                        <h3 style="margin:0;font-family:'Geist',sans-serif;font-size:20px;font-weight:800;line-height:1.35;color:var(--wl-ink)">{{ $question->localizedText() }}</h3>
-                    </div>
-
-                    {{-- Answer options, one per row. --}}
-                    <div style="display:flex;flex-direction:column;gap:12px">
+                    <div class="qr-opts">
                         @foreach ($question->options as $oIndex => $option)
-                            {{-- Same four hues (yellow/blue/red/purple); dark mode darkens the tint so
-                                 the answer text stays readable, keeping the solid accent for picks. --}}
+                            {{-- Letter badge hue by position: green / blue / purple / orange. --}}
                             @php($pal = ($isDark ? [
-                                ['tint' => '#524628', 'solid' => '#D99A28'],
-                                ['tint' => '#2B3E56', 'solid' => '#3E86C9'],
-                                ['tint' => '#4E2C3B', 'solid' => '#E0568A'],
-                                ['tint' => '#3C3359', 'solid' => '#7C5CBF'],
+                                ['bg' => 'rgba(23,144,123,.22)', 'fg' => '#4FD1B8'],
+                                ['bg' => 'rgba(62,134,201,.22)', 'fg' => '#7BB7E8'],
+                                ['bg' => 'rgba(124,92,191,.22)', 'fg' => '#B49CE6'],
+                                ['bg' => 'rgba(217,154,40,.22)', 'fg' => '#E8B968'],
                             ] : [
-                                ['tint' => '#FBF0D9', 'solid' => '#D99A28'],
-                                ['tint' => '#DCEBF8', 'solid' => '#3E86C9'],
-                                ['tint' => '#FCE1EA', 'solid' => '#E0568A'],
-                                ['tint' => '#EDE7F9', 'solid' => '#7C5CBF'],
+                                ['bg' => '#E3F3EE', 'fg' => '#17907B'],
+                                ['bg' => '#DCEBF8', 'fg' => '#3E86C9'],
+                                ['bg' => '#EDE7F9', 'fg' => '#7C5CBF'],
+                                ['bg' => '#FBF0D9', 'fg' => '#D9862B'],
                             ])[$oIndex % 4])
-                            <label class="qopt2 {{ $question->isMultiple() ? 'check' : 'radio' }}" style="--tint:{{ $pal['tint'] }};--solid:{{ $pal['solid'] }}">
+                            <label class="qopt {{ $question->isMultiple() ? 'check' : 'radio' }}">
                                 <input type="{{ $question->isMultiple() ? 'checkbox' : 'radio' }}" name="answers[{{ $question->id }}][]" value="{{ $option->id }}" @change="touch({{ $index }})">
-                                <span class="q2letter">{{ chr(65 + $oIndex) }}</span>
-                                <span class="q2text">{{ $option->localizedText($question->source_locale) }}</span>
-                                <span class="q2radio"><x-icon name="check" style="width:15px;height:15px" /></span>
+                                <span class="qr-radio"><span class="dot"></span></span>
+                                <span class="qr-letter" style="background:{{ $pal['bg'] }};color:{{ $pal['fg'] }}">{{ chr(65 + $oIndex) }}</span>
+                                <span class="qr-otext">{{ $option->localizedText($question->source_locale) }}</span>
                             </label>
                         @endforeach
                     </div>
                 </section>
             @endforeach
 
-            {{-- Footer, in its own card below the question: Sebelum · question jumper · Seterusnya/Hantar --}}
-            <div class="q2footer" style="display:flex;align-items:center;gap:12px;background:var(--wl-surface);border:1px solid var(--wl-line);border-radius:20px;padding:16px 20px;box-shadow:0 8px 24px var(--wl-line)">
-                <button type="button" @click="previous()" class="q2navbtn" :style="{ visibility: current === 0 ? 'hidden' : 'visible' }"
-                        style="min-height:48px;cursor:pointer;border-radius:14px;border:1.5px solid var(--wl-line-2);background:var(--wl-surface);color:var(--wl-ink);font-family:'Geist',sans-serif;font-weight:800;font-size:15px;padding:0 20px;display:inline-flex;align-items:center;gap:8px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Sebelum') }}</button>
+            {{-- Footer: prev (left) + next / submit (right) --}}
+            <div class="qr-foot">
+                <button type="button" @click="previous()" class="qr-navbtn qr-prev" :style="{ visibility: current === 0 ? 'hidden' : 'visible' }"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Soalan sebelumnya') }}</button>
 
-                <div class="q2jumper" style="flex:1;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
-                    @foreach ($questions as $index => $question)
-                        <button type="button" class="qnum" @click="go({{ $index }})"
-                                :class="{ 'active': current === {{ $index }}, 'answered': current !== {{ $index }} && answered[{{ $index }}] }">{{ $index + 1 }}</button>
-                    @endforeach
-                </div>
-
-                <button type="submit" x-show="current === total - 1" x-cloak :disabled="submitting" class="q2navbtn q2actbtn"
-                        style="min-height:48px;border:none;cursor:pointer;border-radius:14px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:15px;padding:0 24px">
+                <button type="submit" x-show="current === total - 1" x-cloak :disabled="submitting" class="qr-navbtn qr-next">
                     <span x-show="! submitting">{{ __('Hantar Jawapan') }}</span><span x-show="submitting" x-cloak>{{ __('Menghantar...') }}</span>
                 </button>
-                <button type="button" x-show="current < total - 1" @click="next()" class="q2navbtn q2actbtn"
-                        style="min-height:48px;border:none;cursor:pointer;border-radius:14px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:15px;padding:0 24px;display:inline-flex;align-items:center;gap:8px">{{ __('Seterusnya') }} <x-icon name="arrow-right" class="h-4 w-4" /></button>
+                <button type="button" x-show="current < total - 1" @click="next()" class="qr-navbtn qr-next">{{ __('Soalan seterusnya') }} <x-icon name="arrow-right" class="h-4 w-4" /></button>
             </div>
         </form>
     </div>
