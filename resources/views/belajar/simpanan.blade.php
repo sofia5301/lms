@@ -98,8 +98,7 @@
             </div>
         </div>
 
-        <x-year-subject-filter variant="student" :all-years="false" with-chapter
-            :action="route('simpanan.index')" :grades="$grades" :subjects="$subjects" :filter="$filter" />
+        <div style="background:#FEF0CE;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#8A6A12">DEBUG: filter removed</div>
 
         @if (empty($tree))
             <div style="background:var(--wl-surface);border:1px dashed var(--wl-line-3);border-radius:22px;padding:56px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
