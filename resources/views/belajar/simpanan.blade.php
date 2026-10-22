@@ -35,6 +35,14 @@
         uksort($tree, fn ($a, $b) => ($order[$a] ?? 999) <=> ($order[$b] ?? 999));
         foreach (array_keys($tree) as $sid) {
             uasort($tree[$sid]['chapters'], fn ($a, $b) => ($a['number'] ?? 0) <=> ($b['number'] ?? 0));
+            $v = 0;
+            $m = 0;
+            foreach ($tree[$sid]['chapters'] as $cc) {
+                $v += count($cc['videos'] ?? []);
+                $m += count($cc['materials'] ?? []);
+            }
+            $tree[$sid]['vcount'] = $v;
+            $tree[$sid]['mcount'] = $m;
         }
         } catch (\Throwable $e) {
             $treeError = $e->getMessage().'  @  '.basename($e->getFile()).':'.$e->getLine();
@@ -120,8 +128,8 @@
                 @php($barBg = "color-mix(in oklab, {$col} var(--pill-bw), var(--pill-bb))")
                 @php($barFg = "color-mix(in oklab, {$col} var(--pill-fw), var(--pill-fb))")
                 @php($tintBar = "color-mix(in oklab, {$col} 13%, var(--wl-surface))")
-                @php($vCount = collect($grp['chapters'])->sum(fn ($c) => count($c['videos'] ?? [])))
-                @php($mCount = collect($grp['chapters'])->sum(fn ($c) => count($c['materials'] ?? [])))
+                @php($vCount = $grp['vcount'] ?? 0)
+                @php($mCount = $grp['mcount'] ?? 0)
                 <div class="off-sub" x-data="{ open: {{ $loop->first ? 'true' : 'false' }} }">
                     <div class="off-sbar" style="background:{{ $tintBar }}" @click="open = !open">
                         <span class="off-stile" style="background:{{ $barBg }};color:{{ $barFg }}"><x-subject-icon :subject="$sub" :size="22" /></span>
