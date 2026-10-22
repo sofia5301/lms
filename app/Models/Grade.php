@@ -66,9 +66,14 @@ class Grade extends Model
     {
         return $this->subjects()
             ->orderBy('sort_order')
-            ->withCount(['lessons as lessons_count' => fn ($query) => $query
-                ->where('lessons.is_published', true)
-                ->where('chapters.grade_id', $this->id)])
+            ->withCount([
+                'lessons as lessons_count' => fn ($query) => $query
+                    ->where('lessons.is_published', true)
+                    ->where('chapters.grade_id', $this->id),
+                'chapters as chapters_count' => fn ($query) => $query
+                    ->where('chapters.grade_id', $this->id)
+                    ->where('chapters.is_active', true),
+            ])
             ->get()
             ->groupBy('category');
     }
