@@ -126,6 +126,9 @@
                                 </div>
                                 <div class="off-brows" x-show="bopen">
                                     @foreach ($videos as $lesson)
+                                        @php($vmeta = __('Video'))
+                                        @php($vmeta = $lesson->durationLabel() ? $vmeta.' · '.$lesson->durationLabel() : $vmeta)
+                                        @php($vmeta = $lesson->teacher ? $vmeta.' · '.__('Guru: :name', ['name' => $lesson->teacher->name]) : $vmeta)
                                         <div class="off-row">
                                             <a href="{{ route('video.show', $lesson) }}" class="off-thumb" style="background:color-mix(in oklab, {{ $col }} 18%, #fff)">
                                                 @if ($lesson->thumbnailUrl())
@@ -139,7 +142,7 @@
                                             </a>
                                             <div class="off-mid">
                                                 <a href="{{ route('video.show', $lesson) }}" class="off-title">{{ $lesson->title }}</a>
-                                                <span class="off-meta">{{ __('Video') }}@if ($lesson->durationLabel()) · {{ $lesson->durationLabel() }}@endif@if ($lesson->teacher) · {{ __('Guru: :name', ['name' => $lesson->teacher->name]) }}@endif</span>
+                                                <span class="off-meta">{{ $vmeta }}</span>
                                             </div>
                                             @if ($lesson->isUpload())
                                                 <a href="{{ route('muat-turun.video', $lesson) }}" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
@@ -149,11 +152,13 @@
                                         </div>
                                     @endforeach
                                     @foreach ($materials as $material)
+                                        @php($mmeta = __('Bahan sokongan').' · '.$material->humanSize())
+                                        @php($mmeta = $material->teacher ? $mmeta.' · '.__('Guru: :name', ['name' => $material->teacher->name]) : $mmeta)
                                         <div class="off-row">
                                             <span class="off-thumb" style="background:{{ $isDark ? 'rgba(224,86,78,.14)' : '#FDECEA' }};color:#E0564E"><x-icon :name="$material->iconName()" style="width:30px;height:30px" /></span>
                                             <div class="off-mid">
                                                 <span class="off-title">{{ $material->title }}</span>
-                                                <span class="off-meta">{{ __('Bahan sokongan') }} · {{ $material->humanSize() }}@if ($material->teacher) · {{ __('Guru: :name', ['name' => $material->teacher->name]) }}@endif</span>
+                                                <span class="off-meta">{{ $mmeta }}</span>
                                             </div>
                                             <a href="{{ route('muat-turun.bahan', $material) }}" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
                                         </div>
