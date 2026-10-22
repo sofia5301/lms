@@ -92,7 +92,7 @@
             </div>
         </div>
 
-        <div style="margin-top:12px">
+        <div style="margin-top:28px">
             <x-year-subject-filter variant="student" :all-years="false" with-chapter
                 :action="route('simpanan.index')" :grades="$grades" :subjects="$subjects" :filter="$filter" />
         </div>
