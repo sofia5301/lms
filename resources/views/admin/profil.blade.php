@@ -125,7 +125,7 @@
                 <x-icon name="chevron-down" class="h-5 w-5" ::style="open ? 'transform:rotate(180deg)' : ''" style="transition:transform .15s;color:var(--tp-muted);flex-shrink:0" />
             </button>
 
-            <form method="POST" action="{{ route('password.update') }}" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:20px;margin-top:4px">
+            <form method="POST" action="{{ route('password.update') }}" x-show="open" x-cloak style="display:flex;flex-direction:column;gap:20px;margin-top:22px">
                 @csrf
                 @method('PUT')
                 <div class="pf-grid3">
