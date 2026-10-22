@@ -3,7 +3,7 @@
     $stats = [
         ['icon' => 'video',   'label' => __('Jumlah video'),      'value' => $totalCount,   'trend' => $totalTrend,   'tint' => '#DCF2EE', 'fg' => '#0F7A68'],
         ['icon' => 'youtube', 'label' => __('Video YouTube'),     'value' => $youtubeCount, 'trend' => $youtubeTrend, 'tint' => '#FBE4E4', 'fg' => '#D23B4E'],
-        ['icon' => 'upload',  'label' => __('Video dimuat naik'), 'value' => $uploadCount,  'trend' => $uploadTrend,  'tint' => '#E4EEF9', 'fg' => '#2E6CA8'],
+        ['icon' => 'cloud-upload', 'label' => __('Video dimuat naik'), 'value' => $uploadCount, 'trend' => $uploadTrend, 'tint' => '#E4EEF9', 'fg' => '#2E6CA8'],
     ];
 @endphp
 
