@@ -86,6 +86,40 @@ class YoutubeApi
     }
 
     /**
+     * The video currently being live-streamed on a channel, or null when the channel is not live.
+     * Uses search.list?eventType=live (100 quota units), so callers must throttle — this is meant
+     * to run from a scheduled sweep, not per page load. Not cached here; the sweep stores results.
+     *
+     * @return array{video_id:string, title:string, thumbnail_url:?string}|null
+     */
+    public function liveForChannel(string $channelId): ?array
+    {
+        $resp = Http::timeout(12)->get(self::BASE.'/search', [
+            'part' => 'snippet',
+            'channelId' => $channelId,
+            'eventType' => 'live',
+            'type' => 'video',
+            'maxResults' => 1,
+            'key' => (string) config('services.youtube.key'),
+        ]);
+
+        $resp->throw();
+
+        $item = $resp->json('items.0');
+
+        if (! $item || ! data_get($item, 'id.videoId')) {
+            return null;
+        }
+
+        return [
+            'video_id' => (string) data_get($item, 'id.videoId'),
+            'title' => (string) data_get($item, 'snippet.title', ''),
+            'thumbnail_url' => data_get($item, 'snippet.thumbnails.medium.url')
+                ?? data_get($item, 'snippet.thumbnails.default.url'),
+        ];
+    }
+
+    /**
      * ISO 8601 duration ("PT15M20S") → whole seconds, or null when absent/unparseable.
      */
     public static function parseDuration(?string $iso): ?int

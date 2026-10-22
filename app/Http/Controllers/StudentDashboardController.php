@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lesson;
 use App\Models\LessonProgress;
+use App\Models\LiveStream;
 use App\Services\LeaderboardService;
 use App\Services\TrendingService;
 use App\Support\ActiveGrade;
@@ -63,9 +64,25 @@ class StudentDashboardController extends Controller
             ->limit(12)
             ->get();
 
+        // Live now: verified teacher channels streaming right now, limited to channels that
+        // actually have published lessons in this student's Tahun. Read from the cached table
+        // (filled by the `live:refresh` sweep), never the YouTube API on a page load.
+        $gradeChannelIds = Lesson::published()
+            ->whereHas('chapter', fn ($q) => $q->where('grade_id', $gradeId)->where('is_active', true))
+            ->whereNotNull('youtube_channel_id')
+            ->distinct()
+            ->pluck('youtube_channel_id');
+
+        // rescue() keeps the home page up during the brief deploy window before the migration
+        // creates the live_streams table (new code can serve a request before `migrate` finishes).
+        $liveStreams = $gradeChannelIds->isNotEmpty()
+            ? rescue(fn () => LiveStream::whereIn('channel_id', $gradeChannelIds)->with('teacher:id,name')->latest('started_at')->get(), collect(), false)
+            : collect();
+
         return view('belajar.index', [
             'user' => $user,
             'grade' => $grade,
+            'liveStreams' => $liveStreams,
             'points' => $myRow->points ?? 0,
             'rank' => $myRow->rank ?? null,
             'hero' => $continue->first() ?? $trend['lessons']->first(),

@@ -58,6 +58,21 @@
         @media (max-width:980px) { .hm-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media (max-width:560px) { .hm-grid { grid-template-columns:1fr; } }
 
+        /* Live now */
+        .hm-livegrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+        @media (max-width:560px) { .hm-livegrid { grid-template-columns:1fr; } }
+        .hm-livecard { display:flex; flex-direction:column; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:18px; overflow:hidden; box-shadow:0 4px 16px rgba(46,44,80,.05); text-decoration:none; transition:transform .12s ease-out, box-shadow .12s; }
+        .hm-livecard:hover { transform:translateY(-2px); box-shadow:0 12px 26px rgba(46,44,80,.12); }
+        .hm-livethumb { position:relative; aspect-ratio:16/9; background:linear-gradient(135deg,#2B2B3A,#1C1C27); display:block; }
+        .hm-livethumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .hm-livebadge { position:absolute; left:10px; top:10px; z-index:2; display:inline-flex; align-items:center; gap:6px; background:#E0251B; color:#fff; font-family:'Geist',sans-serif; font-size:11px; font-weight:800; letter-spacing:.08em; border-radius:7px; padding:4px 9px; }
+        .hm-livebadge .dot { width:7px; height:7px; border-radius:50%; background:#fff; animation:hm-pulse 1.4s ease-in-out infinite; }
+        @keyframes hm-pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+        .hm-liveplay { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,.92); display:grid; place-items:center; color:#E0251B; z-index:1; }
+        .hm-livebody { padding:13px 15px 15px; display:flex; flex-direction:column; gap:5px; }
+        .hm-livetitle { font-family:'Geist',sans-serif; font-weight:800; font-size:14.5px; color:var(--wl-ink); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .hm-liveteacher { font-size:12.5px; font-weight:700; color:var(--wl-muted); display:inline-flex; align-items:center; gap:6px; }
+
         /* Horizontal rail with floating prev/next arrows */
         .hm-railwrap { position:relative; }
         .hm-rail { display:flex; gap:16px; overflow-x:auto; scroll-behavior:smooth; padding-bottom:4px; scroll-snap-type:x proximity; scrollbar-width:none; }
@@ -86,6 +101,32 @@
         </div>
     @else
         <div style="display:flex;flex-direction:column;gap:28px;margin-top:22px">
+
+            {{-- Siaran Langsung: teacher channels live right now (opens YouTube in a new tab) --}}
+            @if (($liveStreams ?? collect())->isNotEmpty())
+                <div class="hm-sec">
+                    <h2 class="hm-sectitle"><span style="width:10px;height:10px;border-radius:50%;background:#E0251B;display:inline-block;animation:hm-pulse 1.4s ease-in-out infinite"></span> {{ __('Siaran Langsung') }}</h2>
+                    <div class="hm-livegrid">
+                        @foreach ($liveStreams as $live)
+                            <a href="{{ $live->watchUrl() }}" target="_blank" rel="noopener noreferrer" class="hm-livecard">
+                                <span class="hm-livethumb">
+                                    @if ($live->thumbnail_url)
+                                        <img src="{{ $live->thumbnail_url }}" alt="" loading="lazy">
+                                    @endif
+                                    <span class="hm-livebadge"><span class="dot"></span> LIVE</span>
+                                    <span class="hm-liveplay"><x-icon name="play" class="h-5 w-5" style="margin-left:2px" /></span>
+                                </span>
+                                <span class="hm-livebody">
+                                    <span class="hm-livetitle">{{ $live->title ?: __('Siaran Langsung') }}</span>
+                                    @if ($live->teacher)
+                                        <span class="hm-liveteacher"><x-icon name="user" style="width:14px;height:14px" /> {{ $live->teacher->name }}</span>
+                                    @endif
+                                </span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             {{-- TOP: hero (left) + continue-watching list (right) --}}
             @if ($hero || $continue->isNotEmpty())
