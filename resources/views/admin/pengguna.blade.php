@@ -18,19 +18,31 @@
     {{-- The success banner is rendered once by <x-flash /> in the admin layout. --}}
     <div style="display:flex;flex-direction:column;gap:18px">
 
-        {{-- Summary chips --}}
-        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
-            <div style="background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:4px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
-                <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#2E6CA8"><x-icon name="user" class="h-4 w-4" />{{ __('Cikgu') }}</span>
-                <span style="font-family:'Geist',sans-serif;font-size:24px;font-weight:800;color:var(--tp-ink)">{{ number_format($counts['teacher']) }}</span>
+        {{-- Summary cards: tinted icon tile + big number, with a large faded illustration on the right. --}}
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+            <div style="position:relative;overflow:hidden;background:color-mix(in oklab, #2E6CA8 6%, var(--tp-surface));border:1px solid var(--tp-line);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
+                <span style="position:relative;z-index:1;width:48px;height:48px;border-radius:14px;background:#E4EEF9;color:#2E6CA8;display:grid;place-items:center;flex-shrink:0"><x-icon name="user" class="h-6 w-6" /></span>
+                <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:3px">
+                    <span style="font-family:'Geist',sans-serif;font-size:13px;font-weight:700;color:#2E6CA8">{{ __('Cikgu') }}</span>
+                    <span style="font-family:'Geist',sans-serif;font-size:26px;font-weight:800;color:var(--tp-ink);line-height:1">{{ number_format($counts['teacher']) }}</span>
+                </div>
+                <span style="position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:#2E6CA8;opacity:.14;z-index:0;pointer-events:none"><x-icon name="users" style="width:92px;height:92px" /></span>
             </div>
-            <div style="background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:4px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
-                <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#0F7A68"><x-icon name="graduation" class="h-4 w-4" />{{ __('Murid') }}</span>
-                <span style="font-family:'Geist',sans-serif;font-size:24px;font-weight:800;color:var(--tp-ink)">{{ number_format($counts['student']) }}</span>
+            <div style="position:relative;overflow:hidden;background:color-mix(in oklab, #0F7A68 6%, var(--tp-surface));border:1px solid var(--tp-line);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
+                <span style="position:relative;z-index:1;width:48px;height:48px;border-radius:14px;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;flex-shrink:0"><x-icon name="graduation" class="h-6 w-6" /></span>
+                <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:3px">
+                    <span style="font-family:'Geist',sans-serif;font-size:13px;font-weight:700;color:#0F7A68">{{ __('Murid') }}</span>
+                    <span style="font-family:'Geist',sans-serif;font-size:26px;font-weight:800;color:var(--tp-ink);line-height:1">{{ number_format($counts['student']) }}</span>
+                </div>
+                <span style="position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:#0F7A68;opacity:.14;z-index:0;pointer-events:none"><x-icon name="graduation" style="width:92px;height:92px" /></span>
             </div>
-            <div style="background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:4px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
-                <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#C24936"><x-icon name="x-circle" class="h-4 w-4" />{{ __('Tidak aktif') }}</span>
-                <span style="font-family:'Geist',sans-serif;font-size:24px;font-weight:800;color:var(--tp-ink)">{{ number_format($counts['inactive']) }}</span>
+            <div style="position:relative;overflow:hidden;background:color-mix(in oklab, #C24936 6%, var(--tp-surface));border:1px solid var(--tp-line);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
+                <span style="position:relative;z-index:1;width:48px;height:48px;border-radius:14px;background:#FBE4E4;color:#C24936;display:grid;place-items:center;flex-shrink:0"><x-icon name="clock" class="h-6 w-6" /></span>
+                <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:3px">
+                    <span style="font-family:'Geist',sans-serif;font-size:13px;font-weight:700;color:#C24936">{{ __('Tidak aktif') }}</span>
+                    <span style="font-family:'Geist',sans-serif;font-size:26px;font-weight:800;color:var(--tp-ink);line-height:1">{{ number_format($counts['inactive']) }}</span>
+                </div>
+                <span style="position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:#C24936;opacity:.14;z-index:0;pointer-events:none"><x-icon name="users" style="width:92px;height:92px" /></span>
             </div>
         </div>
 
