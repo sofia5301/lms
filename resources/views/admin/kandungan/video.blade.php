@@ -23,7 +23,7 @@
         @include('admin.kandungan._tabs', ['active' => 'video'])
 
         {{-- Stats: tinted icon circle + value + month-over-month trend, with a large faded circle. --}}
-        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:38px">
             @foreach ($stats as $s)
                 <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:18px;padding:18px 22px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
                     <span style="position:relative;z-index:1;width:60px;height:60px;border-radius:50%;background:{{ $s['tint'] }};color:{{ $s['fg'] }};display:grid;place-items:center;flex-shrink:0"><x-icon :name="$s['icon']" class="h-7 w-7" /></span>
