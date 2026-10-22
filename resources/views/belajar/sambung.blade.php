@@ -44,7 +44,7 @@
         @media (max-width:560px) { .sm-list .sm-thumb { width:130px; } }
     </style>
 
-    <div class="sm-wrap" x-data="{ view: 'grid', q: '' }">
+    <div class="sm-wrap" x-data="{ q: '' }">
         <div class="sm-head">
             <span class="sm-htile"><x-icon name="play" style="width:24px;height:24px;margin-left:2px" /></span>
             <div class="sm-htxt">
@@ -56,10 +56,6 @@
                     <div class="sm-search">
                         <span class="ic"><x-icon name="search" class="h-[18px] w-[18px]" /></span>
                         <input type="text" x-model="q" placeholder="{{ __('Cari dalam senarai ini...') }}" aria-label="{{ __('Cari') }}">
-                    </div>
-                    <div class="sm-toggle">
-                        <button type="button" class="sm-tgl" :class="view === 'grid' ? 'on' : ''" @click="view = 'grid'" aria-label="{{ __('Grid') }}"><x-icon name="dashboard" class="h-[18px] w-[18px]" /></button>
-                        <button type="button" class="sm-tgl" :class="view === 'list' ? 'on' : ''" @click="view = 'list'" aria-label="{{ __('Senarai') }}"><x-icon name="list" class="h-[18px] w-[18px]" /></button>
                     </div>
                 </div>
             @endif
@@ -73,7 +69,7 @@
                 <a href="{{ route('belajar.index') }}" class="wl-btn-primary" style="margin-top:6px;min-height:46px;display:inline-flex;align-items:center;border-radius:12px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:14.5px;padding:0 22px;text-decoration:none">{{ __('Cari Video') }}</a>
             </div>
         @else
-            <div :class="view === 'list' ? 'sm-list' : 'sm-grid'">
+            <div class="sm-grid">
                 @foreach ($lessons as $lesson)
                     @php($lsub = $lesson->chapter->subject)
                     @php($lcol = $lsub->color ?: '#17907B')
