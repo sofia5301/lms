@@ -133,47 +133,7 @@
                                     <span class="off-chev" :style="bopen ? 'transform:rotate(180deg)' : ''"><x-icon name="chevron-down" class="h-5 w-5" /></span>
                                 </div>
 
-                                <div class="off-brows" x-show="bopen">
-                                    @foreach ($videos as $lesson)
-                                        @php($vmeta = __('Video'))
-                                        @php($vmeta = $lesson->durationLabel() ? $vmeta.' · '.$lesson->durationLabel() : $vmeta)
-                                        @php($vmeta = $lesson->teacher ? $vmeta.' · '.__('Guru: :name', ['name' => $lesson->teacher->name]) : $vmeta)
-                                        <div class="off-row">
-                                            <a href="{{ route('video.show', $lesson) }}" class="off-thumb" style="background:linear-gradient(135deg, color-mix(in oklab, {{ $col }} 30%, #fff), color-mix(in oklab, {{ $col }} 12%, #fff))">
-                                                @if ($lesson->thumbnailUrl())
-                                                    <img src="{{ $lesson->thumbnailUrl() }}" alt="" loading="lazy">
-                                                @else
-                                                    <x-subject-icon :subject="$sub" :size="28" />
-                                                @endif
-                                                @if ($lesson->durationLabel())
-                                                    <span class="off-dur">{{ $lesson->durationLabel() }}</span>
-                                                @endif
-                                            </a>
-                                            <div class="off-mid">
-                                                <a href="{{ route('video.show', $lesson) }}" class="off-title">{{ $lesson->title }}</a>
-                                                <span class="off-meta">{{ $vmeta }}</span>
-                                            </div>
-                                            @if ($lesson->isUpload())
-                                                <a href="{{ route('muat-turun.video', $lesson) }}" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
-                                            @else
-                                                <span class="off-act off-online"><x-icon name="lock" style="width:16px;height:16px" /><span class="lbl">{{ __('Dalam talian sahaja') }}</span></span>
-                                            @endif
-                                        </div>
-                                    @endforeach
-
-                                    @foreach ($materials as $material)
-                                        @php($mmeta = __('Bahan sokongan').' · '.$material->humanSize())
-                                        @php($mmeta = $material->teacher ? $mmeta.' · '.__('Guru: :name', ['name' => $material->teacher->name]) : $mmeta)
-                                        <div class="off-row">
-                                            <span class="off-thumb" style="background:{{ $isDark ? 'rgba(224,86,78,.14)' : '#FDECEA' }};color:#E0564E"><x-icon :name="$material->iconName()" style="width:30px;height:30px" /></span>
-                                            <div class="off-mid">
-                                                <span class="off-title">{{ $material->title }}</span>
-                                                <span class="off-meta">{{ $mmeta }}</span>
-                                            </div>
-                                            <a href="{{ route('muat-turun.bahan', $material) }}" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
-                                        </div>
-                                    @endforeach
-                                </div>
+                                <div class="off-brows" x-show="bopen" style="padding:10px 16px;color:var(--wl-muted);font-size:13px">{{ count($videos) }} video · {{ count($materials) }} bahan (rows hidden for debug)</div>
                             </div>
                         @endforeach
                     </div>
