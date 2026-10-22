@@ -47,7 +47,8 @@
         .pu-err { margin:0; font-size:12.5px; font-weight:700; color:#C24936; }
 
         .pu-guide { background:color-mix(in oklab, #17907B 7%, var(--tp-surface)); border:1px solid var(--tp-line); border-radius:20px; padding:24px; position:sticky; top:16px; }
-        .pu-guidehero { height:150px; border-radius:16px; background:linear-gradient(135deg, rgba(23,144,123,.18), rgba(23,144,123,.05)); display:grid; place-items:center; color:#17907B; margin-bottom:16px; }
+        .pu-guidehero { border-radius:16px; overflow:hidden; margin-bottom:16px; aspect-ratio:3/2; }
+        .pu-guidehero img { width:100%; height:100%; object-fit:cover; display:block; }
     </style>
 
     <div class="pu-wrap" style="max-width:1240px;margin-left:auto;margin-right:auto;width:100%">
@@ -312,7 +313,7 @@
 
             {{-- Guide --}}
             <aside class="pu-guide">
-                <div class="pu-guidehero"><x-icon name="users" style="width:52px;height:52px" /></div>
+                <div class="pu-guidehero"><img src="{{ asset('images/add-user.png') }}" alt=""></div>
                 <h3 style="margin:0 0 8px;font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--tp-ink)">{{ $editing ? __('Sunting pengguna') : __('Tambah pengguna baharu') }}</h3>
                 <p style="margin:0;font-size:13.5px;color:var(--tp-muted-2);line-height:1.6">{{ __('Cipta akaun untuk cikgu atau murid supaya mereka boleh mengakses kandungan pembelajaran di WeLearn.') }}</p>
             </aside>
