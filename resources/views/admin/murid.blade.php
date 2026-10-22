@@ -19,7 +19,7 @@
         {{-- Stats: total + one per Tahun, tinted icon circle + number + faded illustration. --}}
         @php($pal = [['#DCF2EE','#0F7A68'],['#ECE9F7','#7C5CBF'],['#FBEAD3','#C8821E'],['#E4EEF9','#2E6CA8'],['#FBE4E4','#C24936'],['#DCF2EE','#0F7A68']])
         <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px">
-            <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
+            <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:16px;padding:22px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
                 <span style="position:relative;z-index:1;width:44px;height:44px;border-radius:50%;background:#E4EEF9;color:#2E6CA8;display:grid;place-items:center;flex-shrink:0"><x-icon name="users" class="h-[22px] w-[22px]" /></span>
                 <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;min-width:0">
                     <span style="font-size:12px;font-weight:700;color:var(--tp-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ __('Jumlah murid') }}</span>
@@ -29,7 +29,7 @@
             </div>
             @foreach ($grades as $grade)
                 @php($c = $pal[$loop->index % count($pal)])
-                <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
+                <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:16px;padding:22px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
                     <span style="position:relative;z-index:1;width:44px;height:44px;border-radius:50%;background:{{ $c[0] }};color:{{ $c[1] }};display:grid;place-items:center;flex-shrink:0"><x-icon name="graduation" class="h-[22px] w-[22px]" /></span>
                     <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;min-width:0">
                         <span style="font-size:12px;font-weight:700;color:var(--tp-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $grade->displayName() }}</span>
