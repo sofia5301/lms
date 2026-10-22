@@ -57,6 +57,17 @@
         .hm-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
         @media (max-width:980px) { .hm-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media (max-width:560px) { .hm-grid { grid-template-columns:1fr; } }
+
+        /* Horizontal rail with floating prev/next arrows */
+        .hm-railwrap { position:relative; }
+        .hm-rail { display:flex; gap:16px; overflow-x:auto; scroll-behavior:smooth; padding-bottom:4px; scroll-snap-type:x proximity; scrollbar-width:none; }
+        .hm-rail::-webkit-scrollbar { display:none; }
+        .hm-railcard { flex:0 0 clamp(236px, 23vw, 280px); scroll-snap-align:start; }
+        .hm-arrow { position:absolute; top:calc(50% - 2px); transform:translateY(-50%); width:44px; height:44px; border-radius:50%; background:var(--wl-surface); border:1px solid var(--wl-line); box-shadow:0 6px 18px rgba(46,44,80,.16); display:grid; place-items:center; cursor:pointer; color:#2E6CA8; z-index:3; }
+        .hm-arrow:hover { background:#F4F8FC; }
+        .hm-arrow-r { right:-8px; }
+        .hm-arrow-l { left:-8px; }
+        @media (max-width:560px) { .hm-arrow { display:none; } }
     </style>
 
     <div class="wl-pagehead" style="display:flex;align-items:flex-start;gap:16px">
@@ -164,10 +175,14 @@
                         <h2 class="hm-sectitle"><x-icon name="flame" class="h-5 w-5" style="color:#E0564E" /> {{ $trendingFallback ? __('Baru ditambah') : __('Paling popular') }}</h2>
                         <a href="{{ route('subjek.index') }}" style="font-size:13.5px;font-weight:700">{{ __('Lihat semua') }}</a>
                     </div>
-                    <div class="hm-grid">
-                        @foreach ($trending->take(4) as $lesson)
-                            <x-vid-card :lesson="$lesson" :thumbHeight="110" :showViews="! $trendingFallback" />
-                        @endforeach
+                    <div class="hm-railwrap" x-data="homeRail()" x-init="$nextTick(() => update())">
+                        <div class="hm-rail" x-ref="track" @scroll.debounce.100ms="update()">
+                            @foreach ($trending->take(12) as $lesson)
+                                <div class="hm-railcard"><x-vid-card :lesson="$lesson" :thumbHeight="110" :showViews="! $trendingFallback" /></div>
+                            @endforeach
+                        </div>
+                        <button type="button" class="hm-arrow hm-arrow-l" @click="nudge(-1)" x-show="! atStart" x-cloak aria-label="{{ __('Sebelum') }}"><x-icon name="chevron-left" class="h-5 w-5" /></button>
+                        <button type="button" class="hm-arrow hm-arrow-r" @click="nudge(1)" x-show="! atEnd" aria-label="{{ __('Seterusnya') }}"><x-icon name="chevron-right" class="h-5 w-5" /></button>
                     </div>
                 </div>
             @endif
@@ -179,10 +194,14 @@
                         <h2 class="hm-sectitle">{{ __('Baru ditambah') }}</h2>
                         <a href="{{ route('subjek.index') }}" style="font-size:13.5px;font-weight:700">{{ __('Lihat semua') }}</a>
                     </div>
-                    <div class="hm-grid">
-                        @foreach ($newest->take(4) as $lesson)
-                            <x-vid-card :lesson="$lesson" :thumbHeight="110" :showViews="true" />
-                        @endforeach
+                    <div class="hm-railwrap" x-data="homeRail()" x-init="$nextTick(() => update())">
+                        <div class="hm-rail" x-ref="track" @scroll.debounce.100ms="update()">
+                            @foreach ($newest->take(12) as $lesson)
+                                <div class="hm-railcard"><x-vid-card :lesson="$lesson" :thumbHeight="110" :showViews="true" /></div>
+                            @endforeach
+                        </div>
+                        <button type="button" class="hm-arrow hm-arrow-l" @click="nudge(-1)" x-show="! atStart" x-cloak aria-label="{{ __('Sebelum') }}"><x-icon name="chevron-left" class="h-5 w-5" /></button>
+                        <button type="button" class="hm-arrow hm-arrow-r" @click="nudge(1)" x-show="! atEnd" aria-label="{{ __('Seterusnya') }}"><x-icon name="chevron-right" class="h-5 w-5" /></button>
                     </div>
                 </div>
             @endif
@@ -194,10 +213,14 @@
                         <h2 class="hm-sectitle"><x-icon name="star" class="h-5 w-5" style="color:#E3A31C" /> {{ __('Anda mungkin suka') }}</h2>
                         <a href="{{ route('subjek.index') }}" style="font-size:13.5px;font-weight:700">{{ __('Lihat semua') }}</a>
                     </div>
-                    <div class="hm-grid">
-                        @foreach ($suggested->take(4) as $lesson)
-                            <x-vid-card :lesson="$lesson" :thumbHeight="110" :showViews="true" />
-                        @endforeach
+                    <div class="hm-railwrap" x-data="homeRail()" x-init="$nextTick(() => update())">
+                        <div class="hm-rail" x-ref="track" @scroll.debounce.100ms="update()">
+                            @foreach ($suggested->take(12) as $lesson)
+                                <div class="hm-railcard"><x-vid-card :lesson="$lesson" :thumbHeight="110" :showViews="true" /></div>
+                            @endforeach
+                        </div>
+                        <button type="button" class="hm-arrow hm-arrow-l" @click="nudge(-1)" x-show="! atStart" x-cloak aria-label="{{ __('Sebelum') }}"><x-icon name="chevron-left" class="h-5 w-5" /></button>
+                        <button type="button" class="hm-arrow hm-arrow-r" @click="nudge(1)" x-show="! atEnd" aria-label="{{ __('Seterusnya') }}"><x-icon name="chevron-right" class="h-5 w-5" /></button>
                     </div>
                 </div>
             @endif
@@ -209,4 +232,25 @@
             </div>
         @endif
     @endif
+
+    @push('scripts')
+        <script>
+            function homeRail() {
+                return {
+                    atStart: true,
+                    atEnd: false,
+                    update() {
+                        const el = this.$refs.track;
+                        if (! el) return;
+                        this.atStart = el.scrollLeft <= 2;
+                        this.atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+                    },
+                    nudge(direction) {
+                        const el = this.$refs.track;
+                        el.scrollBy({ left: direction * el.clientWidth * 0.82, behavior: 'smooth' });
+                    },
+                };
+            }
+        </script>
+    @endpush
 </x-student-layout>
