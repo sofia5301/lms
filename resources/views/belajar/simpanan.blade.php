@@ -111,12 +111,9 @@
                 @php($subjectFirst = $loop->first)
                 @php($sub = $grp['subject'])
                 @php($col = $sub->color ?: '#17907B')
-                @php($barBg = 'color-mix(in oklab, '.$col.' var(--pill-bw), var(--pill-bb))')
-                @php($barFg = 'color-mix(in oklab, '.$col.' var(--pill-fw), var(--pill-fb))')
-                @php($tintBar = 'color-mix(in oklab, '.$col.' 13%, var(--wl-surface))')
                 <div class="off-sub" x-data="{ open: {{ $subjectFirst ? 'true' : 'false' }} }">
-                    <div class="off-sbar" style="background:{{ $tintBar }}" @click="open = !open">
-                        <span class="off-stile" style="background:{{ $barBg }};color:{{ $barFg }}"><x-subject-icon :subject="$sub" :size="22" /></span>
+                    <div class="off-sbar" style="background:color-mix(in oklab, {{ $col }} 13%, var(--wl-surface))" @click="open = !open">
+                        <span class="off-stile" style="background:color-mix(in oklab, {{ $col }} var(--pill-bw), var(--pill-bb));color:color-mix(in oklab, {{ $col }} var(--pill-fw), var(--pill-fb))"><x-subject-icon :subject="$sub" :size="22" /></span>
                         <span class="off-sname">{{ $sub->displayName() }}</span>
                         <span class="off-scount">{{ $grp['vcount'] ?? 0 }} {{ __('video') }} · {{ $grp['mcount'] ?? 0 }} {{ __('bahan') }}</span>
                         <span class="off-chev" :style="open ? 'transform:rotate(180deg)' : ''"><x-icon name="chevron-down" class="h-5 w-5" /></span>
@@ -128,10 +125,9 @@
                             @php($chapter = $c['chapter'])
                             @php($videos = isset($c['videos']) ? $c['videos'] : [])
                             @php($materials = isset($c['materials']) ? $c['materials'] : [])
-                            @php($babTint = 'color-mix(in oklab, '.$col.' 9%, var(--wl-surface))')
                             <div class="off-bab" x-data="{ bopen: {{ $subjectFirst && $chapterFirst ? 'true' : 'false' }} }">
-                                <div class="off-bbar" style="background:{{ $babTint }}" @click="bopen = !bopen">
-                                    <span class="off-btile" style="background:{{ $barBg }};color:{{ $barFg }}"><x-icon name="briefcase" class="h-[18px] w-[18px]" /></span>
+                                <div class="off-bbar" style="background:color-mix(in oklab, {{ $col }} 9%, var(--wl-surface))" @click="bopen = !bopen">
+                                    <span class="off-btile" style="background:color-mix(in oklab, {{ $col }} var(--pill-bw), var(--pill-bb));color:color-mix(in oklab, {{ $col }} var(--pill-fw), var(--pill-fb))"><x-icon name="briefcase" class="h-[18px] w-[18px]" /></span>
                                     <span class="off-bname">{{ __('Bab :n', ['n' => $chapter->number]) }} — {{ $chapter->title }}</span>
                                     <span class="off-bcount">{{ count($videos) }} {{ __('video') }} · {{ count($materials) }} {{ __('bahan') }}</span>
                                     <span class="off-chev" :style="bopen ? 'transform:rotate(180deg)' : ''"><x-icon name="chevron-down" class="h-5 w-5" /></span>
@@ -139,12 +135,11 @@
 
                                 <div class="off-brows" x-show="bopen">
                                     @foreach ($videos as $lesson)
-                                        @php($grad = 'linear-gradient(135deg, color-mix(in oklab, '.$col.' 30%, #fff), color-mix(in oklab, '.$col.' 12%, #fff))')
                                         @php($vmeta = __('Video'))
                                         @php($vmeta = $lesson->durationLabel() ? $vmeta.' · '.$lesson->durationLabel() : $vmeta)
                                         @php($vmeta = $lesson->teacher ? $vmeta.' · '.__('Guru: :name', ['name' => $lesson->teacher->name]) : $vmeta)
                                         <div class="off-row">
-                                            <a href="{{ route('video.show', $lesson) }}" class="off-thumb" style="background:{{ $grad }}">
+                                            <a href="{{ route('video.show', $lesson) }}" class="off-thumb" style="background:linear-gradient(135deg, color-mix(in oklab, {{ $col }} 30%, #fff), color-mix(in oklab, {{ $col }} 12%, #fff))">
                                                 @if ($lesson->thumbnailUrl())
                                                     <img src="{{ $lesson->thumbnailUrl() }}" alt="" loading="lazy">
                                                 @else
