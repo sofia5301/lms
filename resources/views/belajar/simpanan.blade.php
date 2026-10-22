@@ -123,78 +123,17 @@
             </div>
         @else
             @foreach ($tree as $grp)
-                @php($subjectFirst = $loop->first)
-                @php($sub = $grp['subject'])
-                @php($col = $sub->color ?: '#17907B')
-                @php($barBg = "color-mix(in oklab, {$col} var(--pill-bw), var(--pill-bb))")
-                @php($barFg = "color-mix(in oklab, {$col} var(--pill-fw), var(--pill-fb))")
-                @php($tintBar = "color-mix(in oklab, {$col} 13%, var(--wl-surface))")
-                @php($vCount = $grp['vcount'] ?? 0)
-                @php($mCount = $grp['mcount'] ?? 0)
-                <div class="off-sub" x-data="{ open: {{ $loop->first ? 'true' : 'false' }} }">
-                    <div class="off-sbar" style="background:{{ $tintBar }}" @click="open = !open">
-                        <span class="off-stile" style="background:{{ $barBg }};color:{{ $barFg }}"><x-subject-icon :subject="$sub" :size="22" /></span>
-                        <span class="off-sname">{{ $sub->displayName() }}</span>
-                        <span class="off-scount">{{ $vCount }} {{ __('video') }} · {{ $mCount }} {{ __('bahan') }}</span>
-                        <span class="off-chev" :style="open ? 'transform:rotate(180deg)' : ''"><x-icon name="chevron-down" class="h-5 w-5" /></span>
-                    </div>
-
-                    <div class="off-sbody" x-show="open">
-                        @foreach ($grp['chapters'] as $c)
-                            @php($chapter = $c['chapter'])
-                            @php($videos = $c['videos'] ?? [])
-                            @php($materials = $c['materials'] ?? [])
-                            @php($babTint = "color-mix(in oklab, {$col} 9%, var(--wl-surface))")
-                            <div class="off-bab" x-data="{ bopen: {{ $subjectFirst && $loop->first ? 'true' : 'false' }} }">
-                                <div class="off-bbar" style="background:{{ $babTint }}" @click="bopen = !bopen">
-                                    <span class="off-btile" style="background:{{ $barBg }};color:{{ $barFg }}"><x-icon name="briefcase" class="h-[18px] w-[18px]" /></span>
-                                    <span class="off-bname">{{ __('Bab :n', ['n' => $chapter->number]) }} — {{ $chapter->title }}</span>
-                                    <span class="off-bcount">{{ count($videos) }} {{ __('video') }} · {{ count($materials) }} {{ __('bahan') }}</span>
-                                    <span class="off-chev" :style="bopen ? 'transform:rotate(180deg)' : ''"><x-icon name="chevron-down" class="h-5 w-5" /></span>
-                                </div>
-
-                                <div class="off-brows" x-show="bopen">
-                                    {{-- Videos --}}
-                                    @foreach ($videos as $lesson)
-                                        @php($grad = "linear-gradient(135deg, color-mix(in oklab, {$col} 30%, #fff), color-mix(in oklab, {$col} 12%, #fff))")
-                                        <div class="off-row">
-                                            <a href="{{ route('video.show', $lesson) }}" class="off-thumb" style="background:{{ $grad }}">
-                                                @if ($lesson->thumbnailUrl())
-                                                    <img src="{{ $lesson->thumbnailUrl() }}" alt="" loading="lazy">
-                                                @else
-                                                    <x-subject-icon :subject="$sub" :size="28" />
-                                                @endif
-                                                @if ($lesson->durationLabel())
-                                                    <span class="off-dur">{{ $lesson->durationLabel() }}</span>
-                                                @endif
-                                            </a>
-                                            <div class="off-mid">
-                                                <a href="{{ route('video.show', $lesson) }}" class="off-title">{{ $lesson->title }}</a>
-                                                <span class="off-meta">{{ __('Video') }}@if ($lesson->durationLabel()) · {{ $lesson->durationLabel() }}@endif @if ($lesson->teacher)· {{ __('Guru: :name', ['name' => $lesson->teacher->name]) }}@endif</span>
-                                            </div>
-                                            @if ($lesson->isUpload())
-                                                <a href="{{ route('muat-turun.video', $lesson) }}" @click="remember(@js($lesson->title))" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
-                                            @else
-                                                <span class="off-act off-online"><x-icon name="lock" style="width:16px;height:16px" /><span class="lbl">{{ __('Dalam talian sahaja') }}</span></span>
-                                            @endif
-                                        </div>
-                                    @endforeach
-
-                                    {{-- Materials --}}
-                                    @foreach ($materials as $material)
-                                        <div class="off-row">
-                                            <span class="off-thumb" style="background:{{ $isDark ? 'rgba(224,86,78,.14)' : '#FDECEA' }};color:#E0564E"><x-icon :name="$material->iconName()" style="width:30px;height:30px" /></span>
-                                            <div class="off-mid">
-                                                <span class="off-title">{{ $material->title }}</span>
-                                                <span class="off-meta">{{ __('Bahan sokongan') }} · {{ $material->humanSize() }}@if ($material->teacher) · {{ __('Guru: :name', ['name' => $material->teacher->name]) }}@endif</span>
-                                            </div>
-                                            <a href="{{ route('muat-turun.bahan', $material) }}" @click="remember(@js($material->title))" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
+                <div style="border:1px solid var(--wl-line);border-radius:12px;padding:14px;margin-bottom:10px">
+                    <div style="font-family:'Geist',sans-serif;font-weight:800;color:var(--wl-ink)">{{ $grp['subject']->displayName() }} — {{ $grp['vcount'] ?? 0 }} video · {{ $grp['mcount'] ?? 0 }} bahan</div>
+                    @foreach ($grp['chapters'] as $c)
+                        <div style="margin-top:8px;font-weight:700;color:var(--wl-ink)">Bab {{ $c['chapter']->number }}: {{ $c['chapter']->title }}</div>
+                        @foreach (($c['videos'] ?? []) as $lesson)
+                            <div style="font-size:13px;color:var(--wl-muted)">VID: {{ $lesson->title }} @if ($lesson->isUpload())[upload]@else[yt]@endif</div>
                         @endforeach
-                    </div>
+                        @foreach (($c['materials'] ?? []) as $material)
+                            <div style="font-size:13px;color:var(--wl-muted)">MAT: {{ $material->title }} · {{ $material->humanSize() }}</div>
+                        @endforeach
+                    @endforeach
                 </div>
             @endforeach
         @endif
