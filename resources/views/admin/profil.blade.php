@@ -34,7 +34,7 @@
         @media (max-width:900px) { .pf-grid2, .pf-grid3 { grid-template-columns:1fr; } }
     </style>
 
-    <div style="display:flex;flex-direction:column;gap:20px;max-width:1280px">
+    <div style="display:flex;flex-direction:column;gap:20px;max-width:1280px;margin:24px auto 0;width:100%">
 
         {{-- Account details --}}
         <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" style="{{ $card }};gap:20px">
