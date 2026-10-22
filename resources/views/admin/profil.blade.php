@@ -109,7 +109,9 @@
                 </div>
             </div>
 
-            <button type="submit" class="wl-primary" style="{{ $primary }};align-self:flex-start">{!! $saveIcon !!} {{ __('Simpan') }}</button>
+            <div style="display:flex;justify-content:flex-end;margin-top:24px">
+                <button type="submit" class="wl-primary" style="{{ $primary }}">{!! $saveIcon !!} {{ __('Simpan') }}</button>
+            </div>
         </form>
 
         {{-- Change password: collapsible, opens automatically when a change failed validation. --}}
