@@ -17,7 +17,7 @@
         .hm-pill { background:rgba(255,255,255,.92); color:#2E6CA8; border-radius:999px; padding:4px 12px; font-family:'Geist',sans-serif; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; }
         .hm-pill.bab { color:#4A5A6B; }
         .hm-herotitle { margin:0; font-family:'Geist',sans-serif; font-size:24px; font-weight:800; color:#fff; letter-spacing:-.01em; text-shadow:0 2px 10px rgba(0,0,0,.4); }
-        .hm-herobody { padding:16px 18px 18px; display:flex; flex-direction:column; gap:14px; }
+        .hm-herobody { padding:18px 18px 26px; display:flex; flex-direction:column; gap:20px; }
         .hm-progress { height:7px; border-radius:999px; background:{{ $isDark ? 'var(--wl-line-2)' : '#E8EDF2' }}; overflow:hidden; }
         .hm-progress > i { display:block; height:100%; border-radius:999px; background:#17907B; }
         .hm-herocta { display:flex; gap:10px; flex-wrap:wrap; }
