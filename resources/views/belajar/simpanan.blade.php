@@ -5,29 +5,35 @@
         // chapter shows its videos and its materials together.
         $tree = [];
         foreach ($lessons as $l) {
-            $sid = $l->chapter->subject->id;
-            $cid = $l->chapter->id;
-            $tree[$sid]['subject'] = $l->chapter->subject;
-            $tree[$sid]['chapters'][$cid]['chapter'] = $l->chapter;
+            $chapter = $l->chapter;
+            $subject = $chapter?->subject;
+            if (! $subject) { continue; }
+            $sid = $subject->id;
+            $cid = $chapter->id;
+            $tree[$sid]['subject'] = $subject;
+            $tree[$sid]['chapters'][$cid]['chapter'] = $chapter;
+            $tree[$sid]['chapters'][$cid]['number'] = $chapter->number;
             $tree[$sid]['chapters'][$cid]['videos'][] = $l;
         }
         foreach ($materialsByChapter as $mats) {
-            $chapter = $mats->first()->chapter;
-            $sid = $chapter->subject->id;
+            $chapter = $mats->first()?->chapter;
+            $subject = $chapter?->subject;
+            if (! $subject) { continue; }
+            $sid = $subject->id;
             $cid = $chapter->id;
-            $tree[$sid]['subject'] = $chapter->subject;
+            $tree[$sid]['subject'] = $subject;
             $tree[$sid]['chapters'][$cid]['chapter'] = $chapter;
+            $tree[$sid]['chapters'][$cid]['number'] = $chapter->number;
             foreach ($mats as $m) {
                 $tree[$sid]['chapters'][$cid]['materials'][] = $m;
             }
         }
         // Order subjects by their configured sort order, chapters by number.
-        $order = $subjects->pluck('sort_order', 'id');
+        $order = $subjects->pluck('sort_order', 'id')->all();
         uksort($tree, fn ($a, $b) => ($order[$a] ?? 999) <=> ($order[$b] ?? 999));
-        foreach ($tree as &$grp) {
-            uasort($grp['chapters'], fn ($a, $b) => $a['chapter']->number <=> $b['chapter']->number);
+        foreach (array_keys($tree) as $sid) {
+            uasort($tree[$sid]['chapters'], fn ($a, $b) => ($a['number'] ?? 0) <=> ($b['number'] ?? 0));
         }
-        unset($grp);
     @endphp
 
     <style>
@@ -98,6 +104,7 @@
             </div>
         @else
             @foreach ($tree as $grp)
+                @php($subjectFirst = $loop->first)
                 @php($sub = $grp['subject'])
                 @php($col = $sub->color ?: '#17907B')
                 @php($barBg = "color-mix(in oklab, {$col} var(--pill-bw), var(--pill-bb))")
@@ -119,7 +126,7 @@
                             @php($videos = $c['videos'] ?? [])
                             @php($materials = $c['materials'] ?? [])
                             @php($babTint = "color-mix(in oklab, {$col} 9%, var(--wl-surface))")
-                            <div class="off-bab" x-data="{ bopen: {{ $loop->parent->first && $loop->first ? 'true' : 'false' }} }">
+                            <div class="off-bab" x-data="{ bopen: {{ $subjectFirst && $loop->first ? 'true' : 'false' }} }">
                                 <div class="off-bbar" style="background:{{ $babTint }}" @click="bopen = !bopen">
                                     <span class="off-btile" style="background:{{ $barBg }};color:{{ $barFg }}"><x-icon name="briefcase" class="h-[18px] w-[18px]" /></span>
                                     <span class="off-bname">{{ __('Bab :n', ['n' => $chapter->number]) }} — {{ $chapter->title }}</span>
