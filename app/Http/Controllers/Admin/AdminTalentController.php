@@ -54,6 +54,9 @@ class AdminTalentController extends Controller
             'totalTeachers' => SchoolScope::users(User::where('role', User::ROLE_TEACHER))->count(),
             'activeCount' => SchoolScope::users(User::where('role', User::ROLE_TEACHER))->where('is_active', true)->count(),
             'inactiveCount' => SchoolScope::users(User::where('role', User::ROLE_TEACHER))->where('is_active', false)->count(),
+            // Month-over-month: teachers added in the last 30 days (total, and active).
+            'teacherTrend' => SchoolScope::users(User::where('role', User::ROLE_TEACHER))->where('created_at', '>=', now()->subDays(30))->count(),
+            'activeTrend' => SchoolScope::users(User::where('role', User::ROLE_TEACHER))->where('is_active', true)->where('created_at', '>=', now()->subDays(30))->count(),
             'subjectSlug' => $subjectSlug,
             'gradeLevel' => $gradeLevel,
             'search' => $search,
