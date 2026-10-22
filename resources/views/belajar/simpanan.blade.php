@@ -31,7 +31,7 @@
     @endphp
 
     <div style="padding:20px;max-width:1000px;margin:0 auto">
-        <h1 style="font-family:'Geist',sans-serif;font-weight:800;color:var(--wl-ink)">Simpanan Offline (debug 3 — plain accordion)</h1>
+        <h1 style="font-family:'Geist',sans-serif;font-weight:800;color:var(--wl-ink)">Simpanan Offline — VERSION 7 (isDark probe: {{ $isDark ? 'dark' : 'light' }})</h1>
 
         @foreach ($tree as $grp)
             @php($sub = $grp['subject'])
