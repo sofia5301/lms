@@ -151,20 +151,7 @@
                     @endforeach
                 </div>
 
-                <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:rgba(23,144,123,.08);border:1px solid rgba(23,144,123,.18);border-radius:14px;padding:16px 18px">
-                    <div style="flex:1;min-width:260px;display:flex;gap:12px;align-items:flex-start">
-                        <span style="width:30px;height:30px;border-radius:50%;background:#17907B;color:#fff;display:grid;place-items:center;flex-shrink:0;margin-top:1px"><x-icon name="info" class="h-[16px] w-[16px]" /></span>
-                        <div>
-                            <div style="font-family:'Geist',sans-serif;font-weight:800;font-size:13.5px;color:var(--tp-ink)">{{ __('Syarat kata laluan') }}</div>
-                            <ul style="margin:6px 0 0;padding-left:16px;font-size:12.5px;color:var(--tp-muted-2);line-height:1.75">
-                                <li>{{ __('Sekurang-kurangnya 8 aksara') }}</li>
-                                <li>{{ __('Mengandungi huruf besar, huruf kecil, nombor dan simbol') }}</li>
-                                <li>{{ __('Tidak sama dengan kata laluan sebelumnya') }}</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <button type="submit" class="wl-primary" style="{{ $primary }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> {{ __('Tukar kata laluan') }}</button>
-                </div>
+                <button type="submit" class="wl-primary" style="{{ $primary }};align-self:flex-start;margin-top:4px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> {{ __('Tukar kata laluan') }}</button>
             </form>
         </div>
     </div>
