@@ -21,7 +21,7 @@
         @media (max-width:520px) { .sm-grid { grid-template-columns:1fr; } }
         .sm-list { display:flex; flex-direction:column; gap:14px; }
 
-        .sm-card { display:flex; flex-direction:column; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:18px; overflow:hidden; box-shadow:0 4px 16px rgba(46,44,80,.05); }
+        .sm-card { position:relative; display:flex; flex-direction:column; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:18px; overflow:hidden; box-shadow:0 4px 16px rgba(46,44,80,.05); }
         .sm-thumb { position:relative; aspect-ratio:16/10; background:linear-gradient(135deg,#C4DCF2,#A5C9EA); display:block; text-decoration:none; flex-shrink:0; }
         .sm-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
         .sm-play { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.9); display:grid; place-items:center; color:#2E6CA8; z-index:1; }
@@ -51,14 +51,6 @@
                 <h1 style="margin:0;font-family:'Geist',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.01em;color:var(--wl-ink)">{{ __('Sambung Menonton') }}</h1>
                 <span style="font-size:14px;color:var(--wl-muted)">{{ __('Video yang belum habis anda tonton.') }}</span>
             </div>
-            @if ($lessons->isNotEmpty())
-                <div class="sm-tools">
-                    <div class="sm-search">
-                        <span class="ic"><x-icon name="search" class="h-[18px] w-[18px]" /></span>
-                        <input type="text" x-model="q" placeholder="{{ __('Cari dalam senarai ini...') }}" aria-label="{{ __('Cari') }}">
-                    </div>
-                </div>
-            @endif
         </div>
 
         <a href="{{ route('belajar.index') }}" class="wl-back" style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:-6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Kembali ke Utama') }}</a>
