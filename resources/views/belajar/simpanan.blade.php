@@ -1,141 +1,177 @@
 <x-student-layout :title="__('Simpanan Offline')">
-    <div x-data="offlineDownloads()">
-        <header class="mb-6">
-            <div class="wl-favhead" style="display:flex;align-items:flex-start;gap:16px">
-                <span class="hi-tile" style="width:48px;height:48px;border-radius:14px;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;flex-shrink:0"><x-icon name="download" style="width:24px;height:24px" /></span>
-                <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
-                    <h1 style="margin:0;font-family:'Geist',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.01em;color:var(--wl-ink)">{{ __('Simpanan Offline') }}</h1>
-                    <p style="margin:0;max-width:62ch;font-size:14px;font-weight:600;color:var(--wl-muted);line-height:1.5">{{ __('Muat turun video yang dimuat naik dan bahan sokongan untuk ditonton atau dibaca tanpa internet. Video YouTube hanya boleh ditonton dalam talian.') }}</p>
-                </div>
-            </div>
-        </header>
+    @php($isDark = ($theme ?? 'light') === 'dark')
+    @php
+        // Merge the uploaded lessons and supporting materials into one Subject -> Bab tree, so a
+        // chapter shows its videos and its materials together.
+        $tree = [];
+        foreach ($lessons as $l) {
+            $sid = $l->chapter->subject->id;
+            $cid = $l->chapter->id;
+            $tree[$sid]['subject'] = $l->chapter->subject;
+            $tree[$sid]['chapters'][$cid]['chapter'] = $l->chapter;
+            $tree[$sid]['chapters'][$cid]['videos'][] = $l;
+        }
+        foreach ($materialsByChapter as $mats) {
+            $chapter = $mats->first()->chapter;
+            $sid = $chapter->subject->id;
+            $cid = $chapter->id;
+            $tree[$sid]['subject'] = $chapter->subject;
+            $tree[$sid]['chapters'][$cid]['chapter'] = $chapter;
+            foreach ($mats as $m) {
+                $tree[$sid]['chapters'][$cid]['materials'][] = $m;
+            }
+        }
+        // Order subjects by their configured sort order, chapters by number.
+        $order = $subjects->pluck('sort_order', 'id');
+        uksort($tree, fn ($a, $b) => ($order[$a] ?? 999) <=> ($order[$b] ?? 999));
+        foreach ($tree as &$grp) {
+            uasort($grp['chapters'], fn ($a, $b) => $a['chapter']->number <=> $b['chapter']->number);
+        }
+        unset($grp);
+    @endphp
 
-        {{-- Dependent Year -> Subject filter (brief §3.1). Defaults to the student's active Tahun. --}}
-        <div class="mb-6">
-            <x-year-subject-filter variant="student" :all-years="false" with-chapter
-                :action="route('simpanan.index')" :grades="$grades" :subjects="$subjects" :filter="$filter" />
+    <style>
+        .off-wrap { display:flex; flex-direction:column; gap:22px; max-width:1240px; width:100%; margin:0 auto; }
+
+        /* Header */
+        .off-head { display:flex; align-items:flex-start; gap:16px; }
+        .off-htile { width:54px; height:54px; border-radius:15px; background:{{ $isDark ? 'rgba(23,144,123,.2)' : '#DCF2EE' }}; color:#0F7A68; display:grid; place-items:center; flex-shrink:0; }
+
+        /* Subject accordion (outer) */
+        .off-sub { border:1px solid var(--wl-line); border-radius:18px; overflow:hidden; box-shadow:0 3px 12px rgba(46,44,80,.04); }
+        .off-sbar { display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer; user-select:none; }
+        .off-stile { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; flex-shrink:0; }
+        .off-sname { font-family:'Geist',sans-serif; font-size:18px; font-weight:800; color:var(--wl-ink); }
+        .off-scount { font-size:13px; font-weight:700; color:var(--wl-muted); }
+        .off-chev { margin-left:auto; color:var(--wl-muted); display:inline-flex; transition:transform .18s; }
+        .off-sbody { padding:14px 16px; display:flex; flex-direction:column; gap:12px; background:{{ $isDark ? 'rgba(255,255,255,.02)' : '#FAFBFC' }}; border-top:1px solid var(--wl-line); }
+
+        /* Bab accordion (inner) */
+        .off-bab { border:1px solid var(--wl-line); border-radius:14px; overflow:hidden; background:var(--wl-surface); }
+        .off-bbar { display:flex; align-items:center; gap:12px; padding:12px 16px; cursor:pointer; user-select:none; }
+        .off-btile { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; flex-shrink:0; }
+        .off-bname { font-family:'Geist',sans-serif; font-size:14.5px; font-weight:800; color:var(--wl-ink); }
+        .off-bcount { font-size:12.5px; font-weight:700; color:var(--wl-muted); }
+        .off-brows { border-top:1px solid var(--wl-line); }
+
+        /* Item row */
+        .off-row { display:flex; align-items:center; gap:16px; padding:12px 16px; }
+        .off-row + .off-row { border-top:1px solid var(--wl-line); }
+        .off-thumb { position:relative; width:128px; height:74px; flex-shrink:0; border-radius:12px; overflow:hidden; display:grid; place-items:center; }
+        .off-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .off-dur { position:absolute; right:6px; bottom:6px; background:rgba(40,56,74,.88); color:#fff; font-size:10.5px; font-weight:700; border-radius:7px; padding:2px 7px; z-index:1; }
+        .off-mid { flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; }
+        .off-title { font-family:'Geist',sans-serif; font-weight:800; font-size:15.5px; color:var(--wl-ink); text-decoration:none; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .off-meta { font-size:13px; font-weight:600; color:var(--wl-muted); }
+        .off-act { flex-shrink:0; display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 20px; border-radius:12px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; text-decoration:none; }
+        .off-dl { background:var(--wl-surface); border:1.5px solid #9FD8CB; color:#0F7A68; }
+        .off-dl:hover { background:#F0FAF7; }
+        .off-online { background:{{ $isDark ? 'rgba(255,255,255,.04)' : '#F4F5F7' }}; border:1.5px solid var(--wl-line-2); color:var(--wl-muted); cursor:default; }
+
+        @media (max-width:760px) {
+            .off-thumb { width:92px; height:56px; }
+            .off-title { font-size:14px; }
+            .off-act { padding:0 14px; min-height:40px; font-size:12.5px; }
+            .off-act span.lbl { display:none; }
+        }
+    </style>
+
+    <div class="off-wrap" x-data="offlineDownloads()">
+        {{-- Header --}}
+        <div class="off-head">
+            <span class="off-htile"><x-icon name="download" style="width:28px;height:28px" /></span>
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+                <h1 style="margin:0;font-family:'Geist',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.01em;color:var(--wl-ink)">{{ __('Simpanan Offline') }}</h1>
+                <p style="margin:0;max-width:72ch;font-size:14.5px;font-weight:600;color:var(--wl-muted);line-height:1.5">{{ __('Video dan bahan pembelajaran yang dimuat naik oleh guru untuk ditonton atau dimuat turun.') }}</p>
+            </div>
         </div>
 
-        {{-- Uploaded videos are downloadable; YouTube ones are honestly marked online-only. --}}
-        <section class="mb-10">
-            <h2 class="wl-offh2 mb-4 text-lg font-extrabold text-ink">{{ __('Video Pelajaran') }}</h2>
+        {{-- Dependent Tahun -> Subjek -> Bab filter. --}}
+        <x-year-subject-filter variant="student" :all-years="false" with-chapter
+            :action="route('simpanan.index')" :grades="$grades" :subjects="$subjects" :filter="$filter" />
 
-            @if ($lessons->isEmpty())
-                <p class="rounded-card border border-dashed border-line p-4 text-sm text-ink-2">
-                    {{ __('Tiada video untuk Tahun ini lagi.') }}
-                </p>
-            @else
-                <ul style="display:flex;flex-direction:column;gap:12px">
-                    @foreach ($lessons as $lesson)
-                        @php($ac = $lesson->chapter->subject->color ?: '#17907B')
-                        @php($grad = "linear-gradient(135deg, color-mix(in oklab, {$ac} 10%, #fff), color-mix(in oklab, {$ac} 22%, #fff))")
-                        @php($tint = "color-mix(in oklab, {$ac} 14%, #fff)")
-                        <li class="wl-offrow" style="position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;background:var(--wl-surface);border:1px solid var(--wl-line);border-radius:16px;padding:12px 16px;box-shadow:0 4px 16px rgba(46,44,80,.04)">
-                            {{-- Faint leaf flourish on the right. --}}
-                            <svg aria-hidden="true" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);opacity:.2;pointer-events:none;z-index:0" width="92" height="74" viewBox="0 0 92 74" fill="{{ $ac }}">
-                                <path d="M8 68 C 26 54 46 42 84 12" fill="none" stroke="{{ $ac }}" stroke-width="1.5"/>
-                                <ellipse cx="0" cy="0" rx="10" ry="4.5" transform="translate(26 54) rotate(-32)"/>
-                                <ellipse cx="0" cy="0" rx="10" ry="4.5" transform="translate(40 47) rotate(28)"/>
-                                <ellipse cx="0" cy="0" rx="9" ry="4" transform="translate(52 37) rotate(-32)"/>
-                                <ellipse cx="0" cy="0" rx="9" ry="4" transform="translate(64 30) rotate(28)"/>
-                                <ellipse cx="0" cy="0" rx="8" ry="3.6" transform="translate(76 19) rotate(-30)"/>
-                            </svg>
+        @if (empty($tree))
+            <div style="background:var(--wl-surface);border:1px dashed var(--wl-line-3);border-radius:22px;padding:56px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+                <x-icon name="download" class="h-9 w-9" style="color:var(--wl-muted)" />
+                <h3 style="margin:0;font-family:'Geist',sans-serif;font-size:19px;font-weight:800;color:var(--wl-ink)">{{ __('Tiada kandungan untuk Tahun ini lagi.') }}</h3>
+                <p style="margin:0;font-size:14.5px;color:var(--wl-muted);max-width:360px">{{ __('Cuba tukar Tahun, subjek atau bab di atas.') }}</p>
+            </div>
+        @else
+            @foreach ($tree as $grp)
+                @php($sub = $grp['subject'])
+                @php($col = $sub->color ?: '#17907B')
+                @php($barBg = "color-mix(in oklab, {$col} var(--pill-bw), var(--pill-bb))")
+                @php($barFg = "color-mix(in oklab, {$col} var(--pill-fw), var(--pill-fb))")
+                @php($tintBar = "color-mix(in oklab, {$col} 13%, var(--wl-surface))")
+                @php($vCount = collect($grp['chapters'])->sum(fn ($c) => count($c['videos'] ?? [])))
+                @php($mCount = collect($grp['chapters'])->sum(fn ($c) => count($c['materials'] ?? [])))
+                <div class="off-sub" x-data="{ open: {{ $loop->first ? 'true' : 'false' }} }">
+                    <div class="off-sbar" style="background:{{ $tintBar }}" @click="open = !open">
+                        <span class="off-stile" style="background:{{ $barBg }};color:{{ $barFg }}"><x-subject-icon :subject="$sub" :size="22" /></span>
+                        <span class="off-sname">{{ $sub->displayName() }}</span>
+                        <span class="off-scount">{{ $vCount }} {{ __('video') }} · {{ $mCount }} {{ __('bahan') }}</span>
+                        <span class="off-chev" :style="open ? 'transform:rotate(180deg)' : ''"><x-icon name="chevron-down" class="h-5 w-5" /></span>
+                    </div>
 
-                            {{-- Thumbnail on a soft gradient (video image, or the subject icon). --}}
-                            <span style="position:relative;z-index:1;flex-shrink:0;width:104px;height:66px;border-radius:13px;overflow:hidden;background:{{ $grad }};display:grid;place-items:center">
-                                @if ($lesson->thumbnailUrl())
-                                    <img src="{{ $lesson->thumbnailUrl() }}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">
-                                @else
-                                    <span style="color:{{ $ac }}"><x-subject-icon :subject="$lesson->chapter->subject" :size="30" /></span>
-                                @endif
-                            </span>
+                    <div class="off-sbody" x-show="open">
+                        @foreach ($grp['chapters'] as $c)
+                            @php($chapter = $c['chapter'])
+                            @php($videos = $c['videos'] ?? [])
+                            @php($materials = $c['materials'] ?? [])
+                            @php($babTint = "color-mix(in oklab, {$col} 9%, var(--wl-surface))")
+                            <div class="off-bab" x-data="{ bopen: {{ $loop->parent->first && $loop->first ? 'true' : 'false' }} }">
+                                <div class="off-bbar" style="background:{{ $babTint }}" @click="bopen = !bopen">
+                                    <span class="off-btile" style="background:{{ $barBg }};color:{{ $barFg }}"><x-icon name="briefcase" class="h-[18px] w-[18px]" /></span>
+                                    <span class="off-bname">{{ __('Bab :n', ['n' => $chapter->number]) }} — {{ $chapter->title }}</span>
+                                    <span class="off-bcount">{{ count($videos) }} {{ __('video') }} · {{ count($materials) }} {{ __('bahan') }}</span>
+                                    <span class="off-chev" :style="bopen ? 'transform:rotate(180deg)' : ''"><x-icon name="chevron-down" class="h-5 w-5" /></span>
+                                </div>
 
-                            <span class="wl-offrow-body" style="position:relative;z-index:1;min-width:0;flex:1;display:flex;flex-direction:column;gap:3px">
-                                <a href="{{ route('video.show', $lesson) }}" style="font-family:'Geist',sans-serif;font-weight:800;font-size:15px;color:var(--wl-ink);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $lesson->title }}</a>
-                                <span style="display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap">
-                                    <span style="background:color-mix(in oklab, {{ $ac }} var(--pill-bw), var(--pill-bb));color:color-mix(in oklab, {{ $ac }} var(--pill-fw), var(--pill-fb));border-radius:999px;padding:3px 12px;font-family:'Geist',sans-serif;font-size:12px;font-weight:800">{{ $lesson->chapter->subject->displayName() }}</span>
-                                    <span style="font-size:12.5px;font-weight:700;color:var(--wl-muted)">· {{ __('Bab :n', ['n' => $lesson->chapter->number]) }}</span>
-                                </span>
-                                @if ($lesson->teacher)
-                                    <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--wl-muted)"><x-icon name="user" style="width:14px;height:14px" />{{ __('Guru: :name', ['name' => $lesson->teacher->name]) }}</span>
-                                @endif
-                            </span>
+                                <div class="off-brows" x-show="bopen">
+                                    {{-- Videos --}}
+                                    @foreach ($videos as $lesson)
+                                        @php($grad = "linear-gradient(135deg, color-mix(in oklab, {$col} 30%, #fff), color-mix(in oklab, {$col} 12%, #fff))")
+                                        <div class="off-row">
+                                            <a href="{{ route('video.show', $lesson) }}" class="off-thumb" style="background:{{ $grad }}">
+                                                @if ($lesson->thumbnailUrl())
+                                                    <img src="{{ $lesson->thumbnailUrl() }}" alt="" loading="lazy">
+                                                @else
+                                                    <x-subject-icon :subject="$sub" :size="28" />
+                                                @endif
+                                                @if ($lesson->durationLabel())
+                                                    <span class="off-dur">{{ $lesson->durationLabel() }}</span>
+                                                @endif
+                                            </a>
+                                            <div class="off-mid">
+                                                <a href="{{ route('video.show', $lesson) }}" class="off-title">{{ $lesson->title }}</a>
+                                                <span class="off-meta">{{ __('Video') }}@if ($lesson->durationLabel()) · {{ $lesson->durationLabel() }}@endif @if ($lesson->teacher)· {{ __('Guru: :name', ['name' => $lesson->teacher->name]) }}@endif</span>
+                                            </div>
+                                            @if ($lesson->isUpload())
+                                                <a href="{{ route('muat-turun.video', $lesson) }}" @click="remember(@js($lesson->title))" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
+                                            @else
+                                                <span class="off-act off-online"><x-icon name="lock" style="width:16px;height:16px" /><span class="lbl">{{ __('Dalam talian sahaja') }}</span></span>
+                                            @endif
+                                        </div>
+                                    @endforeach
 
-                            @if ($lesson->isUpload())
-                                <a href="{{ route('muat-turun.video', $lesson) }}" @click="remember(@js($lesson->title))" class="wl-offrow-act"
-                                   style="position:relative;z-index:1;flex-shrink:0;display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 20px;border-radius:12px;background:var(--wl-surface);border:1.5px solid color-mix(in oklab, {{ $ac }} 32%, #fff);color:{{ $ac }};font-family:'Geist',sans-serif;font-weight:800;font-size:14px;text-decoration:none">
-                                    <x-icon name="download" style="width:17px;height:17px" />{{ __('Muat Turun') }}
-                                </a>
-                            @else
-                                <span class="wl-offrow-act wl-offrow-act--status" style="position:relative;z-index:1;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:5px">
-                                    {{-- Outlined like the Download button, but greyed out: it is a status, not a clickable action. --}}
-                                    <span style="display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 18px;border-radius:12px;background:var(--wl-surface);border:1.5px solid var(--wl-line-3);color:var(--wl-muted);font-family:'Geist',sans-serif;font-weight:800;font-size:14px;cursor:default"><x-icon name="play" style="width:16px;height:16px" />{{ __('Dalam talian sahaja') }}</span>
-                                    <span style="font-size:12px;color:var(--wl-muted);text-align:right">{{ __('Video ini hanya boleh ditonton dalam talian.') }}</span>
-                                </span>
-                            @endif
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
-        </section>
-
-        {{-- Supporting materials: genuinely useful offline even for YouTube lessons. --}}
-        <section class="mb-10">
-            <h2 class="wl-offh2 mb-4 text-lg font-extrabold text-ink">{{ __('Bahan Sokongan') }}</h2>
-
-            @if ($materialsByChapter->isEmpty())
-                <p class="rounded-card border border-dashed border-line p-4 text-sm text-ink-2">
-                    {{ __('Tiada bahan sokongan untuk Tahun ini lagi.') }}
-                </p>
-            @else
-                <ul style="display:flex;flex-direction:column;gap:12px">
-                    @foreach ($materialsByChapter as $materials)
-                        @foreach ($materials as $material)
-                            @php($chapter = $material->chapter)
-                            @php($ac = $chapter->subject->color ?: '#17907B')
-                            @php($tint = "color-mix(in oklab, {$ac} 14%, #fff)")
-                            @php($tintInk = "color-mix(in oklab, {$ac} 80%, #000)")
-                            @php($grad = "linear-gradient(135deg, color-mix(in oklab, {$ac} 10%, #fff), color-mix(in oklab, {$ac} 22%, #fff))")
-                            <li class="wl-offrow" style="position:relative;overflow:hidden;display:flex;align-items:center;gap:16px;background:var(--wl-surface);border:1px solid var(--wl-line);border-radius:16px;padding:12px 16px;box-shadow:0 4px 16px rgba(46,44,80,.04)">
-                                {{-- Faint leaf flourish. --}}
-                                <svg aria-hidden="true" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);opacity:.18;pointer-events:none;z-index:0" width="92" height="74" viewBox="0 0 92 74" fill="{{ $ac }}">
-                                    <path d="M8 68 C 26 54 46 42 84 12" fill="none" stroke="{{ $ac }}" stroke-width="1.5"/>
-                                    <ellipse cx="0" cy="0" rx="10" ry="4.5" transform="translate(26 54) rotate(-32)"/>
-                                    <ellipse cx="0" cy="0" rx="10" ry="4.5" transform="translate(40 47) rotate(28)"/>
-                                    <ellipse cx="0" cy="0" rx="9" ry="4" transform="translate(52 37) rotate(-32)"/>
-                                    <ellipse cx="0" cy="0" rx="9" ry="4" transform="translate(64 30) rotate(28)"/>
-                                    <ellipse cx="0" cy="0" rx="8" ry="3.6" transform="translate(76 19) rotate(-30)"/>
-                                </svg>
-
-                                {{-- File-type icon on a soft gradient. --}}
-                                <span style="position:relative;z-index:1;flex-shrink:0;width:96px;height:66px;border-radius:13px;background:{{ $grad }};display:grid;place-items:center;color:{{ $ac }}"><x-icon :name="$material->iconName()" style="width:30px;height:30px" /></span>
-
-                                <span class="wl-offrow-body" style="position:relative;z-index:1;min-width:0;flex:1;display:flex;flex-direction:column;gap:5px">
-                                    <span style="font-family:'Geist',sans-serif;font-weight:800;font-size:15.5px;color:var(--wl-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $material->title }}</span>
-                                    <span style="display:inline-flex;align-items:center;gap:9px;flex-wrap:wrap">
-                                        <span style="background:color-mix(in oklab, {{ $ac }} var(--pill-bw), var(--pill-bb));color:color-mix(in oklab, {{ $ac }} var(--pill-fw), var(--pill-fb));border-radius:999px;padding:3px 12px;font-family:'Geist',sans-serif;font-size:12px;font-weight:800">{{ $chapter->subject->displayName() }}</span>
-                                        <span style="font-size:12.5px;font-weight:700;color:var(--wl-muted)">· {{ __('Bab :number: :title', ['number' => $chapter->number, 'title' => $chapter->title]) }}</span>
-                                    </span>
-                                    <span style="display:inline-flex;align-items:center;gap:10px;font-size:12.5px;color:var(--wl-muted)">
-                                        <span style="display:inline-flex;align-items:center;gap:5px"><x-icon name="file" style="width:14px;height:14px" />{{ $material->humanSize() }}</span>
-                                        @if ($material->teacher)
-                                            <span style="width:4px;height:4px;border-radius:50%;background:var(--wl-line-2)"></span>
-                                            <span style="display:inline-flex;align-items:center;gap:5px"><x-icon name="user" style="width:14px;height:14px" />{{ __('Guru: :name', ['name' => $material->teacher->name]) }}</span>
-                                        @endif
-                                    </span>
-                                </span>
-
-                                <a href="{{ route('muat-turun.bahan', $material) }}" @click="remember(@js($material->title))" class="wl-offrow-act"
-                                   style="position:relative;z-index:1;flex-shrink:0;display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 20px;border-radius:12px;background:var(--wl-surface);border:1.5px solid color-mix(in oklab, {{ $ac }} 32%, #fff);color:{{ $ac }};font-family:'Geist',sans-serif;font-weight:800;font-size:14px;text-decoration:none">
-                                    <x-icon name="download" style="width:17px;height:17px" />{{ __('Muat Turun') }}
-                                </a>
-                            </li>
+                                    {{-- Materials --}}
+                                    @foreach ($materials as $material)
+                                        <div class="off-row">
+                                            <span class="off-thumb" style="background:{{ $isDark ? 'rgba(224,86,78,.14)' : '#FDECEA' }};color:#E0564E"><x-icon :name="$material->iconName()" style="width:30px;height:30px" /></span>
+                                            <div class="off-mid">
+                                                <span class="off-title">{{ $material->title }}</span>
+                                                <span class="off-meta">{{ __('Bahan sokongan') }} · {{ $material->humanSize() }}@if ($material->teacher) · {{ __('Guru: :name', ['name' => $material->teacher->name]) }}@endif</span>
+                                            </div>
+                                            <a href="{{ route('muat-turun.bahan', $material) }}" @click="remember(@js($material->title))" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
-                    @endforeach
-                </ul>
-            @endif
-        </section>
-
+                    </div>
+                </div>
+            @endforeach
+        @endif
     </div>
 
     @push('scripts')
@@ -143,13 +179,11 @@
             function offlineDownloads() {
                 return {
                     downloads: JSON.parse(localStorage.getItem('my-downloads') || '[]'),
-
                     remember(title) {
                         const entry = { title, at: new Date().toLocaleDateString() };
                         this.downloads = [entry, ...this.downloads.filter(d => d.title !== title)].slice(0, 50);
                         localStorage.setItem('my-downloads', JSON.stringify(this.downloads));
                     },
-
                     clearAll() {
                         this.downloads = [];
                         localStorage.removeItem('my-downloads');
