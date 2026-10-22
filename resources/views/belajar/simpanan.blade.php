@@ -2,9 +2,6 @@
     @php($isDark = ($theme ?? 'light') === 'dark')
     <style>
         .off-test { color:{{ $isDark ? '#fff' : '#000' }}; }
-        @media (max-width:760px) {
-            .off-test { font-size:14px; }
-        }
     </style>
     @php
         $tree = [];
