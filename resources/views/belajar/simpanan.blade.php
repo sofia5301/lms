@@ -1,8 +1,6 @@
 <x-student-layout :title="__('Simpanan Offline')">
     @php($isDark = ($theme ?? 'light') === 'dark')
-    <style>
-        .off-test { color:{{ $isDark ? '#fff' : '#000' }}; }
-    </style>
+    <p style="display:none">isDark probe: {{ $isDark ? 'yes' : 'no' }}</p>
     @php
         $tree = [];
         foreach ($lessons as $l) {
