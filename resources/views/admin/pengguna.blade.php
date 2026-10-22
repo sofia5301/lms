@@ -26,7 +26,7 @@
                     <span style="font-family:'Geist',sans-serif;font-size:13px;font-weight:700;color:#2E6CA8">{{ __('Cikgu') }}</span>
                     <span style="font-family:'Geist',sans-serif;font-size:28px;font-weight:800;color:var(--tp-ink);line-height:1">{{ number_format($counts['teacher']) }}</span>
                 </div>
-                <svg viewBox="0 0 24 24" fill="#A9C9F2" width="86" height="86" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);z-index:0;pointer-events:none"><circle cx="6.5" cy="9" r="2"/><path d="M6.5 11.5c-2 0-3.5 1.2-3.5 2.8V16h7v-1.7c0-1.6-1.5-2.8-3.5-2.8z"/><circle cx="17.5" cy="9" r="2"/><path d="M17.5 11.5c-2 0-3.5 1.2-3.5 2.8V16h7v-1.7c0-1.6-1.5-2.8-3.5-2.8z"/><circle cx="12" cy="8" r="3"/><path d="M12 11.5c-2.6 0-4.6 1.6-4.6 3.6V17.5h9.2V15.1c0-2-2-3.6-4.6-3.6z"/></svg>
+                <svg viewBox="0 0 24 24" fill="#A9C9F2" width="86" height="86" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);z-index:0;pointer-events:none;opacity:.5"><circle cx="6.5" cy="9" r="2"/><path d="M6.5 11.5c-2 0-3.5 1.2-3.5 2.8V16h7v-1.7c0-1.6-1.5-2.8-3.5-2.8z"/><circle cx="17.5" cy="9" r="2"/><path d="M17.5 11.5c-2 0-3.5 1.2-3.5 2.8V16h7v-1.7c0-1.6-1.5-2.8-3.5-2.8z"/><circle cx="12" cy="8" r="3"/><path d="M12 11.5c-2.6 0-4.6 1.6-4.6 3.6V17.5h9.2V15.1c0-2-2-3.6-4.6-3.6z"/></svg>
             </div>
             <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:18px;padding:18px 22px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
                 <span style="width:66px;height:66px;border-radius:50%;background:#DCF2EE;color:#0F7A68;display:grid;place-items:center;flex-shrink:0"><x-icon name="graduation" class="h-7 w-7" /></span>
@@ -34,7 +34,7 @@
                     <span style="font-family:'Geist',sans-serif;font-size:13px;font-weight:700;color:#0F7A68">{{ __('Murid') }}</span>
                     <span style="font-family:'Geist',sans-serif;font-size:28px;font-weight:800;color:var(--tp-ink);line-height:1">{{ number_format($counts['student']) }}</span>
                 </div>
-                <svg viewBox="0 0 24 24" fill="#9ED8C8" width="86" height="86" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);z-index:0;pointer-events:none"><path d="M12 3 1 8l11 5 9-4.1V14h2V8z"/><path d="M5 11.1V15c0 1.5 3.1 3 7 3s7-1.5 7-3v-3.9l-7 3.2z"/></svg>
+                <svg viewBox="0 0 24 24" fill="#9ED8C8" width="86" height="86" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);z-index:0;pointer-events:none;opacity:.5"><path d="M12 3 1 8l11 5 9-4.1V14h2V8z"/><path d="M5 11.1V15c0 1.5 3.1 3 7 3s7-1.5 7-3v-3.9l-7 3.2z"/></svg>
             </div>
             <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:18px;padding:18px 22px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
                 <span style="width:66px;height:66px;border-radius:50%;background:#FBE4E4;color:#C24936;display:grid;place-items:center;flex-shrink:0"><x-icon name="clock" class="h-7 w-7" /></span>
@@ -42,7 +42,7 @@
                     <span style="font-family:'Geist',sans-serif;font-size:13px;font-weight:700;color:#C24936">{{ __('Tidak aktif') }}</span>
                     <span style="font-family:'Geist',sans-serif;font-size:28px;font-weight:800;color:var(--tp-ink);line-height:1">{{ number_format($counts['inactive']) }}</span>
                 </div>
-                <svg viewBox="0 0 24 24" fill="#EBB1A8" width="86" height="86" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);z-index:0;pointer-events:none"><circle cx="6.5" cy="9" r="2"/><path d="M6.5 11.5c-2 0-3.5 1.2-3.5 2.8V16h7v-1.7c0-1.6-1.5-2.8-3.5-2.8z"/><circle cx="17.5" cy="9" r="2"/><path d="M17.5 11.5c-2 0-3.5 1.2-3.5 2.8V16h7v-1.7c0-1.6-1.5-2.8-3.5-2.8z"/><circle cx="12" cy="8" r="3"/><path d="M12 11.5c-2.6 0-4.6 1.6-4.6 3.6V17.5h9.2V15.1c0-2-2-3.6-4.6-3.6z"/></svg>
+                <svg viewBox="0 0 24 24" fill="#EBB1A8" width="86" height="86" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);z-index:0;pointer-events:none;opacity:.5"><circle cx="6.5" cy="9" r="2"/><path d="M6.5 11.5c-2 0-3.5 1.2-3.5 2.8V16h7v-1.7c0-1.6-1.5-2.8-3.5-2.8z"/><circle cx="17.5" cy="9" r="2"/><path d="M17.5 11.5c-2 0-3.5 1.2-3.5 2.8V16h7v-1.7c0-1.6-1.5-2.8-3.5-2.8z"/><circle cx="12" cy="8" r="3"/><path d="M12 11.5c-2.6 0-4.6 1.6-4.6 3.6V17.5h9.2V15.1c0-2-2-3.6-4.6-3.6z"/></svg>
             </div>
         </div>
 
