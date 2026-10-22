@@ -61,6 +61,8 @@
             @endif
         </div>
 
+        <a href="{{ route('belajar.index') }}" class="wl-back" style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:-6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Kembali ke Utama') }}</a>
+
         @if ($lessons->isEmpty())
             <div style="background:var(--wl-surface);border:1px dashed var(--wl-line-3);border-radius:22px;padding:56px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:520px;margin:0 auto">
                 <x-icon name="video" class="h-9 w-9" style="color:var(--wl-muted)" />
