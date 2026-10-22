@@ -15,9 +15,7 @@
         .sm-tgl { width:44px; height:44px; display:grid; place-items:center; cursor:pointer; border:none; background:var(--wl-surface); color:var(--wl-muted); }
         .sm-tgl.on { background:#17907B; color:#fff; }
 
-        .sm-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; }
-        @media (max-width:1100px) { .sm-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
-        @media (max-width:820px) { .sm-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        .sm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:18px; }
         @media (max-width:520px) { .sm-grid { grid-template-columns:1fr; } }
         .sm-list { display:flex; flex-direction:column; gap:14px; }
 
