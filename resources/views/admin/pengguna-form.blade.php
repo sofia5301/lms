@@ -243,6 +243,8 @@
 
                 {{-- Step 3: Subjects (teacher) --}}
                 <template x-if="role === 'teacher'">
+                    <div style="display:flex;flex-direction:column;gap:30px">
+                    <div class="pu-divider"></div>
                     <div class="pu-step">
                         <div class="pu-stephead">
                             <span class="pu-num">3</span>
@@ -261,7 +263,10 @@
                             @endforeach
                         </div>
                     </div>
+                    </div>
                 </template>
+
+                <div class="pu-divider"></div>
 
                 {{-- Step 4: Account settings --}}
                 <div class="pu-step">
