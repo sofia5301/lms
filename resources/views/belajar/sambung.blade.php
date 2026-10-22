@@ -1,5 +1,6 @@
 <x-student-layout :title="__('Sambung Menonton')">
     @php($isDark = ($theme ?? 'light') === 'dark')
+    @php($user = auth()->user())
 
     <style>
         .sm-wrap { display:flex; flex-direction:column; gap:22px; max-width:1240px; width:100%; margin:0 auto; }
