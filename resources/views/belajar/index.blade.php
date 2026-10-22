@@ -20,7 +20,7 @@
         .hm-herobody { padding:18px 18px 26px; display:flex; flex-direction:column; gap:14px; }
         .hm-progress { height:7px; border-radius:999px; background:{{ $isDark ? 'var(--wl-line-2)' : '#E8EDF2' }}; overflow:hidden; }
         .hm-progress > i { display:block; height:100%; border-radius:999px; background:#17907B; }
-        .hm-herocta { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+        .hm-herocta { display:flex; gap:10px; flex-wrap:wrap; margin-top:24px; }
         .hm-btn { min-height:46px; display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:12px; font-family:'Geist',sans-serif; font-weight:800; font-size:14.5px; padding:0 20px; cursor:pointer; text-decoration:none; }
         .hm-btn-pri { flex:1; background:#17907B; color:#fff; border:none; }
         .hm-btn-sec { background:var(--wl-surface); color:var(--wl-ink); border:1.5px solid var(--wl-line-2); }
