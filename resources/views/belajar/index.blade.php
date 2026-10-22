@@ -1,6 +1,64 @@
 <x-student-layout :title="__('Utama')">
-    {{-- Page heading, matching the admin dashboard. Greets by username rather than name: that is
-         the display nickname the owner can change, and the one this dashboard is meant to show. --}}
+    @php($isDark = ($theme ?? 'light') === 'dark')
+
+    <style>
+        .hm-top { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.32fr); gap:20px; align-items:stretch; }
+        @media (max-width:980px) { .hm-top { grid-template-columns:1fr; } }
+
+        /* Hero (left) */
+        .hm-hero { display:flex; flex-direction:column; background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:22px; overflow:hidden; box-shadow:0 8px 26px rgba(46,44,80,.08); }
+        .hm-herothumb { position:relative; display:block; aspect-ratio:16/10; background:linear-gradient(135deg,#C4DCF2,#A5C9EA); text-decoration:none; }
+        .hm-herothumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .hm-heroshade { position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,16,24,0) 42%, rgba(10,16,24,.78) 100%); }
+        .hm-heroplay { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,.92); display:grid; place-items:center; color:#2E6CA8; z-index:2; }
+        .hm-herodur { position:absolute; right:12px; top:12px; background:rgba(20,28,38,.82); color:#fff; font-size:11.5px; font-weight:700; border-radius:8px; padding:3px 9px; z-index:2; }
+        .hm-heroover { position:absolute; left:18px; right:18px; bottom:16px; z-index:2; display:flex; flex-direction:column; gap:8px; }
+        .hm-heropills { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .hm-pill { background:rgba(255,255,255,.92); color:#2E6CA8; border-radius:999px; padding:4px 12px; font-family:'Geist',sans-serif; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; }
+        .hm-pill.bab { color:#4A5A6B; }
+        .hm-herotitle { margin:0; font-family:'Geist',sans-serif; font-size:24px; font-weight:800; color:#fff; letter-spacing:-.01em; text-shadow:0 2px 10px rgba(0,0,0,.4); }
+        .hm-herobody { padding:16px 18px 18px; display:flex; flex-direction:column; gap:14px; }
+        .hm-progress { height:7px; border-radius:999px; background:{{ $isDark ? 'var(--wl-line-2)' : '#E8EDF2' }}; overflow:hidden; }
+        .hm-progress > i { display:block; height:100%; border-radius:999px; background:#17907B; }
+        .hm-herocta { display:flex; gap:10px; flex-wrap:wrap; }
+        .hm-btn { min-height:46px; display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:12px; font-family:'Geist',sans-serif; font-weight:800; font-size:14.5px; padding:0 20px; cursor:pointer; text-decoration:none; }
+        .hm-btn-pri { flex:1; background:#17907B; color:#fff; border:none; }
+        .hm-btn-sec { background:var(--wl-surface); color:var(--wl-ink); border:1.5px solid var(--wl-line-2); }
+
+        /* Continue list (right) */
+        .hm-cont { background:var(--wl-surface); border:1px solid var(--wl-line); border-radius:22px; box-shadow:0 8px 26px rgba(46,44,80,.06); padding:18px 20px; display:flex; flex-direction:column; }
+        .hm-conthead { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+        .hm-conticon { width:34px; height:34px; border-radius:10px; background:{{ $isDark ? 'rgba(96,140,200,.2)' : '#EAF2FB' }}; color:#2E6CA8; display:grid; place-items:center; flex-shrink:0; }
+        .hm-conttitle { font-family:'Geist',sans-serif; font-size:16.5px; font-weight:800; color:var(--wl-ink); }
+        .hm-contsee { margin-left:auto; font-size:13px; font-weight:700; color:#0F7A68; text-decoration:none; display:inline-flex; align-items:center; gap:3px; }
+        .hm-controw { display:flex; align-items:center; gap:14px; padding:12px 4px; text-decoration:none; border-top:1px solid var(--wl-line); }
+        .hm-controw:first-of-type { border-top:none; }
+        .hm-ctthumb { position:relative; width:112px; height:64px; flex-shrink:0; border-radius:10px; overflow:hidden; background:linear-gradient(135deg,#C4DCF2,#A5C9EA); }
+        .hm-ctthumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .hm-ctdur { position:absolute; right:5px; bottom:5px; background:rgba(20,28,38,.82); color:#fff; font-size:10px; font-weight:700; border-radius:6px; padding:1px 6px; }
+        .hm-ctmid { flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+        .hm-cttitle { font-family:'Geist',sans-serif; font-weight:800; font-size:14px; color:var(--wl-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .hm-ctmeta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .hm-ctsub { border-radius:999px; padding:2px 10px; font-family:'Geist',sans-serif; font-size:11px; font-weight:800; }
+        .hm-ctbab { font-size:11.5px; font-weight:700; color:var(--wl-muted); }
+        .hm-ctright { flex:0 0 150px; display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+        .hm-ctbar { width:100%; height:6px; border-radius:999px; background:{{ $isDark ? 'var(--wl-line-2)' : '#E8EDF2' }}; overflow:hidden; }
+        .hm-ctbar > i { display:block; height:100%; border-radius:999px; background:#17907B; }
+        .hm-ctpct { font-size:11.5px; font-weight:700; color:var(--wl-muted); }
+        @media (max-width:560px) {
+            .hm-ctright { flex-basis:84px; }
+            .hm-ctthumb { width:92px; height:54px; }
+        }
+
+        /* Section rows */
+        .hm-sec { display:flex; flex-direction:column; gap:16px; }
+        .hm-sechead { display:flex; justify-content:space-between; align-items:center; }
+        .hm-sectitle { margin:0; font-family:'Geist',sans-serif; font-size:21px; font-weight:800; color:var(--wl-ink); display:flex; align-items:center; gap:9px; }
+        .hm-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
+        @media (max-width:980px) { .hm-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media (max-width:560px) { .hm-grid { grid-template-columns:1fr; } }
+    </style>
+
     <div class="wl-pagehead" style="display:flex;align-items:flex-start;gap:16px">
         <span class="hi-tile" style="width:48px;height:48px;border-radius:14px;background:#DCF2EE;display:grid;place-items:center;flex-shrink:0" aria-hidden="true"><img src="{{ asset('images/wave.png') }}" alt="" style="width:30px;height:30px;object-fit:contain"></span>
         <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
@@ -11,101 +69,102 @@
 
     @if (! $grade)
         <div style="background:var(--wl-surface);border:1px dashed var(--wl-line-3);border-radius:22px;padding:56px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:520px;margin:0 auto">
-            <span style="font-size:32px">📚</span>
             <h3 style="margin:0;font-family:'Geist',sans-serif;font-size:19px;font-weight:800;color:var(--wl-ink)">{{ __('Tahun anda belum ditetapkan') }}</h3>
             <p style="margin:0;font-size:14.5px;color:var(--wl-muted);max-width:360px">{{ __('Sila kemas kini profil anda dan pilih Tahun supaya kami boleh tunjukkan kandungan yang betul.') }}</p>
             <a href="{{ route('profile.edit') }}" class="wl-btn-primary" style="margin-top:6px;min-height:46px;display:inline-flex;align-items:center;border-radius:12px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:14.5px;padding:0 22px;text-decoration:none">{{ __('Kemas Kini Profil') }}</a>
         </div>
     @else
-        <div style="display:flex;flex-direction:column;gap:28px">
+        <div style="display:flex;flex-direction:column;gap:28px;margin-top:22px">
 
-            {{-- ── TRENDING / RESUME HERO ── --}}
-            @if ($hero)
-                @php($hs = $hero->chapter->subject)
-                @php($heroFav = $hero->isFavouritedBy($user))
-                @once
-                    {{-- The hero card is a light-blue feature panel; recolour it for night mode
-                         (inline styles win by default, so these overrides use !important). --}}
-                    <style>
-                        html.theme-dark .hero-card  { background:#17232F !important; box-shadow:0 12px 32px rgba(0,0,0,.45) !important; }
-                        html.theme-dark .hero-title { color:#EDF2F8 !important; }
-                        html.theme-dark .hero-babpill { color:#AEB6C2 !important; }
-                        html.theme-dark .hero-subpill { color:#7FB2EA !important; }
-                        html.theme-dark .hero-thumb { background:linear-gradient(135deg,#23313F,#18242F) !important; }
-                    </style>
-                @endonce
-                <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:stretch">
-                    <div class="hero-card" style="border-radius:22px;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,42%);background:#E3F0FA;box-shadow:0 10px 30px rgba(66,118,174,.18)">
-                        <div style="padding:50px;display:flex;flex-direction:column;justify-content:center;gap:14px;min-width:0">
-                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                                <span class="hero-subpill" style="background:var(--wl-surface);color:#2E6CA8;border-radius:999px;padding:5px 13px;font-family:'Geist',sans-serif;font-size:12px;font-weight:800"><x-subject-emoji :subject="$hs" class="text-sm" /> {{ $hs->displayName() }}</span>
-                                <span class="hero-babpill" style="background:var(--wl-surface);color:#4A5A6B;border-radius:999px;padding:5px 13px;font-family:'Geist',sans-serif;font-size:12px;font-weight:800">{{ __('Bab :n', ['n' => $hero->chapter->number]) }}</span>
-                                @unless ($heroResuming)
-                                    <span style="background:#17907B;color:#fff;border-radius:999px;padding:5px 13px;font-family:'Geist',sans-serif;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">{{ __('Trending') }}</span>
-                                @endunless
-                            </div>
-                            <h2 class="hero-title" style="margin:0;font-family:'Geist',sans-serif;font-size:26px;font-weight:800;color:#1A2433;letter-spacing:-.01em;text-wrap:balance">{{ $hero->title }}</h2>
-                            <div class="hero-cta" style="display:flex;gap:10px;flex-wrap:wrap">
-                                <a href="{{ route('video.show', $hero) }}" class="wl-btn-primary" style="min-height:46px;display:inline-flex;align-items:center;gap:8px;border-radius:12px;background:#17907B;color:#fff;font-family:'Geist',sans-serif;font-weight:800;font-size:14.5px;padding:0 22px;text-decoration:none"><x-icon name="play" class="h-4 w-4" /> {{ $heroResuming ? __('Sambung Menonton') : __('Tonton') }}</a>
-                                {{-- AJAX favourite toggle (endpoint returns JSON; no navigation). --}}
-                                <button type="button" x-data="{
-                                            fav: {{ $heroFav ? 'true' : 'false' }},
-                                            busy: false,
-                                            toggle() {
-                                                if (this.busy) return;
-                                                const was = this.fav;
-                                                this.fav = ! was;
-                                                this.busy = true;
-                                                const token = document.querySelector('meta[name=csrf-token]')?.content;
-                                                fetch(was ? '{{ route('kegemaran.padam', $hero) }}' : '{{ route('kegemaran.simpan', $hero) }}', {
-                                                    method: was ? 'DELETE' : 'POST',
-                                                    headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
-                                                }).then(r => { if (! r.ok) throw new Error('failed'); })
-                                                  .catch(() => { this.fav = was; })
-                                                  .finally(() => { this.busy = false; });
-                                            }
-                                        }"
-                                        @click="toggle()"
-                                        :aria-pressed="fav ? 'true' : 'false'"
-                                        class="wl-btn-secondary"
-                                        style="min-height:46px;cursor:pointer;border-radius:12px;border:1.5px solid var(--wl-line-3);background:var(--wl-surface);color:var(--wl-ink);font-family:'Geist',sans-serif;font-weight:700;font-size:14.5px;padding:0 18px;display:inline-flex;align-items:center;gap:6px">
-                                    <x-icon name="heart" class="h-4 w-4" ::style="fav ? 'fill:currentColor;color:#EB5E5A' : 'fill:none'" />
-                                    <span>{{ __('Gemari') }}</span>
-                                </button>
+            {{-- TOP: hero (left) + continue-watching list (right) --}}
+            @if ($hero || $continue->isNotEmpty())
+                <div class="hm-top">
+                    @if ($hero)
+                        @php($hs = $hero->chapter->subject)
+                        @php($heroFav = $hero->isFavouritedBy($user))
+                        @php($heroProg = $hero->progressFor($user))
+                        @php($heroPct = $heroProg && $heroProg->percent ? min(100, $heroProg->percent) : 0)
+                        <div class="hm-hero">
+                            <a href="{{ route('video.show', $hero) }}" class="hm-herothumb">
+                                @if ($hero->thumbnailUrl())
+                                    <img src="{{ $hero->thumbnailUrl() }}" alt="">
+                                @endif
+                                <span class="hm-heroshade"></span>
+                                <span class="hm-heroplay"><x-icon name="play" class="h-5 w-5" style="margin-left:2px" /></span>
+                                @if ($hero->durationLabel())
+                                    <span class="hm-herodur">{{ $hero->durationLabel() }}</span>
+                                @endif
+                                <span class="hm-heroover">
+                                    <span class="hm-heropills">
+                                        <span class="hm-pill"><x-subject-icon :subject="$hs" :size="13" /> {{ $hs->displayName() }}</span>
+                                        <span class="hm-pill bab">{{ __('Bab :n', ['n' => $hero->chapter->number]) }}</span>
+                                    </span>
+                                    <span class="hm-herotitle">{{ $hero->title }}</span>
+                                </span>
+                            </a>
+                            <div class="hm-herobody">
+                                @if ($heroPct > 0)
+                                    <div class="hm-progress"><i style="width:{{ $heroPct }}%"></i></div>
+                                @endif
+                                <div class="hm-herocta">
+                                    <a href="{{ route('video.show', $hero) }}" class="hm-btn hm-btn-pri"><x-icon name="play" class="h-4 w-4" /> {{ $heroResuming ? __('Sambung Menonton') : __('Tonton') }}</a>
+                                    <button type="button" class="hm-btn hm-btn-sec"
+                                            x-data="{ fav: {{ $heroFav ? 'true' : 'false' }}, busy: false, toggle() { if (this.busy) return; const was = this.fav; this.fav = ! was; this.busy = true; const token = document.querySelector('meta[name=csrf-token]')?.content; fetch(was ? '{{ route('kegemaran.padam', $hero) }}' : '{{ route('kegemaran.simpan', $hero) }}', { method: was ? 'DELETE' : 'POST', headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' } }).then(r => { if (! r.ok) throw new Error('failed'); }).catch(() => { this.fav = was; }).finally(() => { this.busy = false; }); } }"
+                                            @click="toggle()" :aria-pressed="fav ? 'true' : 'false'">
+                                        <x-icon name="heart" class="h-4 w-4" ::style="fav ? 'fill:currentColor;color:#EB5E5A' : 'fill:none'" /> {{ __('Gemari') }}
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <a href="{{ route('video.show', $hero) }}" class="hero-thumb" style="background:linear-gradient(135deg,#C4DCF2,#A5C9EA);display:grid;place-items:center;position:relative;min-height:200px;text-decoration:none">
-                            @if ($hero->thumbnailUrl())
-                                <img src="{{ $hero->thumbnailUrl() }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-                            @endif
-                            <span style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;color:#4276AE;z-index:1"><x-icon name="play" class="h-[18px] w-[18px]" style="margin-left:2px" /></span>
-                            @if ($hero->durationLabel())
-                                <span style="position:absolute;right:12px;bottom:10px;background:rgba(66,118,174,.85);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px">{{ $hero->durationLabel() }}</span>
-                            @endif
-                        </a>
-                    </div>
+                    @endif
+
+                    @if ($continue->isNotEmpty())
+                        <div class="hm-cont">
+                            <div class="hm-conthead">
+                                <span class="hm-conticon"><x-icon name="clock" class="h-[18px] w-[18px]" /></span>
+                                <span class="hm-conttitle">{{ __('Sambung menonton') }}</span>
+                                <a href="{{ route('sambung.index') }}" class="hm-contsee">{{ __('Lihat semua') }} <x-icon name="chevron-right" class="h-4 w-4" /></a>
+                            </div>
+                            @foreach ($continue->take(5) as $lesson)
+                                @php($lsub = $lesson->chapter->subject)
+                                @php($lcol = $lsub->color ?: '#17907B')
+                                @php($lprog = $lesson->relationLoaded('progress') ? $lesson->progress->first() : $lesson->progressFor($user))
+                                @php($lpct = $lprog && $lprog->percent ? min(100, $lprog->percent) : 0)
+                                <a href="{{ route('video.show', $lesson) }}" class="hm-controw">
+                                    <span class="hm-ctthumb">
+                                        @if ($lesson->thumbnailUrl())
+                                            <img src="{{ $lesson->thumbnailUrl() }}" alt="">
+                                        @endif
+                                        @if ($lesson->durationLabel())
+                                            <span class="hm-ctdur">{{ $lesson->durationLabel() }}</span>
+                                        @endif
+                                    </span>
+                                    <div class="hm-ctmid">
+                                        <span class="hm-cttitle">{{ $lesson->title }}</span>
+                                        <span class="hm-ctmeta">
+                                            <span class="hm-ctsub" style="background:color-mix(in oklab, {{ $lcol }} var(--pill-bw), var(--pill-bb));color:color-mix(in oklab, {{ $lcol }} var(--pill-fw), var(--pill-fb))">{{ $lsub->displayName() }}</span>
+                                            <span class="hm-ctbab">{{ __('Bab :n', ['n' => $lesson->chapter->number]) }}</span>
+                                        </span>
+                                    </div>
+                                    <div class="hm-ctright">
+                                        <div class="hm-ctbar"><i style="width:{{ max(3, $lpct) }}%"></i></div>
+                                        <span class="hm-ctpct">{{ $lpct }}% {{ __('ditonton') }}</span>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             @endif
 
-            {{-- ── CONTINUE WATCHING (horizontal rail - swipe / arrow-scroll) ── --}}
-            @if ($continue->isNotEmpty())
-                <x-rail :title="__('Sambung menonton')" :seeAll="route('sambung.index')">
-                    @foreach ($continue as $lesson)
-                        <div style="flex:0 0 280px;max-width:85%">
-                            <x-vid-card :lesson="$lesson" :thumbHeight="110" showMeta showProgress />
-                        </div>
-                    @endforeach
-                </x-rail>
-            @endif
-
-            {{-- ── PALING POPULAR (falls back to newest) ── --}}
+            {{-- Paling popular (falls back to newest) --}}
             @if ($trending->isNotEmpty())
-                <div style="display:flex;flex-direction:column;gap:16px">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline">
-                        <h2 style="margin:0;font-family:'Geist',sans-serif;font-size:21px;font-weight:800;color:var(--wl-ink)">{{ $trendingFallback ? __('Baru ditambah') : __('Paling popular') }}</h2>
+                <div class="hm-sec">
+                    <div class="hm-sechead">
+                        <h2 class="hm-sectitle"><x-icon name="flame" class="h-5 w-5" style="color:#E0564E" /> {{ $trendingFallback ? __('Baru ditambah') : __('Paling popular') }}</h2>
                         <a href="{{ route('subjek.index') }}" style="font-size:13.5px;font-weight:700">{{ __('Lihat semua') }}</a>
                     </div>
-                    <div class="wl-cardrow" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+                    <div class="hm-grid">
                         @foreach ($trending->take(4) as $lesson)
                             <x-vid-card :lesson="$lesson" :thumbHeight="110" :showViews="! $trendingFallback" />
                         @endforeach
@@ -113,14 +172,14 @@
                 </div>
             @endif
 
-            {{-- ── BARU DITAMBAH (skipped when trending already fell back) ── --}}
+            {{-- Baru ditambah --}}
             @if ($newest->isNotEmpty() && ! $trendingFallback)
-                <div style="display:flex;flex-direction:column;gap:16px">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline">
-                        <h2 style="margin:0;font-family:'Geist',sans-serif;font-size:21px;font-weight:800;color:var(--wl-ink)">{{ __('Baru ditambah') }}</h2>
+                <div class="hm-sec">
+                    <div class="hm-sechead">
+                        <h2 class="hm-sectitle">{{ __('Baru ditambah') }}</h2>
                         <a href="{{ route('subjek.index') }}" style="font-size:13.5px;font-weight:700">{{ __('Lihat semua') }}</a>
                     </div>
-                    <div class="wl-cardrow" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+                    <div class="hm-grid">
                         @foreach ($newest->take(4) as $lesson)
                             <x-vid-card :lesson="$lesson" :thumbHeight="110" :showViews="true" />
                         @endforeach
@@ -128,11 +187,14 @@
                 </div>
             @endif
 
-            {{-- ── ANDA MUNGKIN SUKA ── --}}
+            {{-- Anda mungkin suka --}}
             @if ($suggested->isNotEmpty())
-                <div style="display:flex;flex-direction:column;gap:16px">
-                    <h2 style="margin:0;font-family:'Geist',sans-serif;font-size:21px;font-weight:800;color:var(--wl-ink)">{{ __('Anda mungkin suka') }}</h2>
-                    <div class="wl-cardrow" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+                <div class="hm-sec">
+                    <div class="hm-sechead">
+                        <h2 class="hm-sectitle"><x-icon name="star" class="h-5 w-5" style="color:#E3A31C" /> {{ __('Anda mungkin suka') }}</h2>
+                        <a href="{{ route('subjek.index') }}" style="font-size:13.5px;font-weight:700">{{ __('Lihat semua') }}</a>
+                    </div>
+                    <div class="hm-grid">
                         @foreach ($suggested->take(4) as $lesson)
                             <x-vid-card :lesson="$lesson" :thumbHeight="110" :showViews="true" />
                         @endforeach
