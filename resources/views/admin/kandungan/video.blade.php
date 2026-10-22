@@ -32,7 +32,7 @@
                         <span style="font-family:'Geist',sans-serif;font-size:28px;font-weight:800;color:var(--tp-ink);line-height:1">{{ number_format($s['value']) }}</span>
                         <span style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:#17907B;margin-top:3px"><x-icon name="arrow-up" style="width:13px;height:13px" />+{{ number_format($s['trend']) }} {{ __('berbanding bulan lepas') }}</span>
                     </div>
-                    <span style="position:absolute;right:-14px;top:50%;transform:translateY(-50%);width:86px;height:86px;border-radius:50%;background:{{ $s['tint'] }};opacity:.5;display:grid;place-items:center;color:{{ $s['fg'] }};z-index:0;pointer-events:none"><x-icon :name="$s['icon']" style="width:40px;height:40px" /></span>
+                    <span style="position:absolute;right:18px;top:50%;transform:translateY(-50%);width:76px;height:76px;border-radius:50%;background:{{ $s['tint'] }};opacity:.5;display:grid;place-items:center;color:{{ $s['fg'] }};z-index:0;pointer-events:none"><x-icon :name="$s['icon']" style="width:36px;height:36px" /></span>
                 </div>
             @endforeach
         </div>
