@@ -20,7 +20,7 @@
     <div style="display:flex;flex-direction:column;gap:18px">
 
         {{-- Summary cards: round icon tile + big number, with a large filled illustration on the right. --}}
-        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:34px">
             <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:18px;padding:18px 22px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
                 <span style="width:66px;height:66px;border-radius:50%;background:#E4EEF9;color:#2E6CA8;display:grid;place-items:center;flex-shrink:0"><x-icon name="user" class="h-7 w-7" /></span>
                 <div style="display:flex;flex-direction:column;gap:3px">
