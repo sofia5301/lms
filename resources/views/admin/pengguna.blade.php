@@ -12,8 +12,8 @@
     {{-- One geometry per view. The fourth column is the widest of the two it has to hold (Jawatan,
          not Tahun); the combined list runs the same layout minus that column. --}}
     @php($cols = $showAttr
-        ? 'grid-template-columns:38px minmax(200px,2.1fr) 112px minmax(190px,2fr) minmax(140px,1.3fr) 112px 100px'
-        : 'grid-template-columns:38px minmax(200px,2.1fr) 112px minmax(190px,2fr) 112px 100px')
+        ? 'grid-template-columns:minmax(200px,2.1fr) 112px minmax(190px,2fr) minmax(140px,1.3fr) 112px 100px'
+        : 'grid-template-columns:minmax(200px,2.1fr) 112px minmax(190px,2fr) 112px 100px')
     @php($avPalette = [['#ECE9F7','#7C5CBF'],['#E4EEF9','#2E6CA8'],['#DCF2EE','#0F7A68'],['#FCE4EC','#D23B6E'],['#FBEAD3','#C8821E'],['#E6F0FB','#3E86C9'],['#FBE4E4','#C24936']])
 
     {{-- The success banner is rendered once by <x-flash /> in the admin layout. --}}
@@ -85,7 +85,6 @@
                 <div style="overflow-x:auto">
                     <div style="min-width:900px">
                         <div style="display:grid;{{ $cols }};gap:12px;padding:14px 20px;border-bottom:1px solid var(--tp-line);background:color-mix(in oklab, #17907B 5%, var(--tp-surface))">
-                            <span style="display:grid;place-items:center"><input type="checkbox" onclick="document.querySelectorAll('.pg-check').forEach(c => c.checked = this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:#17907B"></span>
                             {{-- Everything but Name is centred; names keep a common left edge to scan down. --}}
                             @foreach (array_filter(['Nama', 'Peranan', 'Emel', $showAttr ? ($teacherView ? 'Jawatan' : 'Tahun') : null, 'Status', 'Tindakan']) as $h)
                                 <span style="display:inline-flex;align-items:center;gap:3px;font-family:'Geist',sans-serif;font-size:12px;font-weight:800;color:var(--tp-muted);{{ $loop->first ? '' : 'justify-content:center' }}">{{ __($h) }}@unless ($h === 'Tindakan')<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.45"><path d="M8 9l4-4 4 4"/><path d="M16 15l-4 4-4-4"/></svg>@endunless</span>
@@ -95,7 +94,6 @@
                         @foreach ($users as $u)
                             @php($av = $avPalette[$u->id % count($avPalette)])
                             <div class="tp-tr" style="display:grid;{{ $cols }};gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--tp-line)">
-                                <span style="display:grid;place-items:center"><input type="checkbox" class="pg-check" style="width:16px;height:16px;cursor:pointer;accent-color:#17907B"></span>
                                 <div style="display:flex;align-items:center;gap:12px;min-width:0">
                                     <span style="width:40px;height:40px;border-radius:50%;background:{{ $av[0] }};color:{{ $av[1] }};display:grid;place-items:center;font-family:'Geist',sans-serif;font-weight:800;font-size:13px;flex-shrink:0">{{ $u->initials() }}</span>
                                     <div style="display:flex;flex-direction:column;gap:1px;min-width:0">
