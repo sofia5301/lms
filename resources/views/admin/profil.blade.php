@@ -151,7 +151,9 @@
                     @endforeach
                 </div>
 
-                <button type="submit" class="wl-primary" style="{{ $primary }};align-self:flex-end;margin-top:16px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> {{ __('Tukar kata laluan') }}</button>
+                <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                    <button type="submit" class="wl-primary" style="{{ $primary }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> {{ __('Tukar kata laluan') }}</button>
+                </div>
             </form>
         </div>
     </div>
