@@ -27,17 +27,14 @@
     @endphp
 
     <div style="padding:20px;max-width:1000px;margin:0 auto">
-        <h1 style="font-family:'Geist',sans-serif;font-weight:800;color:var(--wl-ink)">VERSION 11 — testing the filter component</h1>
-
-        <div style="margin:16px 0">
-            <x-year-subject-filter variant="student" :all-years="false" with-chapter
-                :action="route('simpanan.index')" :grades="$grades" :subjects="$subjects" :filter="$filter" />
-        </div>
+        <h1 style="font-family:'Geist',sans-serif;font-weight:800;color:var(--wl-ink)">VERSION 12 — testing icons + row methods</h1>
 
         @foreach ($tree as $grp)
             @php($sub = $grp['subject'])
             <div style="border:1px solid var(--wl-line);border-radius:12px;margin-top:12px;overflow:hidden">
-                <div style="padding:14px;font-weight:800;color:var(--wl-ink);background:var(--wl-surface)">{{ $sub->displayName() }}</div>
+                <div style="padding:14px;font-weight:800;color:var(--wl-ink);display:flex;align-items:center;gap:8px">
+                    <x-subject-icon :subject="$sub" :size="20" />{{ $sub->displayName() }}
+                </div>
                 @foreach ($grp['chapters'] as $c)
                     @php($chapter = $c['chapter'])
                     @php($videos = isset($c['videos']) ? $c['videos'] : [])
@@ -45,10 +42,17 @@
                     <div style="padding:10px 14px;border-top:1px solid var(--wl-line)">
                         <div style="font-weight:700;color:var(--wl-ink)">Bab {{ $chapter->number }}: {{ $chapter->title }}</div>
                         @foreach ($videos as $lesson)
-                            <div style="font-size:13px;color:var(--wl-muted);padding:3px 0">VID: {{ $lesson->title }}</div>
+                            <div style="font-size:13px;color:var(--wl-muted);padding:3px 0">
+                                <a href="{{ route('video.show', $lesson) }}">VID: {{ $lesson->title }}</a>
+                                · thumb:{{ $lesson->thumbnailUrl() ? 'y' : 'n' }} · dur:{{ $lesson->durationLabel() ?? '-' }} · upload:{{ $lesson->isUpload() ? 'y' : 'n' }}
+                                @if ($lesson->isUpload()) · <a href="{{ route('muat-turun.video', $lesson) }}">dl</a> @endif
+                            </div>
                         @endforeach
                         @foreach ($materials as $material)
-                            <div style="font-size:13px;color:var(--wl-muted);padding:3px 0">MAT: {{ $material->title }}</div>
+                            <div style="font-size:13px;color:var(--wl-muted);padding:3px 0">
+                                <x-icon :name="$material->iconName()" style="width:16px;height:16px" /> MAT: {{ $material->title }}
+                                · <a href="{{ route('muat-turun.bahan', $material) }}">dl</a>
+                            </div>
                         @endforeach
                     </div>
                 @endforeach
