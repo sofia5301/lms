@@ -1,6 +1,5 @@
 <x-student-layout :title="__('Simpanan Offline')">
     @php($isDark = ($theme ?? 'light') === 'dark')
-    <p style="display:none">isDark probe: {{ $isDark ? 'yes' : 'no' }}</p>
     @php
         $tree = [];
         foreach ($lessons as $l) {
@@ -28,30 +27,141 @@
                 $tree[$sid]['chapters'][$cid]['materials'][] = $mm;
             }
         }
+        $order = $subjects->pluck('sort_order', 'id')->all();
+        uksort($tree, function ($a, $b) use ($order) {
+            return ($order[$a] ?? 999) <=> ($order[$b] ?? 999);
+        });
+        foreach (array_keys($tree) as $sid) {
+            uasort($tree[$sid]['chapters'], function ($a, $b) {
+                return ($a['number'] ?? 0) <=> ($b['number'] ?? 0);
+            });
+            $v = 0;
+            $m = 0;
+            foreach ($tree[$sid]['chapters'] as $cc) {
+                $v += isset($cc['videos']) ? count($cc['videos']) : 0;
+                $m += isset($cc['materials']) ? count($cc['materials']) : 0;
+            }
+            $tree[$sid]['vcount'] = $v;
+            $tree[$sid]['mcount'] = $m;
+        }
     @endphp
 
-    <div style="padding:20px;max-width:1000px;margin:0 auto">
-        <h1 style="font-family:'Geist',sans-serif;font-weight:800;color:var(--wl-ink)">Simpanan Offline — VERSION 7 (isDark probe: {{ $isDark ? 'dark' : 'light' }})</h1>
+    <style>
+        .off-wrap { display:flex; flex-direction:column; gap:22px; max-width:1240px; width:100%; margin:0 auto; }
+        .off-head { display:flex; align-items:flex-start; gap:16px; }
+        .off-htile { width:54px; height:54px; border-radius:15px; background:{{ $isDark ? 'rgba(23,144,123,.2)' : '#DCF2EE' }}; color:#0F7A68; display:grid; place-items:center; flex-shrink:0; }
+        .off-sub { border:1px solid var(--wl-line); border-radius:18px; overflow:hidden; box-shadow:0 3px 12px rgba(46,44,80,.04); }
+        .off-sbar { display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer; user-select:none; }
+        .off-stile { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; flex-shrink:0; }
+        .off-sname { font-family:'Geist',sans-serif; font-size:18px; font-weight:800; color:var(--wl-ink); }
+        .off-scount { font-size:13px; font-weight:700; color:var(--wl-muted); }
+        .off-chev { margin-left:auto; color:var(--wl-muted); display:inline-flex; transition:transform .18s; }
+        .off-sbody { padding:14px 16px; display:flex; flex-direction:column; gap:12px; background:{{ $isDark ? 'rgba(255,255,255,.02)' : '#FAFBFC' }}; border-top:1px solid var(--wl-line); }
+        .off-bab { border:1px solid var(--wl-line); border-radius:14px; overflow:hidden; background:var(--wl-surface); }
+        .off-bbar { display:flex; align-items:center; gap:12px; padding:12px 16px; cursor:pointer; user-select:none; }
+        .off-btile { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; flex-shrink:0; }
+        .off-bname { font-family:'Geist',sans-serif; font-size:14.5px; font-weight:800; color:var(--wl-ink); }
+        .off-bcount { font-size:12.5px; font-weight:700; color:var(--wl-muted); }
+        .off-brows { border-top:1px solid var(--wl-line); }
+        .off-row { display:flex; align-items:center; gap:16px; padding:12px 16px; }
+        .off-row + .off-row { border-top:1px solid var(--wl-line); }
+        .off-thumb { position:relative; width:128px; height:74px; flex-shrink:0; border-radius:12px; overflow:hidden; display:grid; place-items:center; }
+        .off-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .off-dur { position:absolute; right:6px; bottom:6px; background:rgba(40,56,74,.88); color:#fff; font-size:10.5px; font-weight:700; border-radius:7px; padding:2px 7px; z-index:1; }
+        .off-mid { flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; }
+        .off-title { font-family:'Geist',sans-serif; font-weight:800; font-size:15.5px; color:var(--wl-ink); text-decoration:none; }
+        .off-meta { font-size:13px; font-weight:600; color:var(--wl-muted); }
+        .off-act { flex-shrink:0; display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 20px; border-radius:12px; font-family:'Geist',sans-serif; font-weight:800; font-size:14px; text-decoration:none; }
+        .off-dl { background:var(--wl-surface); border:1.5px solid #9FD8CB; color:#0F7A68; }
+        .off-online { background:{{ $isDark ? 'rgba(255,255,255,.04)' : '#F4F5F7' }}; border:1.5px solid var(--wl-line-2); color:var(--wl-muted); cursor:default; }
+        @media (max-width:760px) {
+            .off-thumb { width:92px; height:56px; }
+            .off-act { padding:0 14px; min-height:40px; }
+            .off-act span.lbl { display:none; }
+        }
+    </style>
 
-        @foreach ($tree as $grp)
-            @php($sub = $grp['subject'])
-            <div style="border:1px solid var(--wl-line);border-radius:12px;margin-top:12px;overflow:hidden">
-                <div style="padding:14px;font-weight:800;color:var(--wl-ink);background:var(--wl-surface)">{{ $sub->displayName() }}</div>
-                @foreach ($grp['chapters'] as $c)
-                    @php($chapter = $c['chapter'])
-                    @php($videos = isset($c['videos']) ? $c['videos'] : [])
-                    @php($materials = isset($c['materials']) ? $c['materials'] : [])
-                    <div style="padding:10px 14px;border-top:1px solid var(--wl-line)">
-                        <div style="font-weight:700;color:var(--wl-ink)">Bab {{ $chapter->number }}: {{ $chapter->title }}</div>
-                        @foreach ($videos as $lesson)
-                            <div style="font-size:13px;color:var(--wl-muted);padding:3px 0">VID: {{ $lesson->title }}</div>
-                        @endforeach
-                        @foreach ($materials as $material)
-                            <div style="font-size:13px;color:var(--wl-muted);padding:3px 0">MAT: {{ $material->title }} · {{ $material->humanSize() }}</div>
+    <div class="off-wrap">
+        <div class="off-head">
+            <span class="off-htile"><x-icon name="download" style="width:28px;height:28px" /></span>
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+                <h1 style="margin:0;font-family:'Geist',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.01em;color:var(--wl-ink)">{{ __('Simpanan Offline') }}</h1>
+                <p style="margin:0;max-width:72ch;font-size:14.5px;font-weight:600;color:var(--wl-muted);line-height:1.5">{{ __('Video dan bahan pembelajaran yang dimuat naik oleh guru untuk ditonton atau dimuat turun.') }}</p>
+            </div>
+        </div>
+
+        <x-year-subject-filter variant="student" :all-years="false" with-chapter
+            :action="route('simpanan.index')" :grades="$grades" :subjects="$subjects" :filter="$filter" />
+
+        @if (empty($tree))
+            <div style="background:var(--wl-surface);border:1px dashed var(--wl-line-3);border-radius:22px;padding:56px;text-align:center">
+                <h3 style="margin:0;font-family:'Geist',sans-serif;font-size:19px;font-weight:800;color:var(--wl-ink)">{{ __('Tiada kandungan untuk Tahun ini lagi.') }}</h3>
+            </div>
+        @else
+            @foreach ($tree as $grp)
+                @php($subjectFirst = $loop->first)
+                @php($sub = $grp['subject'])
+                @php($col = $sub->color ?: '#17907B')
+                <div class="off-sub" x-data="{ open: {{ $subjectFirst ? 'true' : 'false' }} }">
+                    <div class="off-sbar" style="background:color-mix(in oklab, {{ $col }} 13%, var(--wl-surface))" @click="open = !open">
+                        <span class="off-stile" style="background:color-mix(in oklab, {{ $col }} var(--pill-bw), var(--pill-bb));color:color-mix(in oklab, {{ $col }} var(--pill-fw), var(--pill-fb))"><x-subject-icon :subject="$sub" :size="22" /></span>
+                        <span class="off-sname">{{ $sub->displayName() }}</span>
+                        <span class="off-scount">{{ $grp['vcount'] ?? 0 }} {{ __('video') }} · {{ $grp['mcount'] ?? 0 }} {{ __('bahan') }}</span>
+                        <span class="off-chev" :style="open ? 'transform:rotate(180deg)' : ''"><x-icon name="chevron-down" class="h-5 w-5" /></span>
+                    </div>
+                    <div class="off-sbody" x-show="open">
+                        @foreach ($grp['chapters'] as $c)
+                            @php($chapterFirst = $loop->first)
+                            @php($chapter = $c['chapter'])
+                            @php($videos = isset($c['videos']) ? $c['videos'] : [])
+                            @php($materials = isset($c['materials']) ? $c['materials'] : [])
+                            <div class="off-bab" x-data="{ bopen: {{ $subjectFirst && $chapterFirst ? 'true' : 'false' }} }">
+                                <div class="off-bbar" style="background:color-mix(in oklab, {{ $col }} 9%, var(--wl-surface))" @click="bopen = !bopen">
+                                    <span class="off-btile" style="background:color-mix(in oklab, {{ $col }} var(--pill-bw), var(--pill-bb));color:color-mix(in oklab, {{ $col }} var(--pill-fw), var(--pill-fb))"><x-icon name="briefcase" class="h-[18px] w-[18px]" /></span>
+                                    <span class="off-bname">{{ __('Bab') }} {{ $chapter->number }} — {{ $chapter->title }}</span>
+                                    <span class="off-bcount">{{ count($videos) }} {{ __('video') }} · {{ count($materials) }} {{ __('bahan') }}</span>
+                                    <span class="off-chev" :style="bopen ? 'transform:rotate(180deg)' : ''"><x-icon name="chevron-down" class="h-5 w-5" /></span>
+                                </div>
+                                <div class="off-brows" x-show="bopen">
+                                    @foreach ($videos as $lesson)
+                                        <div class="off-row">
+                                            <a href="{{ route('video.show', $lesson) }}" class="off-thumb" style="background:color-mix(in oklab, {{ $col }} 18%, #fff)">
+                                                @if ($lesson->thumbnailUrl())
+                                                    <img src="{{ $lesson->thumbnailUrl() }}" alt="" loading="lazy">
+                                                @else
+                                                    <x-subject-icon :subject="$sub" :size="28" />
+                                                @endif
+                                                @if ($lesson->durationLabel())
+                                                    <span class="off-dur">{{ $lesson->durationLabel() }}</span>
+                                                @endif
+                                            </a>
+                                            <div class="off-mid">
+                                                <a href="{{ route('video.show', $lesson) }}" class="off-title">{{ $lesson->title }}</a>
+                                                <span class="off-meta">{{ __('Video') }}@if ($lesson->durationLabel()) · {{ $lesson->durationLabel() }}@endif</span>
+                                            </div>
+                                            @if ($lesson->isUpload())
+                                                <a href="{{ route('muat-turun.video', $lesson) }}" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
+                                            @else
+                                                <span class="off-act off-online"><x-icon name="lock" style="width:16px;height:16px" /><span class="lbl">{{ __('Dalam talian sahaja') }}</span></span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                    @foreach ($materials as $material)
+                                        <div class="off-row">
+                                            <span class="off-thumb" style="background:{{ $isDark ? 'rgba(224,86,78,.14)' : '#FDECEA' }};color:#E0564E"><x-icon :name="$material->iconName()" style="width:30px;height:30px" /></span>
+                                            <div class="off-mid">
+                                                <span class="off-title">{{ $material->title }}</span>
+                                                <span class="off-meta">{{ __('Bahan sokongan') }} · {{ $material->humanSize() }}</span>
+                                            </div>
+                                            <a href="{{ route('muat-turun.bahan', $material) }}" class="off-act off-dl"><x-icon name="download" style="width:17px;height:17px" /><span class="lbl">{{ __('Muat Turun') }}</span></a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
                     </div>
-                @endforeach
-            </div>
-        @endforeach
+                </div>
+            @endforeach
+        @endif
     </div>
 </x-student-layout>
