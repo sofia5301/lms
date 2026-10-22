@@ -1,7 +1,7 @@
 <x-student-layout :title="app()->getLocale() === 'en' ? 'Leaderboard' : 'Kedudukan'">
     <style>
         /* Top-3 podium. Rank colours are passed per card as --c-* custom properties. */
-        .lb-podium-wrap { position: relative; width: 100%; max-width: 720px; margin: 4px auto 0; }
+        .lb-podium-wrap { position: relative; width: 100%; max-width: 880px; margin: 4px auto 0; }
         .lb-podium { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1.12fr 1fr; gap: clamp(16px, 2.6vw, 38px); align-items: end; }
 
         /* Cream podium steps peeking out beneath the cards. */
