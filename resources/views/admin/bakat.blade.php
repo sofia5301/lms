@@ -55,7 +55,7 @@
         {{-- ============================ Teacher stats ============================ --}}
         <div style="display:flex;flex-direction:column;gap:12px">
             <h2 style="margin:0;font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--tp-ink)">{{ __('Cikgu') }}</h2>
-            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:22px">
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:38px">
                 <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:18px;padding:18px 22px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
                     <span style="position:relative;z-index:1;width:60px;height:60px;border-radius:50%;background:#E4EEF9;color:#2E6CA8;display:grid;place-items:center;flex-shrink:0"><x-icon name="users" class="h-7 w-7" /></span>
                     <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:3px;min-width:0">
