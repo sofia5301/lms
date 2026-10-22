@@ -7,7 +7,7 @@
 
     <style>
         .pu-wrap [x-cloak] { display:none !important; }
-        .pu-grid { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:22px; align-items:start; max-width:1240px; }
+        .pu-grid { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:22px; align-items:start; max-width:1560px; }
         @media (max-width:1040px) { .pu-grid { grid-template-columns:1fr; } }
 
         .pu-form { background:var(--tp-surface); border:1px solid var(--tp-line); border-radius:20px; padding:28px; display:flex; flex-direction:column; gap:30px; box-shadow:0 2px 10px rgba(46,44,80,.04); }
@@ -51,7 +51,7 @@
         .pu-guidehero img { width:100%; height:100%; object-fit:cover; display:block; }
     </style>
 
-    <div class="pu-wrap" style="max-width:1240px;margin-left:auto;margin-right:auto;width:100%">
+    <div class="pu-wrap" style="max-width:1560px;margin-left:auto;margin-right:auto;width:100%">
         <a href="{{ route('admin.pengguna') }}" class="tp-btn-outline"
            style="align-self:flex-start;min-height:40px;border-radius:11px;font-size:13px;padding:0 14px;border-width:1.5px;margin-bottom:16px;display:inline-flex;align-items:center;gap:6px"><x-icon name="arrow-left" class="h-4 w-4" /> {{ __('Semua pengguna') }}</a>
 
