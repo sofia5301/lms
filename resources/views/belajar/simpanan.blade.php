@@ -53,8 +53,8 @@
         .off-head { display:flex; align-items:flex-start; gap:16px; }
         .off-htile { width:54px; height:54px; border-radius:15px; background:{{ $isDark ? 'rgba(23,144,123,.2)' : '#DCF2EE' }}; color:#0F7A68; display:grid; place-items:center; flex-shrink:0; }
         .off-sub { border:1px solid var(--wl-line); border-radius:18px; overflow:hidden; box-shadow:0 3px 12px rgba(46,44,80,.04); }
-        .off-sbar { display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer; user-select:none; }
-        .off-stile { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; flex-shrink:0; }
+        .off-sbar { display:flex; align-items:center; gap:13px; padding:10px 18px; cursor:pointer; user-select:none; }
+        .off-stile { width:38px; height:38px; border-radius:11px; display:grid; place-items:center; flex-shrink:0; }
         .off-sname { font-family:'Geist',sans-serif; font-size:18px; font-weight:800; color:var(--wl-ink); }
         .off-scount { font-size:13px; font-weight:700; color:var(--wl-muted); }
         .off-chev { margin-left:auto; color:var(--wl-muted); display:inline-flex; transition:transform .18s; }
