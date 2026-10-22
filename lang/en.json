@@ -1545,5 +1545,18 @@
     "Tidak sama dengan kata laluan sebelumnya": "Different from your previous password",
     "Masukkan kata laluan semasa": "Enter your current password",
     "Masukkan kata laluan baharu": "Enter a new password",
-    "Masukkan semula kata laluan baharu": "Re-enter the new password"
+    "Masukkan semula kata laluan baharu": "Re-enter the new password",
+    "Pilih jenis pengguna yang ingin didaftarkan.": "Choose the type of user to register.",
+    "Akaun untuk guru yang mengajar di sekolah.": "An account for a teacher at the school.",
+    "Akaun untuk pelajar di sekolah.": "An account for a student at the school.",
+    "Masukkan maklumat pengguna dengan lengkap.": "Fill in the user details completely.",
+    "Masukkan nama penuh": "Enter full name",
+    "Masukkan nama pengguna": "Enter username",
+    "Masukkan nombor telefon": "Enter phone number",
+    "Masukkan jawatan": "Enter position",
+    "Pilih semua subjek yang berkaitan. (untuk cikgu)": "Select all relevant subjects. (for teachers)",
+    "Tambah pengguna baharu": "Add a new user",
+    "Sunting pengguna": "Edit user",
+    "Cipta akaun untuk cikgu atau murid supaya mereka boleh mengakses kandungan pembelajaran di WeLearn.": "Create an account for a teacher or student so they can access learning content on WeLearn.",
+    "Pengguna boleh log masuk ke sistem selepas akaun dicipta.": "The user can sign in to the system once the account is created."
 }
