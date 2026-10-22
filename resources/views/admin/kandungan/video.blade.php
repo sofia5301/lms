@@ -1,9 +1,9 @@
 @php
     $cols = 'grid-template-columns:minmax(0,2.2fr) 1.4fr .8fr .6fr 1fr .9fr .7fr;gap:12px;align-items:center';
     $stats = [
-        ['icon' => 'video',   'label' => __('Jumlah video'),      'value' => $totalCount],
-        ['icon' => 'youtube', 'label' => __('Video YouTube'),     'value' => $youtubeCount],
-        ['icon' => 'upload',  'label' => __('Video dimuat naik'), 'value' => $uploadCount],
+        ['icon' => 'video',   'label' => __('Jumlah video'),      'value' => $totalCount,   'trend' => $totalTrend,   'tint' => '#DCF2EE', 'fg' => '#0F7A68'],
+        ['icon' => 'youtube', 'label' => __('Video YouTube'),     'value' => $youtubeCount, 'trend' => $youtubeTrend, 'tint' => '#FBE4E4', 'fg' => '#D23B4E'],
+        ['icon' => 'upload',  'label' => __('Video dimuat naik'), 'value' => $uploadCount,  'trend' => $uploadTrend,  'tint' => '#E4EEF9', 'fg' => '#2E6CA8'],
     ];
 @endphp
 
@@ -22,12 +22,17 @@
 
         @include('admin.kandungan._tabs', ['active' => 'video'])
 
-        {{-- Stats --}}
+        {{-- Stats: tinted icon circle + value + month-over-month trend, with a large faded circle. --}}
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
             @foreach ($stats as $s)
-                <div style="background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
-                    <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:var(--tp-muted)"><x-icon :name="$s['icon']" class="h-4 w-4" />{{ $s['label'] }}</span>
-                    <span style="font-family:'Geist',sans-serif;font-size:28px;font-weight:800;color:var(--tp-ink)">{{ number_format($s['value']) }}</span>
+                <div style="position:relative;overflow:hidden;background:var(--tp-surface);border:1px solid var(--tp-line);border-radius:18px;padding:18px 22px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(46,44,80,.04)">
+                    <span style="position:relative;z-index:1;width:60px;height:60px;border-radius:50%;background:{{ $s['tint'] }};color:{{ $s['fg'] }};display:grid;place-items:center;flex-shrink:0"><x-icon :name="$s['icon']" class="h-7 w-7" /></span>
+                    <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:3px;min-width:0">
+                        <span style="font-size:13.5px;font-weight:700;color:var(--tp-muted)">{{ $s['label'] }}</span>
+                        <span style="font-family:'Geist',sans-serif;font-size:28px;font-weight:800;color:var(--tp-ink);line-height:1">{{ number_format($s['value']) }}</span>
+                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:#17907B;margin-top:3px"><x-icon name="arrow-up" style="width:13px;height:13px" />+{{ number_format($s['trend']) }} {{ __('berbanding bulan lepas') }}</span>
+                    </div>
+                    <span style="position:absolute;right:-14px;top:50%;transform:translateY(-50%);width:86px;height:86px;border-radius:50%;background:{{ $s['tint'] }};opacity:.5;display:grid;place-items:center;color:{{ $s['fg'] }};z-index:0;pointer-events:none"><x-icon :name="$s['icon']" style="width:40px;height:40px" /></span>
                 </div>
             @endforeach
         </div>

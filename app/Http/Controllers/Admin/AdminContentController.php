@@ -44,12 +44,23 @@ class AdminContentController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        // Month-over-month trend: videos added in the last 30 days (subject/school filter honoured,
+        // date preset ignored so the number is always "new this month"), per source.
+        $monthAgo = now()->subDays(30);
+        $newSince = fn (?string $source = null): int => $this->narrow($filter->apply(SchoolScope::content(Lesson::query())), $search, null, null)
+            ->when($source, fn (Builder $q) => $q->where('source', $source))
+            ->where('lessons.created_at', '>=', $monthAgo)
+            ->count();
+
         return view('admin.kandungan.video', [
             'lessons' => $lessons,
             // Counts follow the filter, so the cards always describe the rows on screen.
             'totalCount' => $filtered()->count(),
             'youtubeCount' => $filtered()->where('source', Lesson::SOURCE_YOUTUBE)->count(),
             'uploadCount' => $filtered()->where('source', Lesson::SOURCE_UPLOAD)->count(),
+            'totalTrend' => $newSince(),
+            'youtubeTrend' => $newSince(Lesson::SOURCE_YOUTUBE),
+            'uploadTrend' => $newSince(Lesson::SOURCE_UPLOAD),
             'subjects' => Subject::orderBy('sort_order')->get(),
             'grades' => Grade::orderBy('level')->get(),
             'filter' => $filter,
