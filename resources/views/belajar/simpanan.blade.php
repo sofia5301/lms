@@ -110,9 +110,10 @@
             <div style="background:#FDE7E0;border:1px solid #E0564E;border-radius:12px;padding:14px 18px;font-size:13px;font-weight:700;color:#8A2A1C;word-break:break-word">DEBUG: {{ $treeError }}</div>
         @endif
 
-        {{-- Dependent Tahun -> Subjek -> Bab filter. --}}
-        <x-year-subject-filter variant="student" :all-years="false" with-chapter
-            :action="route('simpanan.index')" :grades="$grades" :subjects="$subjects" :filter="$filter" />
+        {{-- Dependent Tahun -> Subjek -> Bab filter. (temporarily disabled for debugging) --}}
+        {{-- <x-year-subject-filter variant="student" :all-years="false" with-chapter
+            :action="route('simpanan.index')" :grades="$grades" :subjects="$subjects" :filter="$filter" /> --}}
+        <div style="background:#FEF0CE;border-radius:12px;padding:10px 16px;font-size:12px;font-weight:700;color:#8A6A12">DEBUG: filter hidden · subjects in tree: {{ count($tree) }}</div>
 
         @if (empty($tree))
             <div style="background:var(--wl-surface);border:1px dashed var(--wl-line-3);border-radius:22px;padding:56px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
