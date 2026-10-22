@@ -1536,5 +1536,14 @@
     "ditonton": "watched",
     "Cari dalam senarai ini...": "Search this list...",
     "Kembali ke Utama": "Back to Home",
-    "Siaran Langsung": "Live Now"
+    "Siaran Langsung": "Live Now",
+    "Maklumat akaun pentadbir anda.": "Your administrator account details.",
+    "Tetapkan kata laluan baharu anda untuk keselamatan akaun.": "Set a new password to keep your account secure.",
+    "Syarat kata laluan": "Password requirements",
+    "Sekurang-kurangnya 8 aksara": "At least 8 characters",
+    "Mengandungi huruf besar, huruf kecil, nombor dan simbol": "Includes uppercase, lowercase, a number and a symbol",
+    "Tidak sama dengan kata laluan sebelumnya": "Different from your previous password",
+    "Masukkan kata laluan semasa": "Enter your current password",
+    "Masukkan kata laluan baharu": "Enter a new password",
+    "Masukkan semula kata laluan baharu": "Re-enter the new password"
 }
