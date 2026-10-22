@@ -4,6 +4,8 @@
         // Merge the uploaded lessons and supporting materials into one Subject -> Bab tree, so a
         // chapter shows its videos and its materials together.
         $tree = [];
+        $treeError = null;
+        try {
         foreach ($lessons as $l) {
             $chapter = $l->chapter;
             $subject = $chapter?->subject;
@@ -33,6 +35,10 @@
         uksort($tree, fn ($a, $b) => ($order[$a] ?? 999) <=> ($order[$b] ?? 999));
         foreach (array_keys($tree) as $sid) {
             uasort($tree[$sid]['chapters'], fn ($a, $b) => ($a['number'] ?? 0) <=> ($b['number'] ?? 0));
+        }
+        } catch (\Throwable $e) {
+            $treeError = $e->getMessage().'  @  '.basename($e->getFile()).':'.$e->getLine();
+            $tree = [];
         }
     @endphp
 
@@ -91,6 +97,10 @@
                 <p style="margin:0;max-width:72ch;font-size:14.5px;font-weight:600;color:var(--wl-muted);line-height:1.5">{{ __('Video dan bahan pembelajaran yang dimuat naik oleh guru untuk ditonton atau dimuat turun.') }}</p>
             </div>
         </div>
+
+        @if ($treeError)
+            <div style="background:#FDE7E0;border:1px solid #E0564E;border-radius:12px;padding:14px 18px;font-size:13px;font-weight:700;color:#8A2A1C;word-break:break-word">DEBUG: {{ $treeError }}</div>
+        @endif
 
         {{-- Dependent Tahun -> Subjek -> Bab filter. --}}
         <x-year-subject-filter variant="student" :all-years="false" with-chapter
