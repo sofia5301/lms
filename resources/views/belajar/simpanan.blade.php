@@ -1,4 +1,12 @@
 <x-student-layout :title="__('Simpanan Offline')">
+    @php($isDark = ($theme ?? 'light') === 'dark')
+    <style>
+        .off-probe { color:{{ $isDark ? '#fff' : '#000' }}; background:{{ $isDark ? 'rgba(23,144,123,.2)' : '#DCF2EE' }}; }
+        .off-probe2 { background:{{ $isDark ? 'rgba(255,255,255,.02)' : '#FAFBFC' }}; }
+        @media (max-width:760px) {
+            .off-probe { font-size:14px; }
+        }
+    </style>
     @php
         $tree = [];
         foreach ($lessons as $l) {
@@ -27,7 +35,7 @@
     @endphp
 
     <div style="padding:20px;max-width:1000px;margin:0 auto">
-        <h1 style="font-family:'Geist',sans-serif;font-weight:800;color:var(--wl-ink)">VERSION 12 — testing icons + row methods</h1>
+        <h1 style="font-family:'Geist',sans-serif;font-weight:800;color:var(--wl-ink)">VERSION 13 — testing style + isDark</h1>
 
         @foreach ($tree as $grp)
             @php($sub = $grp['subject'])
