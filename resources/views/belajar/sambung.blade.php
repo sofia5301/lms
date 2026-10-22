@@ -3,7 +3,7 @@
     @php($user = auth()->user())
 
     <style>
-        .sm-wrap { display:flex; flex-direction:column; gap:22px; max-width:1240px; width:100%; margin:0 auto; }
+        .sm-wrap { display:flex; flex-direction:column; gap:22px; width:100%; }
         .sm-head { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
         .sm-htile { width:50px; height:50px; border-radius:14px; background:{{ $isDark ? 'rgba(23,144,123,.22)' : '#17907B' }}; color:#fff; display:grid; place-items:center; flex-shrink:0; }
         .sm-htxt { display:flex; flex-direction:column; gap:2px; min-width:0; }
